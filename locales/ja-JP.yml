@@ -1041,8 +1041,8 @@ thisChannelArchived: "このチャンネルはアーカイブされています�
 displayOfNote: "ノートの表示"
 initialAccountSetting: "初期設定"
 youFollowing: "フォロー中"
-preventAiLearning: "生成AIによる学習を拒否"
-preventAiLearningDescription: "外部の文章生成AIや画像生成AIに対して、投稿したノートや画像などのコンテンツを学習の対象にしないように要求します。これはnoaiフラグをHTMLレスポンスに含めることによって実現されますが、この要求に従うかはそのAI次第であるため、学習を完全に防止するものではありません。"
+preventAiLearning: "NoAIをレスポンスに付加"
+preventAiLearningDescription: "HTMLレスポンスにnoaiフラグを付加します。これにより生成AIの学習セットに含めないよう収集ボットに要求することができます。しかし、noaiフラグはレスポンスを受け取った相手の解釈によるものであり、この要求を完全に無視することができることに留意してください。"
 options: "オプション"
 specifyUser: "ユーザー指定"
 
