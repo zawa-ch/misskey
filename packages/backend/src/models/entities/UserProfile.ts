@@ -148,7 +148,7 @@ export class UserProfile {
 	public noCrawle: boolean;
 
 	@Column('boolean', {
-		default: true,
+		default: false,
 	})
 	public preventAiLearning: boolean;
 
