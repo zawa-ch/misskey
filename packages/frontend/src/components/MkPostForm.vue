@@ -243,7 +243,7 @@ const textLength = $computed((): number => {
 });
 
 const maxTextLength = $computed((): number => {
-	return instance ? instance.maxNoteTextLength : 1000;
+	return $i ? $i.policies.noteLengthLimit : (instance ? instance.maxNoteTextLength : 1000);
 });
 
 const canPost = $computed((): boolean => {

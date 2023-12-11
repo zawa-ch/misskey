@@ -1575,6 +1575,8 @@ _role:
   _options:
     gtlAvailable: "グローバルタイムラインの閲覧"
     ltlAvailable: "ローカルタイムラインの閲覧"
+    canPostNote: "投稿の許可"
+    noteLengthLimit: "投稿の最大文字数"
     canPublicNote: "パブリック投稿の許可"
     canInvite: "サーバー招待コードの発行"
     inviteLimit: "招待コードの作成可能数"

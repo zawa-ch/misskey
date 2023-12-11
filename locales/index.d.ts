@@ -1666,6 +1666,8 @@ export interface Locale {
         "_options": {
             "gtlAvailable": string;
             "ltlAvailable": string;
+            "canPostNote": string;
+            "noteLengthLimit": string;
             "canPublicNote": string;
             "canInvite": string;
             "inviteLimit": string;

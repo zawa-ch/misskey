@@ -601,6 +601,158 @@ describe('Note', () => {
 			assert.strictEqual(note2.status, 200);
 			assert.strictEqual(note2.body.createdNote.visibility, 'home');
 		});
+
+		test('ロールで禁止されている場合投稿できない', async () => {
+			const res = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canPostNote: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(res.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: alice.id,
+				roleId: res.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const post = {
+				text: 'test',
+			};
+			const postNote = await api('/notes/create', post, alice);
+
+			assert.strictEqual(postNote.status, 400);
+			assert.strictEqual(postNote.body.error.code, 'RESTRICTED_BY_ROLE');
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: res.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: res.body.id,
+			}, alice);
+		});
+
+		test('ロールの文字数制限ギリギリは怒られない', async () => {
+			const res = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					noteLengthLimit: {
+						useDefault: false,
+						priority: 0,
+						value: 140,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(res.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: alice.id,
+				roleId: res.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const post = {
+				text: '!'.repeat(140),
+			};
+			const postNote = await api('/notes/create', post, alice);
+
+			assert.strictEqual(postNote.status, 200);
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: res.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: res.body.id,
+			}, alice);
+		});
+
+		test('ロールの文字数制限オーバーで怒られる', async () => {
+			const res = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					noteLengthLimit: {
+						useDefault: false,
+						priority: 0,
+						value: 140,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(res.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: alice.id,
+				roleId: res.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const post = {
+				text: '!'.repeat(141),
+			};
+			const postNote = await api('/notes/create', post, alice);
+
+			assert.strictEqual(postNote.status, 400);
+			assert.strictEqual(postNote.body.error.code, 'NOTE_TOO_LONG_BY_ROLE_LIMIT');
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: res.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: res.body.id,
+			}, alice);
+		});
 	});
 
 	describe('notes/delete', () => {

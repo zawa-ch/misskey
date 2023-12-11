@@ -17,6 +17,7 @@ import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { NoteCreateService } from '@/core/NoteCreateService.js';
 import { DI } from '@/di-symbols.js';
 import { isPureRenote } from '@/misc/is-pure-renote.js';
+import { RoleService } from '@/core/RoleService.js';
 import { ApiError } from '../../error.js';
 
 export const meta = {
@@ -111,6 +112,18 @@ export const meta = {
 			code: 'CANNOT_RENOTE_OUTSIDE_OF_CHANNEL',
 			id: '33510210-8452-094c-6227-4a6c05d99f00',
 		},
+
+		restrictedByRole: {
+			message: 'This feature is restricted by your role.',
+			code: 'RESTRICTED_BY_ROLE',
+			id: '8feff0ba-5ab5-585b-31f4-4df816663fad',
+		},
+
+		tooLong: {
+			message: 'Cannot post notes longer than your role limit.',
+			code: 'NOTE_TOO_LONG_BY_ROLE_LIMIT',
+			id: '8c148117-4d13-4ada-8cf3-4d6286a2bf03',
+		},
 	},
 } as const;
 
@@ -201,6 +214,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 		private noteEntityService: NoteEntityService,
 		private noteCreateService: NoteCreateService,
+		private roleService: RoleService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			let visibleUsers: MiUser[] = [];
@@ -208,6 +222,15 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				visibleUsers = await this.usersRepository.findBy({
 					id: In(ps.visibleUserIds),
 				});
+			}
+
+			// TODO: コール回数多いAPIのためキャッシュする
+			const policies = (await this.roleService.getUserPolicies(me.id));
+			if (!policies.canPostNote) {
+				throw new ApiError(meta.errors.restrictedByRole);
+			}
+			if (ps.text && ps.text.length > policies.noteLengthLimit) {
+				throw new ApiError(meta.errors.tooLong);
 			}
 
 			let files: MiDriveFile[] = [];

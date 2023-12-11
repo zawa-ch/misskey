@@ -1564,6 +1564,8 @@ _role:
   _options:
     gtlAvailable: "Can view the global timeline"
     ltlAvailable: "Can view the local timeline"
+    canPostNote: "Can send notes"
+    noteLengthLimit: "Maximum length of notes"
     canPublicNote: "Can send public notes"
     canInvite: "Can create instance invite codes"
     inviteLimit: "Invite limit"
