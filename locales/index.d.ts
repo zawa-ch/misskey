@@ -789,6 +789,7 @@ export interface Locale {
     "quitFullView": string;
     "addDescription": string;
     "userPagePinTip": string;
+    "textLengthReachUpstreamHardLimitWarning": string;
     "notSpecifiedMentionWarning": string;
     "info": string;
     "userInfo": string;
