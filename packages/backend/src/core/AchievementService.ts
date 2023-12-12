@@ -87,6 +87,7 @@ export const ACHIEVEMENT_TYPES = [
 	'brainDiver',
 	'smashTestNotificationButton',
 	'tutorialCompleted',
+	'mfaEnabled',
 ] as const;
 
 @Injectable()

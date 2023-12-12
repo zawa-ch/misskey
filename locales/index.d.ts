@@ -1626,6 +1626,10 @@ export interface Locale {
                 "title": string;
                 "description": string;
             };
+            "_mfaEnabled": {
+                "title": string;
+                "description": string;
+            };
         };
     };
     "_role": {

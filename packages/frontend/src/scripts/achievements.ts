@@ -83,6 +83,7 @@ export const ACHIEVEMENT_TYPES = [
 	'brainDiver',
 	'smashTestNotificationButton',
 	'tutorialCompleted',
+	'mfaEnabled',
 ] as const;
 
 export const ACHIEVEMENT_BADGES = {
@@ -465,6 +466,11 @@ export const ACHIEVEMENT_BADGES = {
 		img: '/fluent-emoji/1f393.png',
 		bg: 'linear-gradient(0deg, rgb(220 223 225), rgb(172 192 207))',
 		frame: 'bronze',
+	},
+	'mfaEnabled': {
+		img: '/fluent-emoji/1f6e1-fe0f.png',
+		bg: 'linear-gradient(0deg, rgb(144, 224, 255), rgb(255, 168, 252))',
+		frame: 'silver',
 	},
 /* @see <https://github.com/misskey-dev/misskey/pull/10365#discussion_r1155511107>
 } as const satisfies Record<typeof ACHIEVEMENT_TYPES[number], {

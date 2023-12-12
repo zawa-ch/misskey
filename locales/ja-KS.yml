@@ -1470,6 +1470,9 @@ _achievements:
     _smashTestNotificationButton:
       title: "テスト過剰"
       description: "通知テストをごく短時間のうちに連続して行ったねん"
+    _mfaEnabled:
+      title: "これで怖いもんなしや、知らんけど"
+      description: "二要素認証を有効化した"
 _role:
   new: "ロールの作成"
   edit: "ロールの編集"

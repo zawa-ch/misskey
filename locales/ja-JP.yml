@@ -1537,6 +1537,9 @@ _achievements:
     _tutorialCompleted:
       title: "Misskey初心者講座 修了証"
       description: "チュートリアルを完了した"
+    _mfaEnabled:
+      title: "これでなにも怖くない？"
+      description: "二要素認証を有効化した"
 
 _role:
   new: "ロールの作成"

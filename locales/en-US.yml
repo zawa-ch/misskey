@@ -1527,6 +1527,9 @@ _achievements:
     _tutorialCompleted:
       title: "Misskey Elementary Course Diploma"
       description: "Tutorial completed"
+    _mfaEnabled:
+      title: "Nothing to be afraid of now?"
+      description: "Enable Two-factor Authentication"
 _role:
   new: "New role"
   edit: "Edit role"
