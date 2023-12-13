@@ -485,6 +485,7 @@ export interface Locale {
     "native": string;
     "disableDrawer": string;
     "showNoteActionsOnlyHover": string;
+    "overflowLongNotes": string;
     "noHistory": string;
     "signinHistory": string;
     "enableAdvancedMfm": string;

@@ -322,6 +322,10 @@ export const defaultStore = markRaw(new Storage('base', {
 		where: 'device',
 		default: false,
 	},
+	overflowLongNotes: {
+		where: 'device',
+		default: false,
+	},
 	showClipButtonInNoteFooter: {
 		where: 'device',
 		default: false,
