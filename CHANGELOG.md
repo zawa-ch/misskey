@@ -12,7 +12,7 @@
 
 -->
 
-## 2023.11.1-geoplanetary.1.1
+## 2023.11.1-geoplanetary.2
 
 ### General
 - Enhance: 投稿できる最大の文字数を65536文字に引き上げ
