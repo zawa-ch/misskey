@@ -172,6 +172,10 @@ export async function mainBoot() {
 			claimAchievement('passedSinceAccountCreated3');
 		}
 
+		if ($i.twoFactorEnabled) {
+			claimAchievement('mfaEnabled');
+		}
+
 		if (claimedAchievements.length >= 30) {
 			claimAchievement('collectAchievements30');
 		}

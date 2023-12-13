@@ -6,6 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In } from 'typeorm';
+import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import type { MiRole, MiRoleAssignment, RoleAssignmentsRepository, RolesRepository, UsersRepository } from '@/models/_.js';
 import { MemoryKVCache, MemorySingleCache } from '@/misc/cache.js';
 import type { MiUser } from '@/models/User.js';
@@ -26,6 +27,8 @@ import type { OnApplicationShutdown } from '@nestjs/common';
 export type RolePolicies = {
 	gtlAvailable: boolean;
 	ltlAvailable: boolean;
+	canPostNote: boolean;
+	noteLengthLimit: number;
 	canPublicNote: boolean;
 	canInvite: boolean;
 	inviteLimit: number;
@@ -52,6 +55,8 @@ export type RolePolicies = {
 export const DEFAULT_POLICIES: RolePolicies = {
 	gtlAvailable: true,
 	ltlAvailable: true,
+	canPostNote: true,
+	noteLengthLimit: MAX_NOTE_TEXT_LENGTH,
 	canPublicNote: true,
 	canInvite: false,
 	inviteLimit: 0,
@@ -302,6 +307,8 @@ export class RoleService implements OnApplicationShutdown {
 		return {
 			gtlAvailable: calc('gtlAvailable', vs => vs.some(v => v === true)),
 			ltlAvailable: calc('ltlAvailable', vs => vs.some(v => v === true)),
+			canPostNote: calc('canPostNote', vs => vs.some(v => v === true)),
+			noteLengthLimit: calc('noteLengthLimit', vs => Math.max(...vs)),
 			canPublicNote: calc('canPublicNote', vs => vs.some(v => v === true)),
 			canInvite: calc('canInvite', vs => vs.some(v => v === true)),
 			inviteLimit: calc('inviteLimit', vs => Math.max(...vs)),

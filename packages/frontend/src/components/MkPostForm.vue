@@ -19,6 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</button>
 		</div>
 		<div :class="$style.headerRight">
+			<span v-if="defaultStore.state.postformRemainCharacterDisplay === 'counterLegacy'" :class="[$style.textCountLegacy, { [$style.textOver]: textLength > maxTextLength }]">{{ maxTextLength - textLength }}</span>
 			<template v-if="!(channel != null && fixed)">
 				<button v-if="channel == null" ref="visibilityButton" v-click-anime v-tooltip="i18n.ts.visibility" :class="['_button', $style.headerRightItem, $style.visibility]" @click="setVisibility">
 					<span v-if="visibility === 'public'"><i class="ti ti-world"></i></span>
@@ -64,12 +65,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<button class="_buttonPrimary" style="padding: 4px; border-radius: 8px;" @click="addVisibleUser"><i class="ti ti-plus ti-fw"></i></button>
 		</div>
 	</div>
+	<MkInfo v-if="!localOnly && 8192 < textLength" warn :class="$style.textLengthReachUpstreamHardLimit">{{ i18n.ts.textLengthReachUpstreamHardLimitWarning }}</MkInfo>
 	<MkInfo v-if="hasNotSpecifiedMentions" warn :class="$style.hasNotSpecifiedMentions">{{ i18n.ts.notSpecifiedMentionWarning }} - <button class="_textButton" @click="addMissingMention()">{{ i18n.ts.add }}</button></MkInfo>
 	<input v-show="useCw" ref="cwInputEl" v-model="cw" :class="$style.cw" :placeholder="i18n.ts.annotation" @keydown="onKeydown">
 	<div :class="[$style.textOuter, { [$style.withCw]: useCw }]">
 		<textarea ref="textareaEl" v-model="text" :class="[$style.text]" :disabled="posting || posted" :placeholder="placeholder" data-cy-post-form-text @keydown="onKeydown" @paste="onPaste" @compositionupdate="onCompositionUpdate" @compositionend="onCompositionEnd"/>
-		<div v-if="maxTextLength - textLength < 100" :class="['_acrylic', $style.textCount, { [$style.textOver]: textLength > maxTextLength }]">{{ maxTextLength - textLength }}</div>
+		<div v-if="defaultStore.state.postformRemainCharacterDisplay === 'counter' && maxTextLength - textLength < 100" :class="['_acrylic', $style.textCount, { [$style.textOver]: textLength > maxTextLength }]">{{ maxTextLength - textLength }}</div>
 	</div>
+	<MkMeter v-if="defaultStore.state.postformRemainCharacterDisplay === 'meter'" :value="textLength" :denominator="maxTextLength" :mode="'fraction'"/>
 	<input v-show="withHashtags" ref="hashtagsInputEl" v-model="hashtags" :class="$style.hashtags" :placeholder="i18n.ts.hashtags" list="hashtags">
 	<XPostFormAttaches v-model="files" @detach="detachFile" @changeSensitive="updateFileSensitive" @changeName="updateFileName" @replaceFile="replaceFile"/>
 	<MkPollEditor v-if="poll" v-model="poll" @destroyed="poll = null"/>
@@ -107,6 +110,7 @@ import MkNoteSimple from '@/components/MkNoteSimple.vue';
 import MkNotePreview from '@/components/MkNotePreview.vue';
 import XPostFormAttaches from '@/components/MkPostFormAttaches.vue';
 import MkPollEditor from '@/components/MkPollEditor.vue';
+import MkMeter from '@/components/MkMeter.vue';
 import { host, url } from '@/config.js';
 import { erase, unique } from '@/scripts/array.js';
 import { extractMentions } from '@/scripts/extract-mentions.js';
@@ -242,7 +246,7 @@ const textLength = $computed((): number => {
 });
 
 const maxTextLength = $computed((): number => {
-	return instance ? instance.maxNoteTextLength : 1000;
+	return $i ? $i.policies.noteLengthLimit : (instance ? instance.maxNoteTextLength : 1000);
 });
 
 const canPost = $computed((): boolean => {
@@ -1106,6 +1110,10 @@ defineExpose({
 	background: var(--X4);
 }
 
+.textLengthReachUpstreamHardLimit {
+	margin: 0 20px 16px 20px;
+}
+
 .hasNotSpecifiedMentions {
 	margin: 0 20px 16px 20px;
 }
@@ -1162,6 +1170,11 @@ defineExpose({
 	width: 100%;
 	min-height: 90px;
 	height: 100%;
+}
+
+.textCountLegacy {
+	opacity: 0.7;
+	line-height: 66px;
 }
 
 .textCount {

@@ -21,7 +21,7 @@ const INVALID = false;
 describe('api:notes/create', () => {
 	describe('validation', () => {
 		const v = getValidator(paramDef);
-		const tooLong = readFile(_dirname + '/../../../../../test/resources/misskey.svg', 'utf-8');
+		const tooLong = readFile(_dirname + '/../../../../../test/resources/0-w1-s1-v01.txt', 'utf-8');
 
 		test('reject empty', () => {
 			const valid = v({ });

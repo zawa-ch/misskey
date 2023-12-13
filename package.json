@@ -1,6 +1,6 @@
 {
 	"name": "misskey",
-	"version": "2023.11.1-geoplanetary.1",
+	"version": "2023.11.1-geoplanetary.2",
 	"codename": "nasubi",
 	"repository": {
 		"type": "git",

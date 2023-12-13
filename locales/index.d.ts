@@ -485,6 +485,7 @@ export interface Locale {
     "native": string;
     "disableDrawer": string;
     "showNoteActionsOnlyHover": string;
+    "overflowLongNotes": string;
     "noHistory": string;
     "signinHistory": string;
     "enableAdvancedMfm": string;
@@ -537,6 +538,10 @@ export interface Locale {
     "deleteAll": string;
     "showFixedPostForm": string;
     "showFixedPostFormInChannel": string;
+    "postformRemainCharacterDisplay": string;
+    "postformRemainCharacterDisplayCounter": string;
+    "postformRemainCharacterDisplayCounterLegacy": string;
+    "postformRemainCharacterDisplayMeter": string;
     "withRepliesByDefaultForNewlyFollowed": string;
     "newNoteRecived": string;
     "sounds": string;
@@ -789,6 +794,7 @@ export interface Locale {
     "quitFullView": string;
     "addDescription": string;
     "userPagePinTip": string;
+    "textLengthReachUpstreamHardLimitWarning": string;
     "notSpecifiedMentionWarning": string;
     "info": string;
     "userInfo": string;
@@ -1625,6 +1631,10 @@ export interface Locale {
                 "title": string;
                 "description": string;
             };
+            "_mfaEnabled": {
+                "title": string;
+                "description": string;
+            };
         };
     };
     "_role": {
@@ -1665,6 +1675,8 @@ export interface Locale {
         "_options": {
             "gtlAvailable": string;
             "ltlAvailable": string;
+            "canPostNote": string;
+            "noteLengthLimit": string;
             "canPublicNote": string;
             "canInvite": string;
             "inviteLimit": string;

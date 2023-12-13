@@ -40,6 +40,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkSwitch>
 						</MkFolder>
 
+						<MkFolder v-if="matchQuery([i18n.ts._role._options.canPostNote, 'canPostNote'])">
+							<template #label>{{ i18n.ts._role._options.canPostNote }}</template>
+							<template #suffix>{{ policies.canPostNote ? i18n.ts.yes : i18n.ts.no }}</template>
+							<MkSwitch v-model="policies.canPostNote">
+								<template #label>{{ i18n.ts.enable }}</template>
+							</MkSwitch>
+						</MkFolder>
+
+						<MkFolder v-if="matchQuery([i18n.ts._role._options.noteLengthLimit, 'noteLengthLimit'])">
+							<template #label>{{ i18n.ts._role._options.noteLengthLimit }}</template>
+							<template #suffix>{{ policies.noteLengthLimit }}</template>
+							<MkInput v-model="policies.noteLengthLimit" type="number">
+							</MkInput>
+						</MkFolder>
+
 						<MkFolder v-if="matchQuery([i18n.ts._role._options.canPublicNote, 'canPublicNote'])">
 							<template #label>{{ i18n.ts._role._options.canPublicNote }}</template>
 							<template #suffix>{{ policies.canPublicNote ? i18n.ts.yes : i18n.ts.no }}</template>

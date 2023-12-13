@@ -44,6 +44,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="_gaps_m">
 			<div class="_gaps_s">
 				<MkSwitch v-model="showNoteActionsOnlyHover">{{ i18n.ts.showNoteActionsOnlyHover }}</MkSwitch>
+				<MkSwitch v-model="overflowLongNotes">{{ i18n.ts.overflowLongNotes }}<span class="_tips">Geoplanetary unique</span></MkSwitch>
 				<MkSwitch v-model="showClipButtonInNoteFooter">{{ i18n.ts.showClipButtonInNoteFooter }}</MkSwitch>
 				<MkSwitch v-model="collapseRenotes">{{ i18n.ts.collapseRenotes }}</MkSwitch>
 				<MkSwitch v-model="advancedMfm">{{ i18n.ts.enableAdvancedMfm }}</MkSwitch>
@@ -140,6 +141,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<option value="2"><span style="font-size: 16px;">Aa</span></option>
 				<option value="3"><span style="font-size: 17px;">Aa</span></option>
 			</MkRadios>
+
+			<MkRadios v-model="postformRemainCharacterDisplay">
+				<template #label>{{ i18n.ts.postformRemainCharacterDisplay }}<span class="_tips">Geoplanetary unique</span></template>
+				<option value="counter">{{ i18n.ts.postformRemainCharacterDisplayCounter }}</option>
+				<option value="counterLegacy">{{ i18n.ts.postformRemainCharacterDisplayCounterLegacy }}</option>
+				<option value="meter">{{ i18n.ts.postformRemainCharacterDisplayMeter }}</option>
+			</MkRadios>
 		</div>
 	</FormSection>
 
@@ -224,6 +232,7 @@ async function reloadAsk() {
 const overridedDeviceKind = computed(defaultStore.makeGetterSetter('overridedDeviceKind'));
 const serverDisconnectedBehavior = computed(defaultStore.makeGetterSetter('serverDisconnectedBehavior'));
 const showNoteActionsOnlyHover = computed(defaultStore.makeGetterSetter('showNoteActionsOnlyHover'));
+const overflowLongNotes = computed(defaultStore.makeGetterSetter('overflowLongNotes'));
 const showClipButtonInNoteFooter = computed(defaultStore.makeGetterSetter('showClipButtonInNoteFooter'));
 const reactionsDisplaySize = computed(defaultStore.makeGetterSetter('reactionsDisplaySize'));
 const collapseRenotes = computed(defaultStore.makeGetterSetter('collapseRenotes'));
@@ -244,6 +253,7 @@ const imageNewTab = computed(defaultStore.makeGetterSetter('imageNewTab'));
 const nsfw = computed(defaultStore.makeGetterSetter('nsfw'));
 const showFixedPostForm = computed(defaultStore.makeGetterSetter('showFixedPostForm'));
 const showFixedPostFormInChannel = computed(defaultStore.makeGetterSetter('showFixedPostFormInChannel'));
+const postformRemainCharacterDisplay = computed(defaultStore.makeGetterSetter('postformRemainCharacterDisplay'));
 const numberOfPageCache = computed(defaultStore.makeGetterSetter('numberOfPageCache'));
 const instanceTicker = computed(defaultStore.makeGetterSetter('instanceTicker'));
 const enableInfiniteScroll = computed(defaultStore.makeGetterSetter('enableInfiniteScroll'));
@@ -285,6 +295,7 @@ watch([
 	enableInfiniteScroll,
 	squareAvatars,
 	showNoteActionsOnlyHover,
+	overflowLongNotes,
 	showGapBetweenNotesInTimeline,
 	instanceTicker,
 	overridedDeviceKind,

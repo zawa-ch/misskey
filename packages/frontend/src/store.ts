@@ -238,6 +238,10 @@ export const defaultStore = markRaw(new Storage('base', {
 		where: 'device',
 		default: false,
 	},
+	postformRemainCharacterDisplay: {
+		where: 'device',
+		default: 'meter' as 'counter' | 'counterLegacy' | 'meter',
+	},
 	enableInfiniteScroll: {
 		where: 'device',
 		default: true,
@@ -319,6 +323,10 @@ export const defaultStore = markRaw(new Storage('base', {
 		default: 3,
 	},
 	showNoteActionsOnlyHover: {
+		where: 'device',
+		default: false,
+	},
+	overflowLongNotes: {
 		where: 'device',
 		default: false,
 	},

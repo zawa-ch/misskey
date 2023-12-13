@@ -111,6 +111,7 @@ import MkFolder from '@/components/MkFolder.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import { confetti } from '@/scripts/confetti.js';
 import { $i } from '@/account.js';
+import { claimAchievement } from '@/scripts/achievements.js';
 
 defineProps<{
 	twoFactorData: {
@@ -157,6 +158,9 @@ function downloadBackupCodes() {
 }
 
 function allDone() {
+	if ($i && $i.twoFactorEnabled) {
+		claimAchievement('mfaEnabled');
+	}
 	dialog.value.close();
 }
 </script>
