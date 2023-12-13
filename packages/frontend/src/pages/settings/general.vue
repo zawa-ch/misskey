@@ -141,6 +141,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<option value="2"><span style="font-size: 16px;">Aa</span></option>
 				<option value="3"><span style="font-size: 17px;">Aa</span></option>
 			</MkRadios>
+
+			<MkRadios v-model="postformRemainCharacterDisplay">
+				<template #label>{{ i18n.ts.postformRemainCharacterDisplay }}<span class="_tips">Geoplanetary unique</span></template>
+				<option value="counter">{{ i18n.ts.postformRemainCharacterDisplayCounter }}</option>
+				<option value="counterLegacy">{{ i18n.ts.postformRemainCharacterDisplayCounterLegacy }}</option>
+				<option value="meter">{{ i18n.ts.postformRemainCharacterDisplayMeter }}</option>
+			</MkRadios>
 		</div>
 	</FormSection>
 
@@ -246,6 +253,7 @@ const imageNewTab = computed(defaultStore.makeGetterSetter('imageNewTab'));
 const nsfw = computed(defaultStore.makeGetterSetter('nsfw'));
 const showFixedPostForm = computed(defaultStore.makeGetterSetter('showFixedPostForm'));
 const showFixedPostFormInChannel = computed(defaultStore.makeGetterSetter('showFixedPostFormInChannel'));
+const postformRemainCharacterDisplay = computed(defaultStore.makeGetterSetter('postformRemainCharacterDisplay'));
 const numberOfPageCache = computed(defaultStore.makeGetterSetter('numberOfPageCache'));
 const instanceTicker = computed(defaultStore.makeGetterSetter('instanceTicker'));
 const enableInfiniteScroll = computed(defaultStore.makeGetterSetter('enableInfiniteScroll'));

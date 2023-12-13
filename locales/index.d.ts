@@ -538,6 +538,10 @@ export interface Locale {
     "deleteAll": string;
     "showFixedPostForm": string;
     "showFixedPostFormInChannel": string;
+    "postformRemainCharacterDisplay": string;
+    "postformRemainCharacterDisplayCounter": string;
+    "postformRemainCharacterDisplayCounterLegacy": string;
+    "postformRemainCharacterDisplayMeter": string;
     "withRepliesByDefaultForNewlyFollowed": string;
     "newNoteRecived": string;
     "sounds": string;
