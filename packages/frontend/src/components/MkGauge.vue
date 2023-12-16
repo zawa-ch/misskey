@@ -7,12 +7,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div :class="$style.root">
 	<p :class="$style.infoText">
 		{{ props.label }}
-		<span v-if="props.mode === 'percentage'" :class="$style.percentage">{{ vp.toFixed(1) }}%</span>
-		<span v-else-if="props.mode === 'fraction'" :class="$style.percentage">{{ props.value }} / {{ props.denominator }}</span>
-		<span v-else-if="props.mode === 'remain'" :class="$style.percentage">{{ props.denominator ? props.denominator - props.value : null }}</span>
+		<span v-if="props.mode === 'percentage'" :class="$style.percentage">{{ vp?.toFixed(1) ?? 'NaN' }}%</span>
+		<span v-else-if="props.mode === 'fraction'" :class="$style.percentage">{{ props.value }} / {{ denominator }}</span>
+		<span v-else-if="props.mode === 'value'" :class="$style.percentage">{{ props.value }}</span>
+		<span v-else-if="props.mode === 'remain'" :class="$style.percentage">{{ denominator ? denominator - props.value : null }}</span>
 	</p>
 	<div :class="$style.meter" :style="{ background: meterBgColor }">
-		<div :class="$style.meterVal" :style="[{ width: `${vp}%` }, { background: meterColor }]"></div>
+		<div :class="$style.meterVal" :style="[{ width: `${normalize(vp ?? 0, 0, 100)}%` }, { background: meterColor }]"></div>
 	</div>
 </div>
 </template>
@@ -22,26 +23,35 @@ import { } from 'vue';
 
 const props = withDefaults(defineProps<{
 	value: number;
+	mode: 'percentage' | 'fraction' | 'value' | 'remain' | 'none';
 	label: string | null;
-	mode: 'percentage' | 'fraction' | 'remain' | 'none';
-	denominator: number | null;
-	color: string | null;
-	overflowColor: string | null;
+	minValue: number;
+	maxValue: number;
+	color: string;
+	backgroundColor: string;
+	overflowColor: string;
 	checkPositiveOverflow: boolean;
 	checkNegativeOverflow: boolean;
 }>(), {
-	label: null,
 	mode: 'percentage',
-	denominator: null,
-	color: null,
-	overflowColor: null,
+	label: null,
+	minValue: 0,
+	maxValue: 1,
+	color: 'var(--accent)',
+	backgroundColor: 'var(--X11)',
+	overflowColor: 'var(--error)',
 	checkPositiveOverflow: true,
 	checkNegativeOverflow: true,
 });
 
-const vp = $computed(() => props.value / (props.denominator ?? 1) * 100);
-const meterColor = $computed(() => (!props.checkPositiveOverflow || vp <= 100) ? (props.color ?? 'var(--accent)') : (props.overflowColor ?? 'var(--error)'));
-const meterBgColor = $computed(() => (!props.checkNegativeOverflow || 0 <= vp) ? 'var(--X11)' : 'var(--error)');
+const denominator = $computed(() => props.maxValue - props.minValue);
+const vp = $computed(() => denominator > 0 ? ((props.value - props.minValue) / denominator * 100) : undefined);
+const meterColor = $computed(() => denominator > 0 && (!props.checkPositiveOverflow || props.value <= props.maxValue) ? props.color : props.overflowColor);
+const meterBgColor = $computed(() => denominator > 0 && (!props.checkNegativeOverflow || props.minValue <= props.value) ? props.backgroundColor : props.overflowColor);
+
+function normalize(v: number, min: number, max: number) {
+	return v >= min ? (v <= max ? v : max) : min;
+}
 </script>
 
 <style lang="scss" module>

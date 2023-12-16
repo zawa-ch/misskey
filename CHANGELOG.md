@@ -12,6 +12,11 @@
 
 -->
 
+## (unreleased)
+
+### General
+- Enhance: 細かい部分のブラッシュアップ
+
 ## 2023.11.1-geoplanetary.2
 
 ### General
