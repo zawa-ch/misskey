@@ -12,7 +12,7 @@
 
 -->
 
-## (unreleased)
+## 2023.12.0-geoplanetary.3
 
 ### General
 - Enhance: 細かい部分のブラッシュアップ
