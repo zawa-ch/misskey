@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { } from 'vue';
+import { computed } from 'vue';
 
 const props = withDefaults(defineProps<{
 	value: number;
@@ -44,10 +44,10 @@ const props = withDefaults(defineProps<{
 	checkNegativeOverflow: true,
 });
 
-const denominator = $computed(() => props.maxValue - props.minValue);
-const vp = $computed(() => denominator > 0 ? ((props.value - props.minValue) / denominator * 100) : undefined);
-const meterColor = $computed(() => denominator > 0 && (!props.checkPositiveOverflow || props.value <= props.maxValue) ? props.color : props.overflowColor);
-const meterBgColor = $computed(() => denominator > 0 && (!props.checkNegativeOverflow || props.minValue <= props.value) ? props.backgroundColor : props.overflowColor);
+const denominator = computed(() => props.maxValue - props.minValue);
+const vp = computed(() => denominator.value > 0 ? ((props.value - props.minValue) / denominator.value * 100) : undefined);
+const meterColor = computed(() => denominator.value > 0 && (!props.checkPositiveOverflow || props.value <= props.maxValue) ? props.color : props.overflowColor);
+const meterBgColor = computed(() => denominator.value > 0 && (!props.checkNegativeOverflow || props.minValue <= props.value) ? props.backgroundColor : props.overflowColor);
 
 function normalize(v: number, min: number, max: number) {
 	return v >= min ? (v <= max ? v : max) : min;
