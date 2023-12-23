@@ -599,6 +599,14 @@ export const packedMeDetailedOnlySchema = {
 					type: 'boolean',
 					nullable: false, optional: false,
 				},
+				canPostNote: {
+					type: 'boolean',
+					nullable: false, optional: false,
+				},
+				noteLengthLimit: {
+					type: 'number',
+					nullable: false, optional: false,
+				},
 				canPublicNote: {
 					type: 'boolean',
 					nullable: false, optional: false,

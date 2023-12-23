@@ -131,6 +131,8 @@ export const packedRoleSchema = {
 						gtlAvailable: rolePolicyValue,
 						ltlAvailable: rolePolicyValue,
 						webhookLimit: rolePolicyValue,
+						canPostNote: rolePolicyValue,
+						noteLengthLimit: rolePolicyValue,
 						canPublicNote: rolePolicyValue,
 						userListLimit: rolePolicyValue,
 						wordMuteLimit: rolePolicyValue,
