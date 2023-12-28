@@ -1,6 +1,6 @@
 /*
- * version: 2023.12.0-geoplanetary.2
- * generatedAt: 2023-12-23T13:47:54.039Z
+ * version: 2023.12.2-geoplanetary.3
+ * generatedAt: 2023-12-28T12:57:37.378Z
  */
 
 import { components } from './types.js';
