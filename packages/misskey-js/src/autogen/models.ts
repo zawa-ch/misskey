@@ -1,8 +1,3 @@
-/*
- * version: 2023.12.2-geoplanetary.3
- * generatedAt: 2023-12-28T12:57:37.378Z
- */
-
 import { components } from './types.js';
 export type Error = components['schemas']['Error'];
 export type UserLite = components['schemas']['UserLite'];

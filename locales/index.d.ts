@@ -1992,6 +1992,9 @@ export interface Locale extends ILocale {
      * ノートのアクションをホバー時のみ表示する
      */
     "showNoteActionsOnlyHover": string;
+    /**
+     * 長いノートの内容をオーバーフローにする
+     */
     "overflowLongNotes": string;
     /**
      * 履歴はありません
@@ -2201,9 +2204,21 @@ export interface Locale extends ILocale {
      * タイムライン上部に投稿フォームを表示する(チャンネル)
      */
     "showFixedPostFormInChannel": string;
+    /**
+     * 投稿フォームの文字数表示
+     */
     "postformRemainCharacterDisplay": string;
+    /**
+     * カウンター
+     */
     "postformRemainCharacterDisplayCounter": string;
+    /**
+     * カウンター(レガシー)
+     */
     "postformRemainCharacterDisplayCounterLegacy": string;
+    /**
+     * メーター
+     */
     "postformRemainCharacterDisplayMeter": string;
     /**
      * フォローする際、デフォルトで返信をTLに含むようにする
@@ -3249,6 +3264,9 @@ export interface Locale extends ILocale {
      * 個々のノートのメニューから「ピン留め」を選択することで、ここにノートを表示しておくことができます。
      */
     "userPagePinTip": string;
+    /**
+     * 8192文字以上のノートは連合先で正しく表示されない可能性があります
+     */
     "textLengthReachUpstreamHardLimitWarning": string;
     /**
      * 宛先に含まれていないメンションがあります
@@ -4415,11 +4433,11 @@ export interface Locale extends ILocale {
      */
     "youFollowing": string;
     /**
-     * 生成AIによる学習を拒否
+     * NoAIをレスポンスに付加
      */
     "preventAiLearning": string;
     /**
-     * 外部の文章生成AIや画像生成AIに対して、投稿したノートや画像などのコンテンツを学習の対象にしないように要求します。これはnoaiフラグをHTMLレスポンスに含めることによって実現されますが、この要求に従うかはそのAI次第であるため、学習を完全に防止するものではありません。
+     * HTMLレスポンスにnoaiフラグを付加します。これにより生成AIの学習セットに含めないよう収集ボットに要求することができます。しかし、noaiフラグはレスポンスを受け取った相手の解釈によるものであり、この要求を完全に無視することができることに留意してください。
      */
     "preventAiLearningDescription": string;
     /**
@@ -6211,7 +6229,13 @@ export interface Locale extends ILocale {
                 "description": string;
             };
             "_mfaEnabled": {
+                /**
+                 * これでなにも怖くない？
+                 */
                 "title": string;
+                /**
+                 * 二要素認証を有効化した
+                 */
                 "description": string;
             };
             "_bubbleGameExplodingHead": {
@@ -6390,7 +6414,13 @@ export interface Locale extends ILocale {
              * ローカルタイムラインの閲覧
              */
             "ltlAvailable": string;
+            /**
+             * 投稿の許可
+             */
             "canPostNote": string;
+            /**
+             * 投稿の最大文字数
+             */
             "noteLengthLimit": string;
             /**
              * パブリック投稿の許可
