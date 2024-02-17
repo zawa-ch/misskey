@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: syuilo and other misskey contributors
+ * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
@@ -88,6 +88,8 @@ export const ACHIEVEMENT_TYPES = [
 	'smashTestNotificationButton',
 	'tutorialCompleted',
 	'mfaEnabled',
+	'bubbleGameExplodingHead',
+	'bubbleGameDoubleExplodingHead',
 ] as const;
 
 @Injectable()
