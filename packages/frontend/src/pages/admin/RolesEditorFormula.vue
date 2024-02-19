@@ -9,6 +9,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkSelect v-model="type" :class="$style.typeSelect">
 			<option value="isLocal">{{ i18n.ts._role._condition.isLocal }}</option>
 			<option value="isRemote">{{ i18n.ts._role._condition.isRemote }}</option>
+			<option value="isFederated">{{ i18n.ts._role._condition.isFederated }}</option>
+			<option value="isSubscribing">{{ i18n.ts._role._condition.isSubscribing }}</option>
+			<option value="isPublishing">{{ i18n.ts._role._condition.isPublishing }}</option>
+			<option value="isForeign">{{ i18n.ts._role._condition.isForeign }}</option>
 			<option value="createdLessThan">{{ i18n.ts._role._condition.createdLessThan }}</option>
 			<option value="createdMoreThan">{{ i18n.ts._role._condition.createdMoreThan }}</option>
 			<option value="followersLessThanOrEq">{{ i18n.ts._role._condition.followersLessThanOrEq }}</option>

@@ -6427,6 +6427,14 @@ export interface Locale extends ILocale {
              */
             "canPublicNote": string;
             /**
+             * 返信/メンションの許可
+             */
+            "canReply": string;
+            /**
+             * 引用/Renoteの許可
+             */
+            "canQuote": string;
+            /**
              * サーバー招待コードの発行
              */
             "canInvite": string;
@@ -6524,6 +6532,22 @@ export interface Locale extends ILocale {
              * リモートユーザー
              */
             "isRemote": string;
+            /**
+             * 連合サーバーのユーザー
+             */
+            "isFederated": string;
+            /**
+             * 購読サーバーのユーザー
+             */
+            "isSubscribing": string;
+            /**
+             * 配信サーバーのユーザー
+             */
+            "isPublishing": string;
+            /**
+             * 外部サーバーのユーザー
+             */
+            "isForeign": string;
             /**
              * アカウント作成から～以内
              */

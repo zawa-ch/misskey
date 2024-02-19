@@ -29,6 +29,22 @@ type CondFormulaValueIsRemote = {
 	type: 'isRemote';
 };
 
+type CondFormulaValueIsFederated = {
+	type: 'isFederated';
+};
+
+type CondFormulaValueIsSubscribing = {
+	type: 'isSubscribing';
+};
+
+type CondFormulaValueIsPublishing = {
+	type: 'isPublishing';
+};
+
+type CondFormulaValueIsForeign = {
+	type: 'isForeign';
+};
+
 type CondFormulaValueCreatedLessThan = {
 	type: 'createdLessThan';
 	sec: number;
@@ -75,6 +91,10 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueNot |
 	CondFormulaValueIsLocal |
 	CondFormulaValueIsRemote |
+	CondFormulaValueIsFederated |
+	CondFormulaValueIsSubscribing |
+	CondFormulaValueIsPublishing |
+	CondFormulaValueIsForeign |
 	CondFormulaValueCreatedLessThan |
 	CondFormulaValueCreatedMoreThan |
 	CondFormulaValueFollowersLessThanOrEq |
