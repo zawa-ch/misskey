@@ -235,7 +235,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 					return this.userEntityService.isRemoteUser(user);
 				}
 				case 'isFederated': {
-					return this.userEntityService.isRemoteUser(user) && instance ? (instance.followersCount > 0 && instance.followingCount > 0) : false;
+					return this.userEntityService.isRemoteUser(user) && instance ? (instance.followersCount > 0 || instance.followingCount > 0) : false;
 				}
 				case 'isSubscribing': {
 					return this.userEntityService.isRemoteUser(user) && instance ? (instance.followingCount > 0) : false;
