@@ -6525,6 +6525,22 @@ export interface Locale extends ILocale {
              */
             "isRemote": string;
             /**
+             * 連合サーバーのユーザー
+             */
+            "isFederated": string;
+            /**
+             * 購読サーバーのユーザー
+             */
+            "isSubscribing": string;
+            /**
+             * 配信サーバーのユーザー
+             */
+            "isPublishing": string;
+            /**
+             * 外部サーバーのユーザー
+             */
+            "isForeign": string;
+            /**
              * アカウント作成から～以内
              */
             "createdLessThan": string;

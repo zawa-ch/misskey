@@ -6,9 +6,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In } from 'typeorm';
-import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { ModuleRef } from '@nestjs/core';
+import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import type {
+	MiInstance,
 	MiRole,
 	MiRoleAssignment,
 	RoleAssignmentsRepository,
@@ -30,6 +31,8 @@ import { ModerationLogService } from '@/core/ModerationLogService.js';
 import type { Packed } from '@/misc/json-schema.js';
 import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
 import { NotificationService } from '@/core/NotificationService.js';
+import type { Config } from '@/config.js';
+import { FederatedInstanceService } from './FederatedInstanceService.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 
 export type RolePolicies = {
@@ -102,6 +105,9 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	constructor(
 		private moduleRef: ModuleRef,
 
+		@Inject(DI.config)
+		private config: Config,
+
 		@Inject(DI.redis)
 		private redisClient: Redis.Redis,
 
@@ -126,6 +132,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		private globalEventService: GlobalEventService,
 		private idService: IdService,
 		private moderationLogService: ModerationLogService,
+		private federatedInstanceService: FederatedInstanceService,
 		private fanoutTimelineService: FanoutTimelineService,
 	) {
 		//this.onMessage = this.onMessage.bind(this);
@@ -205,23 +212,35 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	private evalCond(user: MiUser, value: RoleCondFormulaValue): boolean {
+	private evalCond(user: MiUser, instance: MiInstance | null, value: RoleCondFormulaValue): boolean {
 		try {
 			switch (value.type) {
 				case 'and': {
-					return value.values.every(v => this.evalCond(user, v));
+					return value.values.every(v => this.evalCond(user, instance, v));
 				}
 				case 'or': {
-					return value.values.some(v => this.evalCond(user, v));
+					return value.values.some(v => this.evalCond(user, instance, v));
 				}
 				case 'not': {
-					return !this.evalCond(user, value.value);
+					return !this.evalCond(user, instance, value.value);
 				}
 				case 'isLocal': {
 					return this.userEntityService.isLocalUser(user);
 				}
 				case 'isRemote': {
 					return this.userEntityService.isRemoteUser(user);
+				}
+				case 'isFederated': {
+					return this.userEntityService.isRemoteUser(user) && instance ? (instance.followersCount > 0 && instance.followingCount > 0) : false;
+				}
+				case 'isSubscribing': {
+					return this.userEntityService.isRemoteUser(user) && instance ? (instance.followingCount > 0) : false;
+				}
+				case 'isPublishing': {
+					return this.userEntityService.isRemoteUser(user) && instance ? (instance.followersCount > 0) : false;
+				}
+				case 'isForeign': {
+					return this.userEntityService.isRemoteUser(user) && instance ? (instance.followersCount === 0 && instance.followingCount === 0) : true;
 				}
 				case 'createdLessThan': {
 					return this.idService.parse(user.id).date.getTime() > (Date.now() - (value.sec * 1000));
@@ -277,7 +296,8 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		const assigns = await this.getUserAssigns(userId);
 		const assignedRoles = roles.filter(r => assigns.map(x => x.roleId).includes(r.id));
 		const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
-		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, r.condFormula));
+		const instance = user ? await this.federatedInstanceService.fetch(user.host ?? this.config.host) : null;
+		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, instance, r.condFormula));
 		return [...assignedRoles, ...matchedCondRoles];
 	}
 
@@ -296,7 +316,8 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		const badgeCondRoles = roles.filter(r => r.asBadge && (r.target === 'conditional'));
 		if (badgeCondRoles.length > 0) {
 			const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
-			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user!, r.condFormula));
+			const instance = user ? await this.federatedInstanceService.fetch(user.host ?? this.config.host) : null;
+			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user!, instance, r.condFormula));
 			return [...assignedBadgeRoles, ...matchedBadgeCondRoles];
 		} else {
 			return assignedBadgeRoles;

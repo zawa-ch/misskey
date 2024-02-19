@@ -1686,6 +1686,10 @@ _role:
   _condition:
     isLocal: "ローカルユーザー"
     isRemote: "リモートユーザー"
+    isFederated: "連合サーバーのユーザー"
+    isSubscribing: "購読サーバーのユーザー"
+    isPublishing: "配信サーバーのユーザー"
+    isForeign: "外部サーバーのユーザー"
     createdLessThan: "アカウント作成から～以内"
     createdMoreThan: "アカウント作成から～経過"
     followersLessThanOrEq: "フォロワー数が～以下"
