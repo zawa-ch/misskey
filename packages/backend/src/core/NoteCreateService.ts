@@ -152,6 +152,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 	#shutdownController = new AbortController();
 
 	public static ContainsProhibitedWordsError = class extends Error {};
+	public static QuoteProhibitedUserError = class extends Error {};
+	public static ReplyProhibitedUserError = class extends Error {};
 
 	constructor(
 		@Inject(DI.config)
@@ -274,6 +276,10 @@ export class NoteCreateService implements OnApplicationShutdown {
 		}
 
 		if (data.renote) {
+			// 引用/Renote可能なユーザーか調べる
+			if ((await this.roleService.getUserPolicies(user.id)).canQuote === false) {
+				throw new NoteCreateService.QuoteProhibitedUserError();
+			}
 			switch (data.renote.visibility) {
 				case 'public':
 					// public noteは無条件にrenote可能
@@ -360,6 +366,11 @@ export class NoteCreateService implements OnApplicationShutdown {
 		}
 
 		tags = tags.filter(tag => Array.from(tag).length <= 128).splice(0, 32);
+
+		// 返信/メンション可能なユーザーか調べる
+		if ((mentionedUsers.length !== 0 || data.reply) && ((await this.roleService.getUserPolicies(user.id)).canReply === false)) {
+			throw new NoteCreateService.ReplyProhibitedUserError();
+		}
 
 		if (data.reply && (user.id !== data.reply.userId) && !mentionedUsers.some(u => u.id === data.reply!.userId)) {
 			mentionedUsers.push(await this.usersRepository.findOneByOrFail({ id: data.reply!.userId }));

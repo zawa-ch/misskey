@@ -402,6 +402,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if (e instanceof NoteCreateService.ContainsProhibitedWordsError) {
 					throw new ApiError(meta.errors.containsProhibitedWords);
 				}
+				if (e instanceof NoteCreateService.QuoteProhibitedUserError) {
+					throw new ApiError(meta.errors.restrictedByRole);
+				}
+				if (e instanceof NoteCreateService.ReplyProhibitedUserError) {
+					throw new ApiError(meta.errors.restrictedByRole);
+				}
 
 				throw e;
 			}

@@ -99,9 +99,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</template>
 			</MkReactionsViewer>
 			<footer :class="$style.footer">
-				<button :class="$style.footerButton" class="_button" @click="reply()">
+				<button v-if="canReply" :class="$style.footerButton" class="_button" @click="reply()">
 					<i class="ti ti-arrow-back-up"></i>
 					<p v-if="appearNote.repliesCount > 0" :class="$style.footerButtonCount">{{ appearNote.repliesCount }}</p>
+				</button>
+				<button v-else :class="$style.footerButton" class="_button" disabled>
+					<i class="ti ti-ban"></i>
 				</button>
 				<button
 					v-if="canRenote"
@@ -262,12 +265,13 @@ const hardMuted = ref(props.withHardMute && checkMute(appearNote.value, $i?.hard
 const translation = ref<Misskey.entities.NotesTranslateResponse | null>(null);
 const translating = ref(false);
 const showTicker = (defaultStore.state.instanceTicker === 'always') || (defaultStore.state.instanceTicker === 'remote' && appearNote.value.user.instance);
-const canRenote = computed(() => ['public', 'home'].includes(appearNote.value.visibility) || (appearNote.value.visibility === 'followers' && appearNote.value.userId === $i?.id));
+const canRenote = computed(() => ($i?.policies.canQuote ?? true) && (['public', 'home'].includes(appearNote.value.visibility) || (appearNote.value.visibility === 'followers' && appearNote.value.userId === $i?.id)));
+const canReply = computed(() => $i?.policies.canReply ?? true);
 const renoteCollapsed = ref(
 	defaultStore.state.collapseRenotes && isRenote && (
 		($i && ($i.id === note.value.userId || $i.id === appearNote.value.userId)) || // `||` must be `||`! See https://github.com/misskey-dev/misskey/issues/13131
 		(appearNote.value.myReaction != null)
-	)
+	),
 );
 
 /* Overload FunctionにLintが対応していないのでコメントアウト

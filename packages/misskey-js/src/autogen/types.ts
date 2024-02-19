@@ -4633,6 +4633,8 @@ export type components = {
       canPostNote: boolean;
       noteLengthLimit: number;
       canPublicNote: boolean;
+      canReply: boolean;
+      canQuote: boolean;
       canInvite: boolean;
       inviteLimit: number;
       inviteLimitCycle: number;

@@ -1661,6 +1661,8 @@ _role:
     canPostNote: "投稿の許可"
     noteLengthLimit: "投稿の最大文字数"
     canPublicNote: "パブリック投稿の許可"
+    canReply: "返信/メンションの許可"
+    canQuote: "引用/Renoteの許可"
     canInvite: "サーバー招待コードの発行"
     inviteLimit: "招待コードの作成可能数"
     inviteLimitCycle: "招待コードの発行間隔"

@@ -63,6 +63,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkSwitch>
 						</MkFolder>
 
+						<MkFolder v-if="matchQuery([i18n.ts._role._options.canReply, 'canReply'])">
+							<template #label>{{ i18n.ts._role._options.canReply }}</template>
+							<template #suffix>{{ policies.canReply ? i18n.ts.yes : i18n.ts.no }}</template>
+							<MkSwitch v-model="policies.canReply">
+								<template #label>{{ i18n.ts.enable }}</template>
+							</MkSwitch>
+						</MkFolder>
+
+						<MkFolder v-if="matchQuery([i18n.ts._role._options.canQuote, 'canQuote'])">
+							<template #label>{{ i18n.ts._role._options.canQuote }}</template>
+							<template #suffix>{{ policies.canQuote ? i18n.ts.yes : i18n.ts.no }}</template>
+							<MkSwitch v-model="policies.canQuote">
+								<template #label>{{ i18n.ts.enable }}</template>
+							</MkSwitch>
+						</MkFolder>
+
 						<MkFolder v-if="matchQuery([i18n.ts._role._options.canInvite, 'canInvite'])">
 							<template #label>{{ i18n.ts._role._options.canInvite }}</template>
 							<template #suffix>{{ policies.canInvite ? i18n.ts.yes : i18n.ts.no }}</template>

@@ -41,6 +41,8 @@ export type RolePolicies = {
 	canPostNote: boolean;
 	noteLengthLimit: number;
 	canPublicNote: boolean;
+	canReply: boolean;
+	canQuote: boolean;
 	canInvite: boolean;
 	inviteLimit: number;
 	inviteLimitCycle: number;
@@ -70,6 +72,8 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canPostNote: true,
 	noteLengthLimit: MAX_NOTE_TEXT_LENGTH,
 	canPublicNote: true,
+	canReply: true,
+	canQuote: true,
 	canInvite: false,
 	inviteLimit: 0,
 	inviteLimitCycle: 60 * 24 * 7,
@@ -353,6 +357,8 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			canPostNote: calc('canPostNote', vs => vs.some(v => v === true)),
 			noteLengthLimit: calc('noteLengthLimit', vs => Math.max(...vs)),
 			canPublicNote: calc('canPublicNote', vs => vs.some(v => v === true)),
+			canReply: calc('canReply', vs => vs.some(v => v === true)),
+			canQuote: calc('canQuote', vs => vs.some(v => v === true)),
 			canInvite: calc('canInvite', vs => vs.some(v => v === true)),
 			inviteLimit: calc('inviteLimit', vs => Math.max(...vs)),
 			inviteLimitCycle: calc('inviteLimitCycle', vs => Math.max(...vs)),

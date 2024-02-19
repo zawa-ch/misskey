@@ -6427,6 +6427,14 @@ export interface Locale extends ILocale {
              */
             "canPublicNote": string;
             /**
+             * 返信/メンションの許可
+             */
+            "canReply": string;
+            /**
+             * 引用/Renoteの許可
+             */
+            "canQuote": string;
+            /**
              * サーバー招待コードの発行
              */
             "canInvite": string;

@@ -148,6 +148,14 @@ export const packedRolePoliciesSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		canReply: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		canQuote: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 		canInvite: {
 			type: 'boolean',
 			optional: false, nullable: false,
