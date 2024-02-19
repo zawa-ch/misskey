@@ -388,7 +388,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				iconUrl: instance.iconUrl,
 				backgroundImageUrl: instance.backgroundImageUrl,
 				logoImageUrl: instance.logoImageUrl,
-				maxNoteTextLength: DEFAULT_POLICIES.noteLengthLimit,
+				maxNoteTextLength: instance.policies.noteLengthLimit,
 				// クライアントの手間を減らすためあらかじめJSONに変換しておく
 				defaultLightTheme: instance.defaultLightTheme ? JSON.stringify(JSON5.parse(instance.defaultLightTheme)) : null,
 				defaultDarkTheme: instance.defaultDarkTheme ? JSON.stringify(JSON5.parse(instance.defaultDarkTheme)) : null,
