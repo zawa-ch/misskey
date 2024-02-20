@@ -132,6 +132,12 @@ export const meta = {
 			code: 'CONTAINS_PROHIBITED_WORDS',
 			id: 'aa6e01d3-a85c-669d-758a-76aab43af334',
 		},
+
+		matchedProhibitedPatterns: {
+			message: 'Cannot post because matches a pattern of prohibited posts.',
+			code: 'MATCHED_PROHIBITED_PATTERNS',
+			id: '80ddff6a-cf7a-4121-9318-120043300545',
+		},
 	},
 } as const;
 
@@ -401,6 +407,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				// TODO: 他のErrorもここでキャッチしてエラーメッセージを当てるようにしたい
 				if (e instanceof NoteCreateService.ContainsProhibitedWordsError) {
 					throw new ApiError(meta.errors.containsProhibitedWords);
+				}
+				if (e instanceof NoteCreateService.MatchedProhibitedPatternsError) {
+					throw new ApiError(meta.errors.matchedProhibitedPatterns);
 				}
 				if (e instanceof NoteCreateService.QuoteProhibitedUserError) {
 					throw new ApiError(meta.errors.restrictedByRole);

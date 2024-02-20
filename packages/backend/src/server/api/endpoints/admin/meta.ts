@@ -163,6 +163,11 @@ export const meta = {
 					type: 'string',
 				},
 			},
+			prohibitedNotePattern: {
+				type: 'object',
+				optional: false, nullable: true,
+				ref: 'ProhibitedNoteFormulaValue',
+			},
 			bannedEmailDomains: {
 				type: 'array',
 				optional: true, nullable: false,
@@ -523,6 +528,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				silencedHosts: instance.silencedHosts,
 				sensitiveWords: instance.sensitiveWords,
 				prohibitedWords: instance.prohibitedWords,
+				prohibitedNotePattern: instance.prohibitedNotePattern.type ? instance.prohibitedNotePattern : null,
 				preservedUsernames: instance.preservedUsernames,
 				hcaptchaSecretKey: instance.hcaptchaSecretKey,
 				mcaptchaSecretKey: instance.mcaptchaSecretKey,

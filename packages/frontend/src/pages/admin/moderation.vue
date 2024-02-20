@@ -49,6 +49,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #label>{{ i18n.ts.hiddenTags }}</template>
 						<template #caption>{{ i18n.ts.hiddenTagsDescription }}</template>
 					</MkTextarea>
+
+					<MkFolder>
+						<template #label>{{ i18n.ts._prohibitedNote.title }}</template>
+						<div :class="$style.caption">{{ i18n.ts._prohibitedNote.description }}</div>
+						<ProhibitedNoteFormula v-model="prohibitedNotePattern"></ProhibitedNoteFormula>
+					</MkFolder>
 				</div>
 			</FormSuspense>
 		</MkSpacer>
@@ -66,6 +72,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import XHeader from './_header_.vue';
+import ProhibitedNoteFormula from './ProhibitedNoteFormula.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
@@ -76,6 +83,7 @@ import { fetchInstance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import { definePageMetadata } from '@/scripts/page-metadata.js';
 import MkButton from '@/components/MkButton.vue';
+import MkFolder from '@/components/MkFolder.vue';
 import FormLink from '@/components/form/link.vue';
 
 const enableRegistration = ref<boolean>(false);
@@ -86,6 +94,7 @@ const hiddenTags = ref<string>('');
 const preservedUsernames = ref<string>('');
 const tosUrl = ref<string | null>(null);
 const privacyPolicyUrl = ref<string | null>(null);
+const prohibitedNotePattern = ref<any>(null);
 
 async function init() {
 	const meta = await misskeyApi('admin/meta');
@@ -97,6 +106,7 @@ async function init() {
 	preservedUsernames.value = meta.preservedUsernames.join('\n');
 	tosUrl.value = meta.tosUrl;
 	privacyPolicyUrl.value = meta.privacyPolicyUrl;
+	prohibitedNotePattern.value = meta.prohibitedNotePattern;
 }
 
 function save() {
@@ -109,6 +119,7 @@ function save() {
 		prohibitedWords: prohibitedWords.value.split('\n'),
 		hiddenTags: hiddenTags.value.split('\n'),
 		preservedUsernames: preservedUsernames.value.split('\n'),
+		prohibitedNotePattern: prohibitedNotePattern.value,
 	}).then(() => {
 		fetchInstance();
 	});
@@ -123,6 +134,15 @@ definePageMetadata(() => ({
 </script>
 
 <style lang="scss" module>
+.caption {
+	font-size: 0.85em;
+	padding: 0 0 8px 0;
+	color: var(--fgTransparentWeak);
+
+	&:empty {
+		display: none;
+	}
+}
 .footer {
 	-webkit-backdrop-filter: var(--blur, blur(15px));
 	backdrop-filter: var(--blur, blur(15px));

@@ -50,6 +50,19 @@ import {
 } from '@/models/json-schema/role.js';
 import { packedAdSchema } from '@/models/json-schema/ad.js';
 import { packedReversiGameLiteSchema, packedReversiGameDetailedSchema } from '@/models/json-schema/reversi-game.js';
+import {
+	packedProhibitedNoteFormulaConstantsSchema,
+	packedProhibitedNoteFormulaLogicsSchema,
+	packedProhibitedNoteFormulaNotSchema,
+	packedProhibitedNoteFormulaZeroArgSchema,
+	packedProhibitedNoteFormulaPatternMatchSchema,
+	packedProhibitedNoteFormulaAssignsRoleSchema,
+	packedProhibitedNoteFormulaCountCompSchema,
+	packedProhibitedNoteFormulaSizeCompSchema,
+	packedProhibitedNoteFormulaMD5HashMatchSchema,
+	packedProhibitedNoteFormulaBlurhashLikelySchema,
+	packedProhibitedNoteFormulaValueSchema,
+} from '@/models/json-schema/prohibitednote.js';
 
 export const refs = {
 	UserLite: packedUserLiteSchema,
@@ -88,6 +101,17 @@ export const refs = {
 	EmojiDetailed: packedEmojiDetailedSchema,
 	Flash: packedFlashSchema,
 	Signin: packedSigninSchema,
+	ProhibitedNoteFormulaConstants: packedProhibitedNoteFormulaConstantsSchema,
+	ProhibitedNoteFormulaLogics: packedProhibitedNoteFormulaLogicsSchema,
+	ProhibitedNoteFormulaNot: packedProhibitedNoteFormulaNotSchema,
+	ProhibitedNoteFormulaZeroArg: packedProhibitedNoteFormulaZeroArgSchema,
+	ProhibitedNoteFormulaPatternMatch: packedProhibitedNoteFormulaPatternMatchSchema,
+	ProhibitedNoteFormulaAssignsRole: packedProhibitedNoteFormulaAssignsRoleSchema,
+	ProhibitedNoteFormulaCountComp: packedProhibitedNoteFormulaCountCompSchema,
+	ProhibitedNoteFormulaSizeComp: packedProhibitedNoteFormulaSizeCompSchema,
+	ProhibitedNoteFormulaMD5HashMatch: packedProhibitedNoteFormulaMD5HashMatchSchema,
+	ProhibitedNoteFormulaBlurhashLikely: packedProhibitedNoteFormulaBlurhashLikelySchema,
+	ProhibitedNoteFormulaValue: packedProhibitedNoteFormulaValueSchema,
 	RoleCondFormulaLogics: packedRoleCondFormulaLogicsSchema,
 	RoleCondFormulaValueNot: packedRoleCondFormulaValueNot,
 	RoleCondFormulaValueIsLocalOrRemote: packedRoleCondFormulaValueIsLocalOrRemoteSchema,

@@ -59,6 +59,7 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { UserBlockingService } from '@/core/UserBlockingService.js';
 import { isReply } from '@/misc/is-reply.js';
 import { trackPromise } from '@/misc/promise-tracker.js';
+import { NoteProhibitService } from '@/core/NoteProhibitService.js';
 
 type NotificationType = 'reply' | 'renote' | 'quote' | 'mention';
 
@@ -152,6 +153,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 	#shutdownController = new AbortController();
 
 	public static ContainsProhibitedWordsError = class extends Error {};
+	public static MatchedProhibitedPatternsError = class extends Error {};
 	public static QuoteProhibitedUserError = class extends Error {};
 	public static ReplyProhibitedUserError = class extends Error {};
 
@@ -221,6 +223,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		private instanceChart: InstanceChart,
 		private utilityService: UtilityService,
 		private userBlockingService: UserBlockingService,
+		private noteProhibitService: NoteProhibitService,
 	) { }
 
 	@bindThis
@@ -388,6 +391,18 @@ export class NoteCreateService implements OnApplicationShutdown {
 			if (data.reply && !data.visibleUsers.some(x => x.id === data.reply!.userId)) {
 				data.visibleUsers.push(await this.usersRepository.findOneByOrFail({ id: data.reply!.userId }));
 			}
+		}
+
+		if (await this.noteProhibitService.isProhibitedNote({
+			userId: user.id,
+			text: data.text,
+			reply: data.reply ?? null,
+			renote: data.renote ?? null,
+			mentions: mentionedUsers.map(v => { return { username: v.username, host: v.host }; }),
+			hashtags: tags,
+			files: data.files ?? null,
+		})) {
+			throw new NoteCreateService.MatchedProhibitedPatternsError();
 		}
 
 		const note = await this.insertNote(user, data, tags, emojis, mentionedUsers);

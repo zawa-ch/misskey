@@ -4553,6 +4553,60 @@ export type components = {
       headers: Record<string, never>;
       success: boolean;
     };
+    ProhibitedNoteFormulaConstants: {
+      /** @enum {string} */
+      type: 'true' | 'false';
+    };
+    ProhibitedNoteFormulaLogics: {
+      /** @enum {string} */
+      type: 'and' | 'or';
+      values: components['schemas']['ProhibitedNoteFormulaValue'][];
+    };
+    ProhibitedNoteFormulaNot: {
+      /** @enum {string} */
+      type: 'not';
+      value: components['schemas']['ProhibitedNoteFormulaValue'];
+    };
+    ProhibitedNoteFormulaZeroArg: {
+      /** @enum {string} */
+      type: 'nameIsDefault' | 'hasText' | 'hasMentions' | 'isReply' | 'isQuoted' | 'hasFiles' | 'hasBrowserInsafe' | 'hasPictures' | 'hasHashtags';
+    };
+    ProhibitedNoteFormulaPatternMatch: {
+      /** @enum {string} */
+      type: 'usernameMatchOf' | 'nameMatchOf' | 'textMatchOf' | 'hasHashtagMatchOf';
+      pattern: string;
+    };
+    ProhibitedNoteFormulaAssignsRole: {
+      /** @enum {string} */
+      type: 'roleAssignedOf';
+      /**
+       * Format: id
+       * @example xxxxxxxxxx
+       */
+      roleId: string;
+    };
+    ProhibitedNoteFormulaCountComp: {
+      /** @enum {string} */
+      type: 'mentionCountIs' | 'mentionCountMoreThanOrEq' | 'mentionCountLessThan' | 'fileCountIs' | 'fileCountMoreThanOrEq' | 'fileCountLessThan' | 'hashtagCountIs' | 'hashtagCountMoreThanOrEq' | 'hashtagCountLessThan';
+      value: number;
+    };
+    ProhibitedNoteFormulaSizeComp: {
+      /** @enum {string} */
+      type: 'fileTotalSizeMoreThanOrEq' | 'fileTotalSizeLessThan' | 'hasFileSizeMoreThanOrEq' | 'hasFileSizeLessThan';
+      size: number;
+    };
+    ProhibitedNoteFormulaMD5HashMatch: {
+      /** @enum {string} */
+      type: 'hasFileMD5Is';
+      hash: string;
+    };
+    ProhibitedNoteFormulaBlurhashLikely: {
+      /** @enum {string} */
+      type: 'hasLikelyBlurhash';
+      hash: string;
+      diff: number;
+    };
+    ProhibitedNoteFormulaValue: components['schemas']['ProhibitedNoteFormulaConstants'] | components['schemas']['ProhibitedNoteFormulaLogics'] | components['schemas']['ProhibitedNoteFormulaNot'] | components['schemas']['ProhibitedNoteFormulaZeroArg'] | components['schemas']['ProhibitedNoteFormulaPatternMatch'] | components['schemas']['ProhibitedNoteFormulaAssignsRole'] | components['schemas']['ProhibitedNoteFormulaCountComp'] | components['schemas']['ProhibitedNoteFormulaSizeComp'] | components['schemas']['ProhibitedNoteFormulaMD5HashMatch'] | components['schemas']['ProhibitedNoteFormulaBlurhashLikely'];
     RoleCondFormulaLogics: {
       id: string;
       /** @enum {string} */
@@ -4784,6 +4838,7 @@ export type operations = {
             blockedHosts: string[];
             sensitiveWords: string[];
             prohibitedWords: string[];
+            prohibitedNotePattern: components['schemas']['ProhibitedNoteFormulaValue'] | null;
             bannedEmailDomains?: string[];
             preservedUsernames: string[];
             hcaptchaSecretKey: string | null;
@@ -8704,6 +8759,7 @@ export type operations = {
           blockedHosts?: string[] | null;
           sensitiveWords?: string[] | null;
           prohibitedWords?: string[] | null;
+          prohibitedNotePattern?: Record<string, never> | null;
           themeColor?: string | null;
           mascotImageUrl?: string | null;
           bannerUrl?: string | null;
