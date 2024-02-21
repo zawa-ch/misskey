@@ -52,7 +52,7 @@ export const packedRoleCondFormulaValueIsLocalOrRemoteSchema = {
 		type: {
 			type: 'string',
 			nullable: false, optional: false,
-			enum: ['isLocal', 'isRemote'],
+			enum: ['isLocal', 'isRemote', 'isFederated', 'isSubscribing', 'isPublishing', 'isForeign'],
 		},
 	},
 } as const;

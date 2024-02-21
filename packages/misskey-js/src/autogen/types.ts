@@ -4622,7 +4622,7 @@ export type components = {
     RoleCondFormulaValueIsLocalOrRemote: {
       id: string;
       /** @enum {string} */
-      type: 'isLocal' | 'isRemote';
+      type: 'isLocal' | 'isRemote' | 'isFederated' | 'isSubscribing' | 'isPublishing' | 'isForeign';
     };
     RoleCondFormulaValueCreated: {
       id: string;
