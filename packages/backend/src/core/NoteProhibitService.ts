@@ -43,14 +43,15 @@ export class NoteProhibitService {
 		if (formula.type) {
 			const user = await this.cacheService.findUserById(subject.userId);
 			const roles = await this.roleService.getUserRoles(subject.userId);
-			return this.evalcond(subject, user, roles, formula);
+			const bhash = subject.files?.filter(v => v.blurhash != null).map(v => { try { return decode(v.blurhash ?? '', 5, 5); } catch (e) { return null; }}).filter(v => v != null).map(v => v as Uint8ClampedArray) ?? [];
+			return this.evalcond(subject, user, roles, bhash, formula);
 		} else {
 			return false;
 		}
 	}
 
 	@bindThis
-	private evalcond(subject: InspectionSubject, user: MiUser, roles: MiRole[], formula: ProhibitedNoteFormulaValue): boolean {
+	private evalcond(subject: InspectionSubject, user: MiUser, roles: MiRole[], blurhashes: Uint8ClampedArray[], formula: ProhibitedNoteFormulaValue): boolean {
 		try {
 			switch (formula.type) {
 				case 'true': {
@@ -60,13 +61,13 @@ export class NoteProhibitService {
 					return false;
 				}
 				case 'and': {
-					return formula.values.every(v => this.evalcond(subject, user, roles, v));
+					return formula.values.every(v => this.evalcond(subject, user, roles, blurhashes, v));
 				}
 				case 'or': {
-					return formula.values.some(v => this.evalcond(subject, user, roles, v));
+					return formula.values.some(v => this.evalcond(subject, user, roles, blurhashes, v));
 				}
 				case 'not': {
-					return !this.evalcond(subject, user, roles, formula.value);
+					return !this.evalcond(subject, user, roles, blurhashes, formula.value);
 				}
 				case 'usernameMatchOf': {
 					return this.utilityService.isKeyWordIncluded(user.username, [formula.pattern]);
@@ -140,8 +141,7 @@ export class NoteProhibitService {
 				case 'hasLikelyBlurhash': {
 					try {
 						const k = decode(formula.hash, 5, 5);
-						const h = (subject.files ?? []).filter(f => f.blurhash != null).map(f => f.blurhash ?? '');
-						return h.some(i => {try { return decode(i, 5, 5).reduce((v, j, n) => v + Math.abs(j - k[n]), 0) <= formula.diff; } catch (e) { return false;}});
+						return blurhashes.some(h => h.reduce((v, j, n) => v + (j >= k[n] ? j - k[n] : k[n] - j), 0) <= formula.diff);
 					} catch (e) {
 						return false;
 					}
