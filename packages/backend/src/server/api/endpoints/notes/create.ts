@@ -27,6 +27,8 @@ export const meta = {
 
 	requireCredential: true,
 
+	requireRolePolicy: 'canPostNote',
+
 	prohibitMoved: true,
 
 	limit: {
@@ -260,9 +262,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			// TODO: コール回数多いAPIのためキャッシュする
 			const policies = (await this.roleService.getUserPolicies(me.id));
-			if (!policies.canPostNote) {
-				throw new ApiError(meta.errors.restrictedByRole);
-			}
 			if (ps.text && ps.text.length > policies.noteLengthLimit) {
 				throw new ApiError(meta.errors.tooLong);
 			}

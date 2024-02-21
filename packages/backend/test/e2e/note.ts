@@ -6,6 +6,7 @@
 process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
+import { expect } from '@jest/globals';
 import { MiNote } from '@/models/Note.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { api, initTestDb, post, signup, uploadFile, uploadUrl } from '../utils.js';
@@ -637,7 +638,7 @@ describe('Note', () => {
 			assert.strictEqual(res.status, 200);
 
 			const assign = await api('admin/roles/assign', {
-				userId: alice.id,
+				userId: bob.id,
 				roleId: res.body.id,
 			}, alice);
 
@@ -646,13 +647,13 @@ describe('Note', () => {
 			const post = {
 				text: 'test',
 			};
-			const postNote = await api('/notes/create', post, alice);
+			const postNote = await api('/notes/create', post, bob);
 
-			assert.strictEqual(postNote.status, 400);
-			assert.strictEqual(postNote.body.error.code, 'RESTRICTED_BY_ROLE');
+			expect(postNote.status).toStrictEqual(403);
+			expect(postNote.body.error.code).toStrictEqual('ROLE_PERMISSION_DENIED');
 
 			await api('admin/roles/unassign', {
-				userId: alice.id,
+				userId: bob.id,
 				roleId: res.body.id,
 			});
 
