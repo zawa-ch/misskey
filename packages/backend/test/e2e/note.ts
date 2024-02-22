@@ -871,6 +871,65 @@ describe('Note', () => {
 			}, alice);
 		});
 
+		test('ロールで禁止されている場合DMできない', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canDirectMessage: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(role.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const bobPost = await post(bob, {
+				text: 'foo',
+			});
+
+			const alicePost = {
+				text: 'bar',
+				replyId: bobPost.id,
+				visibility: 'specified',
+				visibleUserIds: [bob.id],
+			};
+
+			const postNote = await api('/notes/create', alicePost, alice);
+
+			assert.strictEqual(postNote.status, 400);
+			assert.strictEqual(postNote.body.error.code, 'RESTRICTED_BY_ROLE');
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
 		test('ロールで禁止されている場合renoteできない', async () => {
 			const role = await api('admin/roles/create', {
 				name: 'test',

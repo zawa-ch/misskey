@@ -266,7 +266,8 @@ const canPost = computed((): boolean => {
 		(props.mention ? $i.policies.canReply : true) &&
 		(props.reply ? $i.policies.canReply : true) &&
 		(quoteId.value ? $i.policies.canQuote : true) &&
-		(props.renote ? $i.policies.canQuote : true);
+		(props.renote ? $i.policies.canQuote : true) &&
+		(visibility.value === 'specified' ? ((has_mention || visibleUsers.value.filter(u => u.id !== $i.id).length > 0) ? $i.policies.canDirectMessage : true) : true);
 });
 
 const withHashtags = computed(defaultStore.makeGetterSetter('postFormWithHashtags'));

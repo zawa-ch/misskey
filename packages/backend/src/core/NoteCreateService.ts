@@ -156,6 +156,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 	public static MatchedProhibitedPatternsError = class extends Error {};
 	public static QuoteProhibitedUserError = class extends Error {};
 	public static ReplyProhibitedUserError = class extends Error {};
+	public static DirectMessageProhibitedUserError = class extends Error {};
 
 	constructor(
 		@Inject(DI.config)
@@ -258,12 +259,13 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (data.channel != null) data.localOnly = true;
 
 		const meta = await this.metaService.fetch();
+		const policies = await this.roleService.getUserPolicies(user.id);
 
 		if (data.visibility === 'public' && data.channel == null) {
 			const sensitiveWords = meta.sensitiveWords;
 			if (this.utilityService.isKeyWordIncluded(data.cw ?? data.text ?? '', sensitiveWords)) {
 				data.visibility = 'home';
-			} else if ((await this.roleService.getUserPolicies(user.id)).canPublicNote === false) {
+			} else if (policies.canPublicNote === false) {
 				data.visibility = 'home';
 			}
 		}
@@ -280,7 +282,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 		if (data.renote) {
 			// 引用/Renote可能なユーザーか調べる
-			if ((await this.roleService.getUserPolicies(user.id)).canQuote === false) {
+			if (policies.canQuote === false) {
 				throw new NoteCreateService.QuoteProhibitedUserError();
 			}
 			switch (data.renote.visibility) {
@@ -371,8 +373,13 @@ export class NoteCreateService implements OnApplicationShutdown {
 		tags = tags.filter(tag => Array.from(tag).length <= 128).splice(0, 32);
 
 		// 返信/メンション可能なユーザーか調べる
-		if ((mentionedUsers.length !== 0 || data.reply) && ((await this.roleService.getUserPolicies(user.id)).canReply === false)) {
+		if ((mentionedUsers.length !== 0 || data.reply) && (policies.canReply === false)) {
 			throw new NoteCreateService.ReplyProhibitedUserError();
+		}
+
+		// DM可能なユーザーか調べる
+		if ((data.visibility === 'specified') && (mentionedUsers.filter(u => u.id !== user.id).length !== 0 || (data.visibleUsers?.filter(u => u.id !== user.id).length ?? 0) !== 0) && (!policies.canDirectMessage)) {
+			throw new NoteCreateService.DirectMessageProhibitedUserError();
 		}
 
 		if (data.reply && (user.id !== data.reply.userId) && !mentionedUsers.some(u => u.id === data.reply!.userId)) {

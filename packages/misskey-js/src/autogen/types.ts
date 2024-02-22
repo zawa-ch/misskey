@@ -4689,6 +4689,7 @@ export type components = {
       canPublicNote: boolean;
       canReply: boolean;
       canQuote: boolean;
+      canDirectMessage: boolean;
       canInvite: boolean;
       inviteLimit: number;
       inviteLimitCycle: number;

@@ -6435,6 +6435,10 @@ export interface Locale extends ILocale {
              */
             "canQuote": string;
             /**
+             * ダイレクトメッセージの許可
+             */
+            "canDirectMessage": string;
+            /**
              * サーバー招待コードの発行
              */
             "canInvite": string;
