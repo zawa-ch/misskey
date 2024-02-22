@@ -15,10 +15,10 @@
 ## 2024.2.0-geoplantery.5.a
 
 ## General
-- a8ad5dd8 でリモートのメンション/DMに対する制限が壊れていたのを修正
+- Fix: a8ad5dd8 でリモートのメンション/DMに対する制限が壊れていたのを修正
 
 ## Client
-- 画像のBlurhashをコピーする機能を追加
+- Feat: 画像のBlurhashをコピーする機能を追加
 - Fix: a8ad5dd8 で自身への返信を行うことができないのを修正
 
 ## Server
