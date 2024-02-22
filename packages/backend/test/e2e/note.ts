@@ -871,6 +871,62 @@ describe('Note', () => {
 			}, alice);
 		});
 
+		test('ロールで禁止されている場合でも自分には返信できる', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canReply: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(role.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const post1 = await post(alice, {
+				text: 'foo',
+			});
+
+			const post2 = {
+				text: 'bar',
+				replyId: post1.id,
+			};
+
+			const postNote = await api('/notes/create', post2, alice);
+
+			assert.strictEqual(postNote.status, 200);
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
 		test('ロールで禁止されている場合DMできない', async () => {
 			const role = await api('admin/roles/create', {
 				name: 'test',
@@ -919,6 +975,62 @@ describe('Note', () => {
 
 			assert.strictEqual(postNote.status, 400);
 			assert.strictEqual(postNote.body.error.code, 'RESTRICTED_BY_ROLE');
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
+		test('ロールで禁止されている場合でも自分にはDMできる', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canDirectMessage: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(role.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const post1 = await post(alice, {
+				text: 'foo',
+			});
+
+			const post2 = await api('/notes/create', {
+				text: 'bar',
+				replyId: post1.id,
+				visibility: 'specified',
+				visibleUserIds: [alice.id],
+			}, alice);
+
+			assert.strictEqual(post2.status, 200);
 
 			await api('admin/roles/unassign', {
 				userId: alice.id,

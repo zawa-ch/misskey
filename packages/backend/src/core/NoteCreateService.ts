@@ -372,18 +372,18 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 		tags = tags.filter(tag => Array.from(tag).length <= 128).splice(0, 32);
 
+		if (data.reply && (user.id !== data.reply.userId) && !mentionedUsers.some(u => u.id === data.reply!.userId)) {
+			mentionedUsers.push(await this.usersRepository.findOneByOrFail({ id: data.reply!.userId }));
+		}
+
 		// 返信/メンション可能なユーザーか調べる
-		if ((mentionedUsers.length !== 0 || data.reply) && (policies.canReply === false)) {
+		if ((mentionedUsers.filter(u => u.id !== user.id).length !== 0) && (policies.canReply === false)) {
 			throw new NoteCreateService.ReplyProhibitedUserError();
 		}
 
 		// DM可能なユーザーか調べる
-		if ((data.visibility === 'specified') && (mentionedUsers.filter(u => u.id !== user.id).length !== 0 || (data.visibleUsers?.filter(u => u.id !== user.id).length ?? 0) !== 0) && (!policies.canDirectMessage)) {
+		if ((data.visibility === 'specified') && (mentionedUsers.filter(u => u.id !== user.id).length !== 0 || (data.visibleUsers?.filter(u => u.id !== user.id).length ?? 0) !== 0) && (policies.canDirectMessage === false)) {
 			throw new NoteCreateService.DirectMessageProhibitedUserError();
-		}
-
-		if (data.reply && (user.id !== data.reply.userId) && !mentionedUsers.some(u => u.id === data.reply!.userId)) {
-			mentionedUsers.push(await this.usersRepository.findOneByOrFail({ id: data.reply!.userId }));
 		}
 
 		if (data.visibility === 'specified') {
