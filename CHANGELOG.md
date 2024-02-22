@@ -19,6 +19,7 @@
 
 ## Client
 - 画像のBlurhashをコピーする機能を追加
+- Fix: a8ad5dd8 で自身への返信を行うことができないのを修正
 
 ## 2024.2.0-geoplantery.5
 
