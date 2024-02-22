@@ -54,6 +54,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { watch, ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { getStaticImageUrl } from '@/scripts/media-proxy.js';
+import copyToClipboard from '@/scripts/copy-to-clipboard.js';
 import bytes from '@/filters/bytes.js';
 import ImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
 import { defaultStore } from '@/store.js';
@@ -106,6 +107,13 @@ function showMenu(ev: MouseEvent) {
 		icon: 'ti ti-eye-off',
 		action: () => {
 			hide.value = true;
+		},
+	}, {
+		text: i18n.ts.copyBlurhash,
+		icon: 'ti ti-copy',
+		action: () => {
+			copyToClipboard(props.image.blurhash);
+			os.success();
 		},
 	}, ...(iAmModerator ? [{
 		text: i18n.ts.markAsSensitive,

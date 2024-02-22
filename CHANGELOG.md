@@ -12,6 +12,11 @@
 
 -->
 
+## 2024.2.0-geoplantery.5.a
+
+## Client
+- 画像のBlurhashをコピーする機能を追加
+
 ## 2024.2.0-geoplantery.5
 
 ## Note

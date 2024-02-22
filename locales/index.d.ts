@@ -253,6 +253,10 @@ export interface Locale extends ILocale {
      */
     "copyProfileUrl": string;
     /**
+     * 画像のBlurhashをコピー
+     */
+    "copyBlurhash": string;
+    /**
      * ユーザーを検索
      */
     "searchUser": string;
