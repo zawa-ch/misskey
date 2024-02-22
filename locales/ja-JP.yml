@@ -1650,6 +1650,7 @@ _role:
   descriptionOfDisplayOrder: "数値が大きいほどUI上で先頭に表示されます。"
   canEditMembersByModerator: "モデレーターのメンバー編集を許可"
   descriptionOfCanEditMembersByModerator: "オンにすると、管理者に加えてモデレーターもこのロールへユーザーをアサイン/アサイン解除できるようになります。オフにすると管理者のみが行えます。"
+  patternEditDescription: "スペースで区切るとAND指定になり、キーワードをスラッシュで囲むと正規表現になります。"
   priority: "優先度"
   _priority:
     low: "低"
@@ -1687,6 +1688,10 @@ _role:
     canUseTranslator: "翻訳機能の利用"
     avatarDecorationLimit: "アイコンデコレーションの最大取付個数"
   _condition:
+    roleAssignedOf: "マニュアルロールにアサイン済み"
+    usernameMatchOf: "ユーザー名が〜にマッチ"
+    nameMatchOf: "ユーザーの表示名が〜にマッチ"
+    nameIsDefault: "ユーザーの表示名が初期状態"
     isLocal: "ローカルユーザー"
     isRemote: "リモートユーザー"
     isFederated: "連合サーバーのユーザー"
@@ -1718,9 +1723,6 @@ _prohibitedNote:
     and: "〜かつ〜"
     or: "〜または〜"
     not: "～ではない"
-    usernameMatchOf: "ユーザー名が〜にマッチ"
-    nameMatchOf: "ユーザーの表示名が〜にマッチ"
-    nameIsDefault: "ユーザーの表示名が初期状態"
     roleAssignedOf: "ロールにアサイン済み"
     hasText: "テキストを含む"
     textMatchOf: "テキストが〜にマッチ"

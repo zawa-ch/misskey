@@ -30,20 +30,6 @@ type ProhibitedNoteFormulaValueNot = {
 	value: ProhibitedNoteFormulaValue;
 };
 
-type ProhibitedNoteFormulaValueUsernameMatchOf = {
-	type: 'usernameMatchOf';
-	pattern: string;
-};
-
-type ProhibitedNoteFormulaValueNameMatchOf = {
-	type: 'nameMatchOf';
-	pattern: string;
-};
-
-type ProhibitedNoteFormulaValueNameIsDefault = {
-	type: 'nameIsDefault';
-};
-
 type ProhibitedNoteFormulaValueRoleAssignedOf = {
 	type: 'roleAssignedOf';
 	roleId: string;
@@ -174,9 +160,6 @@ export type ProhibitedNoteFormulaValue = (
 	ProhibitedNoteFormulaValueAnd |
 	ProhibitedNoteFormulaValueOr |
 	ProhibitedNoteFormulaValueNot |
-	ProhibitedNoteFormulaValueUsernameMatchOf |
-	ProhibitedNoteFormulaValueNameMatchOf |
-	ProhibitedNoteFormulaValueNameIsDefault |
 	ProhibitedNoteFormulaValueRoleAssignedOf |
 	ProhibitedNoteFormulaValueHasText |
 	ProhibitedNoteFormulaValueTextMatchOf |

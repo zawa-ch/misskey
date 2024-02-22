@@ -14,7 +14,6 @@ import { FILE_TYPE_BROWSERSAFE } from '@/const.js';
 import { MiRole } from '@/models/Role.js';
 import { RoleService } from './RoleService.js';
 import { MetaService } from './MetaService.js';
-import { CacheService } from './CacheService.js';
 import { UtilityService } from './UtilityService.js';
 
 type InspectionSubject = {
@@ -31,7 +30,6 @@ type InspectionSubject = {
 export class NoteProhibitService {
 	constructor(
 		private metaService: MetaService,
-		private cacheService: CacheService,
 		private roleService: RoleService,
 		private utilityService: UtilityService,
 	) {
@@ -41,17 +39,16 @@ export class NoteProhibitService {
 	public async isProhibitedNote(subject: InspectionSubject): Promise<boolean> {
 		const formula = (await this.metaService.fetch()).prohibitedNotePattern;
 		if (formula.type) {
-			const user = await this.cacheService.findUserById(subject.userId);
 			const roles = await this.roleService.getUserRoles(subject.userId);
 			const bhash = subject.files?.filter(v => v.blurhash != null).map(v => { try { return decode(v.blurhash ?? '', 5, 5); } catch (e) { return null; }}).filter(v => v != null).map(v => v as Uint8ClampedArray) ?? [];
-			return this.evalcond(subject, user, roles, bhash, formula);
+			return this.evalcond(subject, roles, bhash, formula);
 		} else {
 			return false;
 		}
 	}
 
 	@bindThis
-	private evalcond(subject: InspectionSubject, user: MiUser, roles: MiRole[], blurhashes: Uint8ClampedArray[], formula: ProhibitedNoteFormulaValue): boolean {
+	private evalcond(subject: InspectionSubject, roles: MiRole[], blurhashes: Uint8ClampedArray[], formula: ProhibitedNoteFormulaValue): boolean {
 		try {
 			switch (formula.type) {
 				case 'true': {
@@ -61,22 +58,13 @@ export class NoteProhibitService {
 					return false;
 				}
 				case 'and': {
-					return formula.values.every(v => this.evalcond(subject, user, roles, blurhashes, v));
+					return formula.values.every(v => this.evalcond(subject, roles, blurhashes, v));
 				}
 				case 'or': {
-					return formula.values.some(v => this.evalcond(subject, user, roles, blurhashes, v));
+					return formula.values.some(v => this.evalcond(subject, roles, blurhashes, v));
 				}
 				case 'not': {
-					return !this.evalcond(subject, user, roles, blurhashes, formula.value);
-				}
-				case 'usernameMatchOf': {
-					return this.utilityService.isKeyWordIncluded(user.username, [formula.pattern]);
-				}
-				case 'nameMatchOf': {
-					return this.utilityService.isKeyWordIncluded(user.name ?? '', [formula.pattern]);
-				}
-				case 'nameIsDefault': {
-					return user.name ? (user.name === user.username) : true;
+					return !this.evalcond(subject, roles, blurhashes, formula.value);
 				}
 				case 'roleAssignedOf': {
 					return roles.some(r => r.id === formula.roleId);

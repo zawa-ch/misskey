@@ -54,7 +54,7 @@ export const packedProhibitedNoteFormulaZeroArgSchema = {
 		type: {
 			type: 'string',
 			nullable: false, optional: false,
-			enum: ['nameIsDefault', 'hasText', 'hasMentions', 'isReply', 'isQuoted', 'hasFiles', 'hasBrowserInsafe', 'hasPictures', 'hasHashtags'],
+			enum: ['hasText', 'hasMentions', 'isReply', 'isQuoted', 'hasFiles', 'hasBrowserInsafe', 'hasPictures', 'hasHashtags'],
 		},
 	},
 } as const;
@@ -65,7 +65,7 @@ export const packedProhibitedNoteFormulaPatternMatchSchema = {
 		type: {
 			type: 'string',
 			nullable: false, optional: false,
-			enum: ['usernameMatchOf', 'nameMatchOf', 'textMatchOf', 'hasHashtagMatchOf'],
+			enum: ['textMatchOf', 'hasHashtagMatchOf'],
 		},
 		pattern: {
 			type: 'string',

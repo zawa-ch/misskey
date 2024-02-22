@@ -4569,11 +4569,11 @@ export type components = {
     };
     ProhibitedNoteFormulaZeroArg: {
       /** @enum {string} */
-      type: 'nameIsDefault' | 'hasText' | 'hasMentions' | 'isReply' | 'isQuoted' | 'hasFiles' | 'hasBrowserInsafe' | 'hasPictures' | 'hasHashtags';
+      type: 'hasText' | 'hasMentions' | 'isReply' | 'isQuoted' | 'hasFiles' | 'hasBrowserInsafe' | 'hasPictures' | 'hasHashtags';
     };
     ProhibitedNoteFormulaPatternMatch: {
       /** @enum {string} */
-      type: 'usernameMatchOf' | 'nameMatchOf' | 'textMatchOf' | 'hasHashtagMatchOf';
+      type: 'textMatchOf' | 'hasHashtagMatchOf';
       pattern: string;
     };
     ProhibitedNoteFormulaAssignsRole: {

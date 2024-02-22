@@ -6388,6 +6388,10 @@ export interface Locale extends ILocale {
          */
         "descriptionOfCanEditMembersByModerator": string;
         /**
+         * スペースで区切るとAND指定になり、キーワードをスラッシュで囲むと正規表現になります。
+         */
+        "patternEditDescription": string;
+        /**
          * 優先度
          */
         "priority": string;
@@ -6529,6 +6533,22 @@ export interface Locale extends ILocale {
         };
         "_condition": {
             /**
+             * マニュアルロールにアサイン済み
+             */
+            "roleAssignedOf": string;
+            /**
+             * ユーザー名が〜にマッチ
+             */
+            "usernameMatchOf": string;
+            /**
+             * ユーザーの表示名が〜にマッチ
+             */
+            "nameMatchOf": string;
+            /**
+             * ユーザーの表示名が初期状態
+             */
+            "nameIsDefault": string;
+            /**
              * ローカルユーザー
              */
             "isLocal": string;
@@ -6644,18 +6664,6 @@ export interface Locale extends ILocale {
              * ～ではない
              */
             "not": string;
-            /**
-             * ユーザー名が〜にマッチ
-             */
-            "usernameMatchOf": string;
-            /**
-             * ユーザーの表示名が〜にマッチ
-             */
-            "nameMatchOf": string;
-            /**
-             * ユーザーの表示名が初期状態
-             */
-            "nameIsDefault": string;
             /**
              * ロールにアサイン済み
              */

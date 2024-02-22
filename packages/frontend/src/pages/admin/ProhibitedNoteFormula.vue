@@ -13,9 +13,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<option value="and">{{ i18n.ts._prohibitedNote._condition.and }}</option>
 			<option value="or">{{ i18n.ts._prohibitedNote._condition.or }}</option>
 			<option value="not">{{ i18n.ts._prohibitedNote._condition.not }}</option>
-			<option value="usernameMatchOf">{{ i18n.ts._prohibitedNote._condition.usernameMatchOf }}</option>
-			<option value="nameMatchOf">{{ i18n.ts._prohibitedNote._condition.nameMatchOf }}</option>
-			<option value="nameIsDefault">{{ i18n.ts._prohibitedNote._condition.nameIsDefault }}</option>
 			<option value="roleAssignedOf">{{ i18n.ts._prohibitedNote._condition.roleAssignedOf }}</option>
 			<option value="hasText">{{ i18n.ts._prohibitedNote._condition.hasText }}</option>
 			<option value="textMatchOf">{{ i18n.ts._prohibitedNote._condition.textMatchOf }}</option>
@@ -79,7 +76,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 	<MkInput v-else-if="['mentionCountIs', 'mentionCountMoreThanOrEq', 'mentionCountLessThan', 'fileCountIs', 'fileCountMoreThanOrEq', 'fileCountLessThan', 'hashtagCountIs', 'hashtagCountMoreThanOrEq', 'hashtagCountLessThan'].includes(type)" v-model="count" type="number"/>
 
-	<MkInput v-else-if="['usernameMatchOf', 'nameMatchOf', 'textMatchOf', 'hasHashtagMatchOf'].includes(type)" v-model="pattern" type="text">
+	<MkInput v-else-if="['textMatchOf', 'hasHashtagMatchOf'].includes(type)" v-model="pattern" type="text">
 		<template #caption>{{ i18n.ts._prohibitedNote.patternEditDescription }}</template>
 	</MkInput>
 
@@ -159,7 +156,6 @@ const type = computed({
 				formula.value = { type: t, value: { type: 'false' } };
 				break;
 			}
-			case 'nameIsDefault':
 			case 'hasText':
 			case 'hasMentions':
 			case 'isReply':
@@ -171,8 +167,6 @@ const type = computed({
 				formula.value = { type: t };
 				break;
 			}
-			case 'usernameMatchOf':
-			case 'nameMatchOf':
 			case 'textMatchOf':
 			case 'hasHashtagMatchOf': {
 				formula.value = { type: t, pattern: '' };

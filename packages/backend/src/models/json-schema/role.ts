@@ -43,6 +43,23 @@ export const packedRoleCondFormulaValueNot = {
 	},
 } as const;
 
+export const packedRoleCondFormulaValueAssignsRoleSchema = {
+	type: 'object',
+	properties: {
+		type: {
+			type: 'string',
+			nullable: false, optional: false,
+			enum: ['roleAssignedOf'],
+		},
+		roleId: {
+			type: 'string',
+			nullable: false, optional: false,
+			format: 'id',
+			example: 'xxxxxxxxxx',
+		},
+	},
+} as const;
+
 export const packedRoleCondFormulaValueIsLocalOrRemoteSchema = {
 	type: 'object',
 	properties: {
@@ -98,6 +115,38 @@ export const packedRoleCondFormulaFollowersOrFollowingOrNotesSchema = {
 		},
 		value: {
 			type: 'number',
+			nullable: false, optional: false,
+		},
+	},
+} as const;
+
+export const packedRoleCondFormulaValueZeroArgSchema = {
+	type: 'object',
+	properties: {
+		id: {
+			type: 'string', optional: false,
+		},
+		type: {
+			type: 'string',
+			nullable: false, optional: false,
+			enum: ['nameIsDefault'],
+		},
+	},
+} as const;
+
+export const packedRoleCondFormulaValuePatternMatchSchema = {
+	type: 'object',
+	properties: {
+		id: {
+			type: 'string', optional: false,
+		},
+		type: {
+			type: 'string',
+			nullable: false, optional: false,
+			enum: ['usernameMatchOf', 'nameMatchOf'],
+		},
+		pattern: {
+			type: 'string',
 			nullable: false, optional: false,
 		},
 	},

@@ -1262,60 +1262,6 @@ describe('Note', () => {
 		}, alice);
 	});
 
-	test('禁止パターンを含む投稿はエラーになる (ユーザーハンドルマッチ)', async () => {
-		const prohibited = await api('admin/update-meta', {
-			prohibitedNotePattern: {
-				type: 'usernameMatchOf',
-				pattern: 'alice',
-			},
-		}, alice);
-		assert.strictEqual(prohibited.status, 204);
-
-		await new Promise(x => setTimeout(x, 2));
-
-		const note1 = await api('/notes/create', {
-			text: 'hoge',
-		}, alice);
-		assert.strictEqual(note1.status, 400);
-		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
-
-		const note2 = await api('/notes/create', {
-			text: 'hoge',
-		}, bob);
-		assert.strictEqual(note2.status, 200);
-
-		await api('admin/update-meta', {
-			prohibitedNotePattern: null,
-		}, alice);
-	});
-
-	test('禁止パターンを含む投稿はエラーになる (デフォルトの名前)', async () => {
-		const prohibited = await api('admin/update-meta', {
-			prohibitedNotePattern: {
-				type: 'nameIsDefault',
-			},
-		}, alice);
-		assert.strictEqual(prohibited.status, 204);
-
-		await new Promise(x => setTimeout(x, 2));
-
-		const note1 = await api('/notes/create', {
-			text: 'hoge',
-		}, alice);
-		assert.strictEqual(note1.status, 400);
-		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
-
-		const note2 = await api('/notes/create', {
-			text: 'hoge',
-		}, bob);
-		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
-
-		await api('admin/update-meta', {
-			prohibitedNotePattern: null,
-		}, alice);
-	});
-
 	test('禁止パターンを含む投稿はエラーになる (ユーザーロール)', async () => {
 		const role = await api('admin/roles/create', {
 			name: 'test',
