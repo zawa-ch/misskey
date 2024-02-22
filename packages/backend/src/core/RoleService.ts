@@ -33,6 +33,7 @@ import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import type { Config } from '@/config.js';
 import { FederatedInstanceService } from './FederatedInstanceService.js';
+import { UtilityService } from './UtilityService.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 
 export type RolePolicies = {
@@ -43,6 +44,7 @@ export type RolePolicies = {
 	canPublicNote: boolean;
 	canReply: boolean;
 	canQuote: boolean;
+	canDirectMessage: boolean;
 	canInvite: boolean;
 	inviteLimit: number;
 	inviteLimitCycle: number;
@@ -74,6 +76,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canPublicNote: true,
 	canReply: true,
 	canQuote: true,
+	canDirectMessage: true,
 	canInvite: false,
 	inviteLimit: 0,
 	inviteLimitCycle: 60 * 24 * 7,
@@ -138,6 +141,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		private moderationLogService: ModerationLogService,
 		private federatedInstanceService: FederatedInstanceService,
 		private fanoutTimelineService: FanoutTimelineService,
+		private utilityService: UtilityService,
 	) {
 		//this.onMessage = this.onMessage.bind(this);
 
@@ -216,17 +220,20 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	private evalCond(user: MiUser, instance: MiInstance | null, value: RoleCondFormulaValue): boolean {
+	private evalCond(user: MiUser, instance: MiInstance | null, roles: MiRole[], value: RoleCondFormulaValue): boolean {
 		try {
 			switch (value.type) {
 				case 'and': {
-					return value.values.every(v => this.evalCond(user, instance, v));
+					return value.values.every(v => this.evalCond(user, instance, roles, v));
 				}
 				case 'or': {
-					return value.values.some(v => this.evalCond(user, instance, v));
+					return value.values.some(v => this.evalCond(user, instance, roles, v));
 				}
 				case 'not': {
-					return !this.evalCond(user, instance, value.value);
+					return !this.evalCond(user, instance, roles, value.value);
+				}
+				case 'roleAssignedOf': {
+					return roles.some(r => r.id === value.roleId);
 				}
 				case 'isLocal': {
 					return this.userEntityService.isLocalUser(user);
@@ -235,16 +242,16 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 					return this.userEntityService.isRemoteUser(user);
 				}
 				case 'isFederated': {
-					return this.userEntityService.isRemoteUser(user) && instance ? (instance.followersCount > 0 || instance.followingCount > 0) : false;
+					return this.userEntityService.isRemoteUser(user) && (instance ? (instance.followersCount > 0 || instance.followingCount > 0) : false);
 				}
 				case 'isSubscribing': {
-					return this.userEntityService.isRemoteUser(user) && instance ? (instance.followingCount > 0) : false;
+					return this.userEntityService.isRemoteUser(user) && (instance ? (instance.followingCount > 0) : false);
 				}
 				case 'isPublishing': {
-					return this.userEntityService.isRemoteUser(user) && instance ? (instance.followersCount > 0) : false;
+					return this.userEntityService.isRemoteUser(user) && (instance ? (instance.followersCount > 0) : false);
 				}
 				case 'isForeign': {
-					return this.userEntityService.isRemoteUser(user) && instance ? (instance.followersCount === 0 && instance.followingCount === 0) : true;
+					return this.userEntityService.isRemoteUser(user) && (instance ? (instance.followersCount === 0 && instance.followingCount === 0) : true);
 				}
 				case 'createdLessThan': {
 					return this.idService.parse(user.id).date.getTime() > (Date.now() - (value.sec * 1000));
@@ -269,6 +276,15 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				}
 				case 'notesMoreThanOrEq': {
 					return user.notesCount >= value.value;
+				}
+				case 'usernameMatchOf': {
+					return this.utilityService.isKeyWordIncluded(user.username, [value.pattern]);
+				}
+				case 'nameMatchOf': {
+					return this.utilityService.isKeyWordIncluded(user.name ?? '', [value.pattern]);
+				}
+				case 'nameIsDefault': {
+					return (user.name ?? user.username) === user.username;
 				}
 				default:
 					return false;
@@ -301,7 +317,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		const assignedRoles = roles.filter(r => assigns.map(x => x.roleId).includes(r.id));
 		const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
 		const instance = user ? await this.federatedInstanceService.fetch(user.host ?? this.config.host) : null;
-		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, instance, r.condFormula));
+		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, instance, assignedRoles, r.condFormula));
 		return [...assignedRoles, ...matchedCondRoles];
 	}
 
@@ -314,14 +330,14 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		let assigns = await this.roleAssignmentByUserIdCache.fetch(userId, () => this.roleAssignmentsRepository.findBy({ userId }));
 		// 期限切れのロールを除外
 		assigns = assigns.filter(a => a.expiresAt == null || (a.expiresAt.getTime() > now));
-		const assignedRoleIds = assigns.map(x => x.roleId);
 		const roles = await this.rolesCache.fetch(() => this.rolesRepository.findBy({}));
-		const assignedBadgeRoles = roles.filter(r => r.asBadge && assignedRoleIds.includes(r.id));
+		const assignedRoles = roles.filter(r => assigns.map(x => x.roleId).includes(r.id));
+		const assignedBadgeRoles = assignedRoles.filter(r => r.asBadge);
 		const badgeCondRoles = roles.filter(r => r.asBadge && (r.target === 'conditional'));
 		if (badgeCondRoles.length > 0) {
 			const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
 			const instance = user ? await this.federatedInstanceService.fetch(user.host ?? this.config.host) : null;
-			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user!, instance, r.condFormula));
+			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user!, instance, assignedRoles, r.condFormula));
 			return [...assignedBadgeRoles, ...matchedBadgeCondRoles];
 		} else {
 			return assignedBadgeRoles;
@@ -359,6 +375,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			canPublicNote: calc('canPublicNote', vs => vs.some(v => v === true)),
 			canReply: calc('canReply', vs => vs.some(v => v === true)),
 			canQuote: calc('canQuote', vs => vs.some(v => v === true)),
+			canDirectMessage: calc('canDirectMessage', vs => vs.some(v => v === true)),
 			canInvite: calc('canInvite', vs => vs.some(v => v === true)),
 			inviteLimit: calc('inviteLimit', vs => Math.max(...vs)),
 			inviteLimitCycle: calc('inviteLimitCycle', vs => Math.max(...vs)),

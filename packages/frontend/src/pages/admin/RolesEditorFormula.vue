@@ -13,6 +13,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<option value="isSubscribing">{{ i18n.ts._role._condition.isSubscribing }}</option>
 			<option value="isPublishing">{{ i18n.ts._role._condition.isPublishing }}</option>
 			<option value="isForeign">{{ i18n.ts._role._condition.isForeign }}</option>
+			<option value="roleAssignedOf">{{ i18n.ts._role._condition.roleAssignedOf }}</option>
+			<option value="usernameMatchOf">{{ i18n.ts._role._condition.usernameMatchOf }}</option>
+			<option value="nameMatchOf">{{ i18n.ts._role._condition.nameMatchOf }}</option>
+			<option value="nameIsDefault">{{ i18n.ts._role._condition.nameIsDefault }}</option>
 			<option value="createdLessThan">{{ i18n.ts._role._condition.createdLessThan }}</option>
 			<option value="createdMoreThan">{{ i18n.ts._role._condition.createdMoreThan }}</option>
 			<option value="followersLessThanOrEq">{{ i18n.ts._role._condition.followersLessThanOrEq }}</option>
@@ -55,6 +59,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 	<MkInput v-else-if="['followersLessThanOrEq', 'followersMoreThanOrEq', 'followingLessThanOrEq', 'followingMoreThanOrEq', 'notesLessThanOrEq', 'notesMoreThanOrEq'].includes(type)" v-model="v.value" type="number">
 	</MkInput>
+
+	<MkInput v-else-if="['usernameMatchOf', 'nameMatchOf'].includes(type)" v-model="v.pattern" type="text">
+		<template #caption>{{ i18n.ts._role.patternEditDescription }}</template>
+	</MkInput>
+
+	<MkSelect v-else-if="type === 'roleAssignedOf'" v-model="v.roleId">
+		<option v-for="role in roles.filter(r => r.target === 'manual')" :key="role.id" :value="role.id">{{ role.name }}</option>
+	</MkSelect>
 </div>
 </template>
 
@@ -66,8 +78,11 @@ import MkSelect from '@/components/MkSelect.vue';
 import MkButton from '@/components/MkButton.vue';
 import { i18n } from '@/i18n.js';
 import { deepClone } from '@/scripts/clone.js';
+import { rolesCache } from '@/cache.js';
 
 const Sortable = defineAsyncComponent(() => import('vuedraggable').then(x => x.default));
+
+const roles = await rolesCache.fetch();
 
 const emit = defineEmits<{
 	(ev: 'update:modelValue', value: any): void;
@@ -96,6 +111,10 @@ const type = computed({
 		if (t === 'and') v.value.values = [];
 		if (t === 'or') v.value.values = [];
 		if (t === 'not') v.value.value = { id: uuid(), type: 'isRemote' };
+		if (t === 'roleAssignedOf') v.value.roleId = '';
+		if (t === 'usernameMatchOf') v.value.pattern = '';
+		if (t === 'nameMatchOf') v.value.pattern = '';
+		if (t === 'nameIsDefault') v.value.pattern = '';
 		if (t === 'createdLessThan') v.value.sec = 86400;
 		if (t === 'createdMoreThan') v.value.sec = 86400;
 		if (t === 'followersLessThanOrEq') v.value.value = 10;

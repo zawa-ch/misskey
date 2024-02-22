@@ -21,6 +21,11 @@ type CondFormulaValueNot = {
 	value: RoleCondFormulaValue;
 };
 
+type CondFormulaValueRoleAssignedOf = {
+	type: 'roleAssignedOf';
+	roleId: string;
+};
+
 type CondFormulaValueIsLocal = {
 	type: 'isLocal';
 };
@@ -85,10 +90,25 @@ type CondFormulaValueNotesMoreThanOrEq = {
 	value: number;
 };
 
+type CondFormulaValueUsernameMatchOf = {
+	type: 'usernameMatchOf';
+	pattern: string;
+};
+
+type CondFormulaValueNameMatchOf = {
+	type: 'nameMatchOf';
+	pattern: string;
+};
+
+type CondFormulaValueNameIsDefault = {
+	type: 'nameIsDefault';
+};
+
 export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueAnd |
 	CondFormulaValueOr |
 	CondFormulaValueNot |
+	CondFormulaValueRoleAssignedOf |
 	CondFormulaValueIsLocal |
 	CondFormulaValueIsRemote |
 	CondFormulaValueIsFederated |
@@ -102,7 +122,10 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueFollowingLessThanOrEq |
 	CondFormulaValueFollowingMoreThanOrEq |
 	CondFormulaValueNotesLessThanOrEq |
-	CondFormulaValueNotesMoreThanOrEq
+	CondFormulaValueNotesMoreThanOrEq |
+	CondFormulaValueUsernameMatchOf |
+	CondFormulaValueNameMatchOf |
+	CondFormulaValueNameIsDefault
 );
 
 @Entity('role')

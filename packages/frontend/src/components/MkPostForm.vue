@@ -257,16 +257,16 @@ const maxTextLength = computed((): number => {
 
 const canPost = computed((): boolean => {
 	const ast = mfm.parse(text.value);
-	const has_mention = extractMentions(ast).length > 0;
+	const has_mention = extractMentions(ast).filter(u => u.username !== $i.username || u.host !== $i.host).length > 0;
 	return !props.mock && !posting.value && !posted.value &&
 		(1 <= textLength.value || 1 <= files.value.length || !!poll.value || !!props.renote) &&
 		(textLength.value <= maxTextLength.value) &&
 		(!poll.value || poll.value.choices.length >= 2) &&
 		(has_mention ? $i.policies.canReply : true) &&
-		(props.mention ? $i.policies.canReply : true) &&
 		(props.reply ? $i.policies.canReply : true) &&
 		(quoteId.value ? $i.policies.canQuote : true) &&
-		(props.renote ? $i.policies.canQuote : true);
+		(props.renote ? $i.policies.canQuote : true) &&
+		(visibility.value === 'specified' ? ((has_mention || visibleUsers.value.filter(u => u.id !== $i.id).length > 0) ? $i.policies.canDirectMessage : true) : true);
 });
 
 const withHashtags = computed(defaultStore.makeGetterSetter('postFormWithHashtags'));

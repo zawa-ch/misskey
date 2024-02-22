@@ -6388,6 +6388,10 @@ export interface Locale extends ILocale {
          */
         "descriptionOfCanEditMembersByModerator": string;
         /**
+         * スペースで区切るとAND指定になり、キーワードをスラッシュで囲むと正規表現になります。
+         */
+        "patternEditDescription": string;
+        /**
          * 優先度
          */
         "priority": string;
@@ -6434,6 +6438,10 @@ export interface Locale extends ILocale {
              * 引用/Renoteの許可
              */
             "canQuote": string;
+            /**
+             * ダイレクトメッセージの許可
+             */
+            "canDirectMessage": string;
             /**
              * サーバー招待コードの発行
              */
@@ -6525,6 +6533,22 @@ export interface Locale extends ILocale {
         };
         "_condition": {
             /**
+             * マニュアルロールにアサイン済み
+             */
+            "roleAssignedOf": string;
+            /**
+             * ユーザー名が〜にマッチ
+             */
+            "usernameMatchOf": string;
+            /**
+             * ユーザーの表示名が〜にマッチ
+             */
+            "nameMatchOf": string;
+            /**
+             * ユーザーの表示名が初期状態
+             */
+            "nameIsDefault": string;
+            /**
              * ローカルユーザー
              */
             "isLocal": string;
@@ -6592,6 +6616,158 @@ export interface Locale extends ILocale {
              * ～ではない
              */
             "not": string;
+        };
+    };
+    "_prohibitedNote": {
+        /**
+         * 投稿禁止ノートのパターン
+         */
+        "title": string;
+        /**
+         * パターンを評価し、真と評価されたノートを投稿できないようにします。投稿の度に評価されるため、複雑な条件を指定すると負荷が増えます。
+         */
+        "description": string;
+        /**
+         * スペースで区切るとAND指定になり、キーワードをスラッシュで囲むと正規表現になります。
+         */
+        "patternEditDescription": string;
+        /**
+         * 無効
+         */
+        "disable": string;
+        /**
+         * ハッシュ
+         */
+        "hash": string;
+        /**
+         * 許容する誤差
+         */
+        "allowDifference": string;
+        "_condition": {
+            /**
+             * 偽
+             */
+            "false_value": string;
+            /**
+             * 真
+             */
+            "true_value": string;
+            /**
+             * 〜かつ〜
+             */
+            "and": string;
+            /**
+             * 〜または〜
+             */
+            "or": string;
+            /**
+             * ～ではない
+             */
+            "not": string;
+            /**
+             * ロールにアサイン済み
+             */
+            "roleAssignedOf": string;
+            /**
+             * テキストを含む
+             */
+            "hasText": string;
+            /**
+             * テキストが〜にマッチ
+             */
+            "textMatchOf": string;
+            /**
+             * メンションを含む
+             */
+            "hasMentions": string;
+            /**
+             * メンションの個数が一致
+             */
+            "mentionCountIs": string;
+            /**
+             * メンションの個数が〜以上
+             */
+            "mentionCountMoreThanOrEq": string;
+            /**
+             * メンションの個数が〜未満
+             */
+            "mentionCountLessThan": string;
+            /**
+             * 返信
+             */
+            "isReply": string;
+            /**
+             * 引用、またはリノート
+             */
+            "isQuoted": string;
+            /**
+             * ファイルを含む
+             */
+            "hasFiles": string;
+            /**
+             * ファイルの個数が一致
+             */
+            "fileCountIs": string;
+            /**
+             * ファイルの個数が〜以上
+             */
+            "fileCountMoreThanOrEq": string;
+            /**
+             * ファイルの個数が〜未満
+             */
+            "fileCountLessThan": string;
+            /**
+             * ファイルの総サイズが〜以上
+             */
+            "fileTotalSizeMoreThanOrEq": string;
+            /**
+             * ファイルの総サイズが〜未満
+             */
+            "fileTotalSizeLessThan": string;
+            /**
+             * サイズが〜以上のファイルを含む
+             */
+            "hasFileSizeMoreThanOrEq": string;
+            /**
+             * サイズが〜未満のファイルを含む
+             */
+            "hasFileSizeLessThan": string;
+            /**
+             * MD5ハッシュが一致するファイルを含む
+             */
+            "hasFileMD5Is": string;
+            /**
+             * ブラウザで表示できないファイルを含む
+             */
+            "hasBrowserInsafe": string;
+            /**
+             * 画像を含む
+             */
+            "hasPictures": string;
+            /**
+             * 画像のBlurhashが近似するファイルを含む
+             */
+            "hasLikelyBlurhash": string;
+            /**
+             * ハッシュタグを含む
+             */
+            "hasHashtags": string;
+            /**
+             * ハッシュタグの個数が一致
+             */
+            "hashtagCountIs": string;
+            /**
+             * ハッシュタグの個数が〜以上
+             */
+            "hashtagCountMoreThanOrEq": string;
+            /**
+             * ハッシュタグの個数が〜未満
+             */
+            "hashtagCountLessThan": string;
+            /**
+             * 〜にマッチするハッシュタグを含む
+             */
+            "hasHashtagMatchOf": string;
         };
     };
     "_sensitiveMediaDetection": {

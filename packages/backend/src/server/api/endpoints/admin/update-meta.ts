@@ -46,6 +46,7 @@ export const paramDef = {
 				type: 'string',
 			},
 		},
+		prohibitedNotePattern: { type: 'object', nullable: true },
 		themeColor: { type: 'string', nullable: true, pattern: '^#[0-9a-fA-F]{6}$' },
 		mascotImageUrl: { type: 'string', nullable: true },
 		bannerUrl: { type: 'string', nullable: true },
@@ -192,6 +193,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					lastValue = h;
 					return h !== '' && h !== lv && !set.blockedHosts?.includes(h);
 				});
+			}
+			if (ps.prohibitedNotePattern !== undefined) {
+				set.prohibitedNotePattern = ps.prohibitedNotePattern ?? {};
 			}
 			if (ps.themeColor !== undefined) {
 				set.themeColor = ps.themeColor;

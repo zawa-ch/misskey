@@ -27,6 +27,8 @@ export const meta = {
 
 	requireCredential: true,
 
+	requireRolePolicy: 'canPostNote',
+
 	prohibitMoved: true,
 
 	limit: {
@@ -131,6 +133,12 @@ export const meta = {
 			message: 'Cannot post because it contains prohibited words.',
 			code: 'CONTAINS_PROHIBITED_WORDS',
 			id: 'aa6e01d3-a85c-669d-758a-76aab43af334',
+		},
+
+		matchedProhibitedPatterns: {
+			message: 'Cannot post because matches a pattern of prohibited posts.',
+			code: 'MATCHED_PROHIBITED_PATTERNS',
+			id: '80ddff6a-cf7a-4121-9318-120043300545',
 		},
 	},
 } as const;
@@ -254,9 +262,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			// TODO: コール回数多いAPIのためキャッシュする
 			const policies = (await this.roleService.getUserPolicies(me.id));
-			if (!policies.canPostNote) {
-				throw new ApiError(meta.errors.restrictedByRole);
-			}
 			if (ps.text && ps.text.length > policies.noteLengthLimit) {
 				throw new ApiError(meta.errors.tooLong);
 			}
@@ -402,10 +407,16 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if (e instanceof NoteCreateService.ContainsProhibitedWordsError) {
 					throw new ApiError(meta.errors.containsProhibitedWords);
 				}
+				if (e instanceof NoteCreateService.MatchedProhibitedPatternsError) {
+					throw new ApiError(meta.errors.matchedProhibitedPatterns);
+				}
 				if (e instanceof NoteCreateService.QuoteProhibitedUserError) {
 					throw new ApiError(meta.errors.restrictedByRole);
 				}
 				if (e instanceof NoteCreateService.ReplyProhibitedUserError) {
+					throw new ApiError(meta.errors.restrictedByRole);
+				}
+				if (e instanceof NoteCreateService.DirectMessageProhibitedUserError) {
 					throw new ApiError(meta.errors.restrictedByRole);
 				}
 

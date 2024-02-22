@@ -6,6 +6,7 @@
 process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
+import { expect } from '@jest/globals';
 import { MiNote } from '@/models/Note.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { api, initTestDb, post, signup, uploadFile, uploadUrl } from '../utils.js';
@@ -637,7 +638,7 @@ describe('Note', () => {
 			assert.strictEqual(res.status, 200);
 
 			const assign = await api('admin/roles/assign', {
-				userId: alice.id,
+				userId: bob.id,
 				roleId: res.body.id,
 			}, alice);
 
@@ -646,13 +647,13 @@ describe('Note', () => {
 			const post = {
 				text: 'test',
 			};
-			const postNote = await api('/notes/create', post, alice);
+			const postNote = await api('/notes/create', post, bob);
 
-			assert.strictEqual(postNote.status, 400);
-			assert.strictEqual(postNote.body.error.code, 'RESTRICTED_BY_ROLE');
+			expect(postNote.status).toStrictEqual(403);
+			expect(postNote.body.error.code).toStrictEqual('ROLE_PERMISSION_DENIED');
 
 			await api('admin/roles/unassign', {
-				userId: alice.id,
+				userId: bob.id,
 				roleId: res.body.id,
 			});
 
@@ -870,6 +871,177 @@ describe('Note', () => {
 			}, alice);
 		});
 
+		test('ロールで禁止されている場合でも自分には返信できる', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canReply: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(role.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const post1 = await post(alice, {
+				text: 'foo',
+			});
+
+			const post2 = {
+				text: 'bar',
+				replyId: post1.id,
+			};
+
+			const postNote = await api('/notes/create', post2, alice);
+
+			assert.strictEqual(postNote.status, 200);
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
+		test('ロールで禁止されている場合DMできない', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canDirectMessage: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(role.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const bobPost = await post(bob, {
+				text: 'foo',
+			});
+
+			const alicePost = {
+				text: 'bar',
+				replyId: bobPost.id,
+				visibility: 'specified',
+				visibleUserIds: [bob.id],
+			};
+
+			const postNote = await api('/notes/create', alicePost, alice);
+
+			assert.strictEqual(postNote.status, 400);
+			assert.strictEqual(postNote.body.error.code, 'RESTRICTED_BY_ROLE');
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
+		test('ロールで禁止されている場合でも自分にはDMできる', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canDirectMessage: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(role.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const post1 = await post(alice, {
+				text: 'foo',
+			});
+
+			const post2 = await api('/notes/create', {
+				text: 'bar',
+				replyId: post1.id,
+				visibility: 'specified',
+				visibleUserIds: [alice.id],
+			}, alice);
+
+			assert.strictEqual(post2.status, 200);
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
 		test('ロールで禁止されている場合renoteできない', async () => {
 			const role = await api('admin/roles/create', {
 				name: 'test',
@@ -915,6 +1087,15 @@ describe('Note', () => {
 
 			assert.strictEqual(res.status, 400);
 			assert.strictEqual(res.body.error.code, 'RESTRICTED_BY_ROLE');
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
 		});
 
 		test('ロールの制限で引用renoteできない', async () => {
@@ -963,6 +1144,15 @@ describe('Note', () => {
 
 			assert.strictEqual(res.status, 400);
 			assert.strictEqual(res.body.error.code, 'RESTRICTED_BY_ROLE');
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
 		});
 
 		test('禁止ワードを含む投稿はエラーになる (単語指定)', async () => {
@@ -1035,6 +1225,852 @@ describe('Note', () => {
 
 			assert.strictEqual(note1.status, 400);
 		});
+	});
+
+	test('禁止パターン無効化時は投稿できる', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: 'hoge',
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (無条件マッチ)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'true',
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: 'hoge',
+		}, alice);
+		assert.strictEqual(note1.status, 400);
+		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ユーザーロール)', async () => {
+		const role = await api('admin/roles/create', {
+			name: 'test',
+			description: '',
+			color: null,
+			iconUrl: null,
+			displayOrder: 0,
+			target: 'manual',
+			condFormula: {},
+			isAdministrator: false,
+			isModerator: false,
+			isPublic: false,
+			isExplorable: false,
+			asBadge: false,
+			canEditMembersByModerator: false,
+			policies: { },
+		}, alice);
+		assert.strictEqual(role.status, 200);
+
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'roleAssignedOf',
+				roleId: role.body.id,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		const assign = await api('admin/roles/assign', {
+			userId: alice.id,
+			roleId: role.body.id,
+		}, alice);
+
+		assert.strictEqual(assign.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: 'hoge',
+		}, alice);
+		assert.strictEqual(note1.status, 400);
+		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		const note2 = await api('/notes/create', {
+			text: 'hoge',
+		}, bob);
+		assert.strictEqual(note2.status, 200);
+
+		await api('admin/roles/unassign', {
+			userId: alice.id,
+			roleId: role.body.id,
+		});
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+
+		await api('admin/roles/delete', {
+			roleId: role.body.id,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (テキスト有無)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hasText',
+			},
+		}, alice);
+
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: 'hoge',
+		}, alice);
+		assert.strictEqual(note1.status, 400);
+		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		const note2 = await api('/notes/create', {
+			text: 'hoge',
+		}, bob);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (テキストマッチ)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'textMatchOf',
+				pattern: 'foo',
+			},
+		}, alice);
+
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: 'hoge',
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'hogefoohuga',
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		const note3 = await api('/notes/create', {
+			text: 'bar',
+		}, bob);
+		assert.strictEqual(note3.status, 200);
+
+		const note4 = await api('/notes/create', {
+			text: 'hofooge',
+		}, bob);
+		assert.strictEqual(note4.status, 400);
+		assert.strictEqual(note4.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (メンション有無)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hasMentions',
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: '@bob yo',
+		}, alice);
+		assert.strictEqual(note1.status, 400);
+		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		const note2 = await api('/notes/create', {
+			text: 'yo',
+		}, alice);
+		assert.strictEqual(note2.status, 200);
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (メンション個数一致)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'mentionCountIs',
+				value: 2,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: '@alice @bob yo',
+		}, alice);
+		assert.strictEqual(note1.status, 400);
+		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		const note2 = await api('/notes/create', {
+			text: '@bob yo',
+		}, alice);
+		assert.strictEqual(note2.status, 200);
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (メンション個数以上)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'mentionCountMoreThanOrEq',
+				value: 2,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: '@alice @bob yo',
+		}, alice);
+		assert.strictEqual(note1.status, 400);
+		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		const note2 = await api('/notes/create', {
+			text: '@alice yo',
+		}, alice);
+		assert.strictEqual(note2.status, 200);
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (メンション個数未満)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'mentionCountLessThan',
+				value: 2,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: 'yo',
+		}, alice);
+		assert.strictEqual(note1.status, 400);
+		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		const note2 = await api('/notes/create', {
+			text: '@alice @bob yo',
+		}, alice);
+		assert.strictEqual(note2.status, 200);
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (返信)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'isReply',
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const bpost = await post(bob, {
+			text: 'foo',
+		});
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'bar',
+			replyId: bpost.id,
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (引用/Renote)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'isQuoted',
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const bpost = await post(bob, {
+			text: 'foo',
+		});
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'bar',
+			renoteId: bpost.id,
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ファイル有無)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hasFiles',
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const file = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file.id],
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ファイル数一致)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'fileCountIs',
+				value: 2,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id],
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id, file2.id],
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ファイル数以上)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'fileCountMoreThanOrEq',
+				value: 2,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id],
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id, file2.id],
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ファイル数未満)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'fileCountLessThan',
+				value: 2,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id, file2.id],
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'foo',
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ファイル総サイズ以上)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'fileTotalSizeMoreThanOrEq',
+				size: 65536,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/kick_gaba7.wav');
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id],
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file2.id],
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ファイル総サイズ未満)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'fileTotalSizeLessThan',
+				size: 1024,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id],
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file2.id],
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ファイルサイズ以上)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hasFileSizeMoreThanOrEq',
+				size: 65536,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/kick_gaba7.wav');
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id],
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id, file2.id],
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ファイルサイズ未満)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hasFileSizeLessThan',
+				size: 1024,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id],
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id, file2.id],
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ファイルMD5一致)', async () => {
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hasFileMD5Is',
+				hash: file2.md5,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id],
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file2.id],
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (非ブラウザセーフファイル)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hasBrowserInsafe',
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id],
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id, file2.id],
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (画像ファイル)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hasPictures',
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id],
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id, file2.id],
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (Blurhash近似)', async () => {
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/with-alpha.png');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		assert.notEqual(file2.blurhash, null);
+
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hasLikelyBlurhash',
+				hash: file2.blurhash ?? '',
+				diff: 0,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id],
+		}, alice);
+		assert.strictEqual(note1.status, 200);
+
+		const note2 = await api('/notes/create', {
+			text: 'foo',
+			fileIds: [file1.id, file2.id],
+		}, alice);
+		assert.strictEqual(note2.status, 400);
+		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ハッシュタグ有無)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hasHashtags',
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: '#foo yo',
+		}, alice);
+		assert.strictEqual(note1.status, 400);
+		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		const note2 = await api('/notes/create', {
+			text: 'yo',
+		}, alice);
+		assert.strictEqual(note2.status, 200);
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ハッシュタグ個数一致)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hashtagCountIs',
+				value: 2,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: '#foo #bar yo',
+		}, alice);
+		assert.strictEqual(note1.status, 400);
+		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		const note2 = await api('/notes/create', {
+			text: '#bar yo',
+		}, alice);
+		assert.strictEqual(note2.status, 200);
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ハッシュタグ個数以上)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hashtagCountMoreThanOrEq',
+				value: 2,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: '#foo #bar yo',
+		}, alice);
+		assert.strictEqual(note1.status, 400);
+		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		const note2 = await api('/notes/create', {
+			text: '#foo yo',
+		}, alice);
+		assert.strictEqual(note2.status, 200);
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ハッシュタグ個数未満)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hashtagCountLessThan',
+				value: 2,
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: 'yo',
+		}, alice);
+		assert.strictEqual(note1.status, 400);
+		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		const note2 = await api('/notes/create', {
+			text: '#foo #bar yo',
+		}, alice);
+		assert.strictEqual(note2.status, 200);
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
+	});
+
+	test('禁止パターンを含む投稿はエラーになる (ハッシュタグパターン一致)', async () => {
+		const prohibited = await api('admin/update-meta', {
+			prohibitedNotePattern: {
+				type: 'hasHashtagMatchOf',
+				value: 'foo',
+			},
+		}, alice);
+		assert.strictEqual(prohibited.status, 204);
+
+		await new Promise(x => setTimeout(x, 2));
+
+		const note1 = await api('/notes/create', {
+			text: '#foobar yo',
+		}, alice);
+		assert.strictEqual(note1.status, 400);
+		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
+
+		const note2 = await api('/notes/create', {
+			text: 'foobar',
+		}, alice);
+		assert.strictEqual(note2.status, 200);
+
+		await api('admin/update-meta', {
+			prohibitedNotePattern: null,
+		}, alice);
 	});
 
 	describe('notes/delete', () => {

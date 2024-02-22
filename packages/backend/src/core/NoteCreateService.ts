@@ -59,6 +59,7 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { UserBlockingService } from '@/core/UserBlockingService.js';
 import { isReply } from '@/misc/is-reply.js';
 import { trackPromise } from '@/misc/promise-tracker.js';
+import { NoteProhibitService } from '@/core/NoteProhibitService.js';
 
 type NotificationType = 'reply' | 'renote' | 'quote' | 'mention';
 
@@ -152,8 +153,10 @@ export class NoteCreateService implements OnApplicationShutdown {
 	#shutdownController = new AbortController();
 
 	public static ContainsProhibitedWordsError = class extends Error {};
+	public static MatchedProhibitedPatternsError = class extends Error {};
 	public static QuoteProhibitedUserError = class extends Error {};
 	public static ReplyProhibitedUserError = class extends Error {};
+	public static DirectMessageProhibitedUserError = class extends Error {};
 
 	constructor(
 		@Inject(DI.config)
@@ -221,6 +224,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		private instanceChart: InstanceChart,
 		private utilityService: UtilityService,
 		private userBlockingService: UserBlockingService,
+		private noteProhibitService: NoteProhibitService,
 	) { }
 
 	@bindThis
@@ -255,12 +259,13 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (data.channel != null) data.localOnly = true;
 
 		const meta = await this.metaService.fetch();
+		const policies = await this.roleService.getUserPolicies(user.id);
 
 		if (data.visibility === 'public' && data.channel == null) {
 			const sensitiveWords = meta.sensitiveWords;
 			if (this.utilityService.isKeyWordIncluded(data.cw ?? data.text ?? '', sensitiveWords)) {
 				data.visibility = 'home';
-			} else if ((await this.roleService.getUserPolicies(user.id)).canPublicNote === false) {
+			} else if (policies.canPublicNote === false) {
 				data.visibility = 'home';
 			}
 		}
@@ -277,7 +282,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 		if (data.renote) {
 			// 引用/Renote可能なユーザーか調べる
-			if ((await this.roleService.getUserPolicies(user.id)).canQuote === false) {
+			if (policies.canQuote === false) {
 				throw new NoteCreateService.QuoteProhibitedUserError();
 			}
 			switch (data.renote.visibility) {
@@ -367,13 +372,18 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 		tags = tags.filter(tag => Array.from(tag).length <= 128).splice(0, 32);
 
+		if (data.reply && (user.id !== data.reply.userId) && !mentionedUsers.some(u => u.id === data.reply!.userId)) {
+			mentionedUsers.push(await this.usersRepository.findOneByOrFail({ id: data.reply!.userId }));
+		}
+
 		// 返信/メンション可能なユーザーか調べる
-		if ((mentionedUsers.length !== 0 || data.reply) && ((await this.roleService.getUserPolicies(user.id)).canReply === false)) {
+		if ((mentionedUsers.filter(u => u.id !== user.id).length !== 0) && (policies.canReply === false)) {
 			throw new NoteCreateService.ReplyProhibitedUserError();
 		}
 
-		if (data.reply && (user.id !== data.reply.userId) && !mentionedUsers.some(u => u.id === data.reply!.userId)) {
-			mentionedUsers.push(await this.usersRepository.findOneByOrFail({ id: data.reply!.userId }));
+		// DM可能なユーザーか調べる
+		if ((data.visibility === 'specified') && (mentionedUsers.filter(u => u.id !== user.id).length !== 0 || (data.visibleUsers?.filter(u => u.id !== user.id).length ?? 0) !== 0) && (policies.canDirectMessage === false)) {
+			throw new NoteCreateService.DirectMessageProhibitedUserError();
 		}
 
 		if (data.visibility === 'specified') {
@@ -388,6 +398,18 @@ export class NoteCreateService implements OnApplicationShutdown {
 			if (data.reply && !data.visibleUsers.some(x => x.id === data.reply!.userId)) {
 				data.visibleUsers.push(await this.usersRepository.findOneByOrFail({ id: data.reply!.userId }));
 			}
+		}
+
+		if (await this.noteProhibitService.isProhibitedNote({
+			userId: user.id,
+			text: data.text,
+			reply: data.reply ?? null,
+			renote: data.renote ?? null,
+			mentions: mentionedUsers.map(v => { return { username: v.username, host: v.host }; }),
+			hashtags: tags,
+			files: data.files ?? null,
+		})) {
+			throw new NoteCreateService.MatchedProhibitedPatternsError();
 		}
 
 		const note = await this.insertNote(user, data, tags, emojis, mentionedUsers);

@@ -6,6 +6,7 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { id } from './util/id.js';
 import { MiUser } from './User.js';
+import type { ProhibitedNoteFormulaValue } from './ProhibitedNoteFormula.js';
 
 @Entity('meta')
 export class MiMeta {
@@ -85,6 +86,11 @@ export class MiMeta {
 		length: 1024, array: true, default: '{}',
 	})
 	public silencedHosts: string[];
+
+	@Column('jsonb', {
+		default: { },
+	})
+	public prohibitedNotePattern : ProhibitedNoteFormulaValue;
 
 	@Column('varchar', {
 		length: 1024,

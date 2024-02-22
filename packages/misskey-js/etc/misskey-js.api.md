@@ -1705,6 +1705,17 @@ declare namespace entities {
         EmojiDetailed,
         Flash,
         Signin,
+        ProhibitedNoteFormulaConstants,
+        ProhibitedNoteFormulaLogics,
+        ProhibitedNoteFormulaNot,
+        ProhibitedNoteFormulaZeroArg,
+        ProhibitedNoteFormulaPatternMatch,
+        ProhibitedNoteFormulaAssignsRole,
+        ProhibitedNoteFormulaCountComp,
+        ProhibitedNoteFormulaSizeComp,
+        ProhibitedNoteFormulaMD5HashMatch,
+        ProhibitedNoteFormulaBlurhashLikely,
+        ProhibitedNoteFormulaValue,
         RoleCondFormulaLogics,
         RoleCondFormulaValueNot,
         RoleCondFormulaValueIsLocalOrRemote,
@@ -2611,6 +2622,39 @@ type PingResponse = operations['ping']['responses']['200']['content']['applicati
 
 // @public (undocumented)
 type PinnedUsersResponse = operations['pinned-users']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ProhibitedNoteFormulaAssignsRole = components['schemas']['ProhibitedNoteFormulaAssignsRole'];
+
+// @public (undocumented)
+type ProhibitedNoteFormulaBlurhashLikely = components['schemas']['ProhibitedNoteFormulaBlurhashLikely'];
+
+// @public (undocumented)
+type ProhibitedNoteFormulaConstants = components['schemas']['ProhibitedNoteFormulaConstants'];
+
+// @public (undocumented)
+type ProhibitedNoteFormulaCountComp = components['schemas']['ProhibitedNoteFormulaCountComp'];
+
+// @public (undocumented)
+type ProhibitedNoteFormulaLogics = components['schemas']['ProhibitedNoteFormulaLogics'];
+
+// @public (undocumented)
+type ProhibitedNoteFormulaMD5HashMatch = components['schemas']['ProhibitedNoteFormulaMD5HashMatch'];
+
+// @public (undocumented)
+type ProhibitedNoteFormulaNot = components['schemas']['ProhibitedNoteFormulaNot'];
+
+// @public (undocumented)
+type ProhibitedNoteFormulaPatternMatch = components['schemas']['ProhibitedNoteFormulaPatternMatch'];
+
+// @public (undocumented)
+type ProhibitedNoteFormulaSizeComp = components['schemas']['ProhibitedNoteFormulaSizeComp'];
+
+// @public (undocumented)
+type ProhibitedNoteFormulaValue = components['schemas']['ProhibitedNoteFormulaValue'];
+
+// @public (undocumented)
+type ProhibitedNoteFormulaZeroArg = components['schemas']['ProhibitedNoteFormulaZeroArg'];
 
 // @public (undocumented)
 type PromoReadRequest = operations['promo/read']['requestBody']['content']['application/json'];
