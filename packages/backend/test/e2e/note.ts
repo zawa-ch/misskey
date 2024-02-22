@@ -814,6 +814,57 @@ describe('Note', () => {
 			}, alice);
 		});
 
+		test('ロールで禁止されている場合リモートユーザーでもメンションできない', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canReply: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(role.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: tom.id,
+				roleId: role.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const post = {
+				text: '@bob@misskey.local yo',
+			};
+			const postNote = await api('/notes/create', post, tom);
+
+			assert.strictEqual(postNote.status, 400);
+			assert.strictEqual(postNote.body.error.code, 'RESTRICTED_BY_ROLE');
+
+			await api('admin/roles/unassign', {
+				userId: tom.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
 		test('ロールで禁止されている場合返信できない', async () => {
 			const role = await api('admin/roles/create', {
 				name: 'test',
@@ -863,6 +914,61 @@ describe('Note', () => {
 
 			await api('admin/roles/unassign', {
 				userId: alice.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
+		test('ロールで禁止されている場合リモートユーザーでも返信できない', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canReply: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(role.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: tom.id,
+				roleId: role.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const post1 = await post(bob, {
+				text: 'foo',
+			});
+
+			const post2 = await api('/notes/create', {
+				text: 'bar',
+				replyId: post1.id,
+			}, tom);
+
+			assert.strictEqual(post2.status, 400);
+			assert.strictEqual(post2.body.error.code, 'RESTRICTED_BY_ROLE');
+
+			await api('admin/roles/unassign', {
+				userId: tom.id,
 				roleId: role.body.id,
 			});
 
@@ -927,6 +1033,60 @@ describe('Note', () => {
 			}, alice);
 		});
 
+		test('リモートユーザーがロールで禁止されている場合でも自分には返信できる', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canReply: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(role.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: tom.id,
+				roleId: role.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const post1 = await post(tom, {
+				text: 'foo',
+			});
+
+			const post2 = await api('/notes/create', {
+				text: 'bar',
+				replyId: post1.id,
+			}, tom);
+
+			assert.strictEqual(post2.status, 200);
+
+			await api('admin/roles/unassign', {
+				userId: tom.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
 		test('ロールで禁止されている場合DMできない', async () => {
 			const role = await api('admin/roles/create', {
 				name: 'test',
@@ -978,6 +1138,63 @@ describe('Note', () => {
 
 			await api('admin/roles/unassign', {
 				userId: alice.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
+		test('ロールで禁止されている場合リモートユーザーでもDMできない', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canDirectMessage: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(role.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: tom.id,
+				roleId: role.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const post1 = await post(bob, {
+				text: 'foo',
+			});
+
+			const post2 = await api('/notes/create', {
+				text: 'bar',
+				replyId: post1.id,
+				visibility: 'specified',
+				visibleUserIds: [bob.id],
+			}, tom);
+
+			assert.strictEqual(post2.status, 400);
+			assert.strictEqual(post2.body.error.code, 'RESTRICTED_BY_ROLE');
+
+			await api('admin/roles/unassign', {
+				userId: tom.id,
 				roleId: role.body.id,
 			});
 
@@ -1098,6 +1315,60 @@ describe('Note', () => {
 			}, alice);
 		});
 
+		test('ロールで禁止されている場合リモートユーザーでもrenoteできない', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canQuote: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(role.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: tom.id,
+				roleId: role.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const post1 = await post(bob, {
+				text: 'test',
+			});
+
+			const post2 = await api('/notes/create', {
+				renoteId: post1.id,
+			}, tom);
+
+			assert.strictEqual(post2.status, 400);
+			assert.strictEqual(post2.body.error.code, 'RESTRICTED_BY_ROLE');
+
+			await api('admin/roles/unassign', {
+				userId: tom.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
 		test('ロールの制限で引用renoteできない', async () => {
 			const role = await api('admin/roles/create', {
 				name: 'test',
@@ -1147,6 +1418,61 @@ describe('Note', () => {
 
 			await api('admin/roles/unassign', {
 				userId: alice.id,
+				roleId: role.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
+		test('ロールの制限でリモートユーザーでも引用renoteできない', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canQuote: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+
+			assert.strictEqual(role.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: tom.id,
+				roleId: role.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+
+			const post1 = await post(bob, {
+				text: 'test',
+			});
+
+			const post2 = await api('/notes/create', {
+				text: 'test',
+				renoteId: post1.id,
+			}, tom);
+
+			assert.strictEqual(post2.status, 400);
+			assert.strictEqual(post2.body.error.code, 'RESTRICTED_BY_ROLE');
+
+			await api('admin/roles/unassign', {
+				userId: tom.id,
 				roleId: role.body.id,
 			});
 
