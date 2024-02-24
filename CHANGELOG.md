@@ -12,7 +12,7 @@
 
 -->
 
-## 2024.2.0-geoplantery.5.a
+## 2024.2.0-geoplantery.6
 
 ## General
 - Fix: a8ad5dd8 でリモートのメンション/DMに対する制限が壊れていたのを修正
