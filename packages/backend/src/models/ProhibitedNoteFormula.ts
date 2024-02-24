@@ -150,7 +150,7 @@ type ProhibitedNoteFormulaValueHashtagCountLessThan = {
 
 type ProhibitedNoteFormulaValueHasHashtagMatchOf = {
 	type: 'hasHashtagMatchOf';
-	value: string;
+	pattern: string;
 };
 
 export type ProhibitedNoteFormulaValue = (

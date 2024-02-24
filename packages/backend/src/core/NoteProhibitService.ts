@@ -147,7 +147,7 @@ export class NoteProhibitService {
 					return (subject.hashtags.length) < formula.value;
 				}
 				case 'hasHashtagMatchOf': {
-					return (subject.hashtags).some(h => this.utilityService.isKeyWordIncluded(h, [formula.value]));
+					return (subject.hashtags).some(h => this.utilityService.isKeyWordIncluded(h, [formula.pattern]));
 				}
 				default:
 					return false;

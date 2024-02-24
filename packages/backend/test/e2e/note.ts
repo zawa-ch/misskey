@@ -2376,7 +2376,7 @@ describe('Note', () => {
 		const prohibited = await api('admin/update-meta', {
 			prohibitedNotePattern: {
 				type: 'hasHashtagMatchOf',
-				value: 'foo',
+				pattern: 'foo',
 			},
 		}, alice);
 		assert.strictEqual(prohibited.status, 204);
