@@ -20,6 +20,8 @@ import { IdService } from '@/core/IdService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';
 import { NotificationService } from '@/core/NotificationService.js';
+import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
+import { UtilityService } from '@/core/UtilityService.js';
 import { sleep } from '../utils.js';
 import type { TestingModule } from '@nestjs/testing';
 import type { MockFunctionMetadata } from 'jest-mock';
@@ -73,6 +75,8 @@ describe('RoleService', () => {
 				CacheService,
 				IdService,
 				GlobalEventService,
+				FederatedInstanceService,
+				UtilityService,
 				{
 					provide: NotificationService,
 					useFactory: () => ({

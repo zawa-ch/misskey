@@ -372,18 +372,26 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 		tags = tags.filter(tag => Array.from(tag).length <= 128).splice(0, 32);
 
-		if (data.reply && (user.id !== data.reply.userId) && !mentionedUsers.some(u => u.id === data.reply!.userId)) {
-			mentionedUsers.push(await this.usersRepository.findOneByOrFail({ id: data.reply!.userId }));
-		}
-
 		// 返信/メンション可能なユーザーか調べる
-		if ((mentionedUsers.filter(u => u.id !== user.id).length !== 0) && (policies.canReply === false)) {
+		// TODO リモートユーザーの自己メンションがここで引っかからないようにする
+		if (data.reply && data.reply.userId !== user.id && (!policies.canReply)) {
+			throw new NoteCreateService.ReplyProhibitedUserError();
+		}
+		if ((mentionedUsers.filter(u => user.host != null || u.id !== user.id || u.host != null).length > 0) && (!policies.canReply)) {
 			throw new NoteCreateService.ReplyProhibitedUserError();
 		}
 
 		// DM可能なユーザーか調べる
-		if ((data.visibility === 'specified') && (mentionedUsers.filter(u => u.id !== user.id).length !== 0 || (data.visibleUsers?.filter(u => u.id !== user.id).length ?? 0) !== 0) && (policies.canDirectMessage === false)) {
+		if (data.visibility === 'specified' && (
+			(data.visibleUsers?.filter(u => u.id !== user.id).length ?? 0) ||
+			(mentionedUsers.filter(u => user.host != null || u.id !== user.id || u.host != null).length > 0) ||
+			(data.reply && data.reply.userId !== user.id)
+		) && (!policies.canDirectMessage)) {
 			throw new NoteCreateService.DirectMessageProhibitedUserError();
+		}
+
+		if (data.reply && (user.id !== data.reply.userId) && !mentionedUsers.some(u => u.id === data.reply!.userId)) {
+			mentionedUsers.push(await this.usersRepository.findOneByOrFail({ id: data.reply!.userId }));
 		}
 
 		if (data.visibility === 'specified') {

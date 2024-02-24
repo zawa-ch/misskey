@@ -24,6 +24,7 @@ import { DownloadService } from '@/core/DownloadService.js';
 import { MetaService } from '@/core/MetaService.js';
 import type { MiRemoteUser } from '@/models/User.js';
 import { genAidx } from '@/misc/id/aidx.js';
+import { NoteProhibitService } from '@/core/NoteProhibitService.js';
 import { MockResolver } from '../misc/mock-resolver.js';
 
 const host = 'https://host1.test';
@@ -101,6 +102,7 @@ describe('ActivityPub', () => {
 		blockedHosts: [] as string[],
 		sensitiveWords: [] as string[],
 		prohibitedWords: [] as string[],
+		prohibitedNotePattern: { type: undefined },
 	} as MiMeta;
 	let meta = metaInitial;
 

@@ -263,7 +263,7 @@ const canPost = computed((): boolean => {
 		(textLength.value <= maxTextLength.value) &&
 		(!poll.value || poll.value.choices.length >= 2) &&
 		(has_mention ? $i.policies.canReply : true) &&
-		(props.reply ? $i.policies.canReply : true) &&
+		((props.reply && props.reply.userId !== $i.id) ? $i.policies.canReply : true) &&
 		(quoteId.value ? $i.policies.canQuote : true) &&
 		(props.renote ? $i.policies.canQuote : true) &&
 		(visibility.value === 'specified' ? ((has_mention || visibleUsers.value.filter(u => u.id !== $i.id).length > 0) ? $i.policies.canDirectMessage : true) : true);

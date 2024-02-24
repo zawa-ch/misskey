@@ -4574,7 +4574,7 @@ export type components = {
     ProhibitedNoteFormulaPatternMatch: {
       /** @enum {string} */
       type: 'textMatchOf' | 'hasHashtagMatchOf';
-      pattern: string;
+      pattern: string | string[];
     };
     ProhibitedNoteFormulaAssignsRole: {
       /** @enum {string} */
