@@ -73,7 +73,7 @@ export class NoteProhibitService {
 					return subject.text != null;
 				}
 				case 'textMatchOf': {
-					return this.utilityService.isKeyWordIncluded(subject.text ?? '', [formula.pattern]);
+					return this.utilityService.isKeyWordIncluded(subject.text ?? '', Array.isArray(formula.pattern) ? formula.pattern : [formula.pattern]);
 				}
 				case 'hasMentions': {
 					return subject.reply ? true : subject.mentions.length > 0;
@@ -147,7 +147,7 @@ export class NoteProhibitService {
 					return (subject.hashtags.length) < formula.value;
 				}
 				case 'hasHashtagMatchOf': {
-					return (subject.hashtags).some(h => this.utilityService.isKeyWordIncluded(h, [formula.pattern]));
+					return (subject.hashtags).some(h => this.utilityService.isKeyWordIncluded(h, Array.isArray(formula.pattern) ? formula.pattern : [formula.pattern]));
 				}
 				default:
 					return false;

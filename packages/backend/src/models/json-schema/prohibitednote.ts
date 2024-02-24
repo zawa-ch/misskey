@@ -68,8 +68,20 @@ export const packedProhibitedNoteFormulaPatternMatchSchema = {
 			enum: ['textMatchOf', 'hasHashtagMatchOf'],
 		},
 		pattern: {
-			type: 'string',
-			nullable: false, optional: false,
+			oneOf: [
+				{
+					type: 'string',
+					nullable: false, optional: false,
+				},
+				{
+					type: 'array',
+					nullable: false, optional: false,
+					items: {
+						type: 'string',
+						nullable: false,
+					},
+				},
+			],
 		},
 	},
 } as const;

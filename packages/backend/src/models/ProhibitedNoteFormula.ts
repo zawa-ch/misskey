@@ -41,7 +41,7 @@ type ProhibitedNoteFormulaValueHasText = {
 
 type ProhibitedNoteFormulaValueTextMatchOf = {
 	type: 'textMatchOf';
-	pattern: string;
+	pattern: string | string[];
 };
 
 type ProhibitedNoteFormulaValueHasMentions = {
@@ -150,7 +150,7 @@ type ProhibitedNoteFormulaValueHashtagCountLessThan = {
 
 type ProhibitedNoteFormulaValueHasHashtagMatchOf = {
 	type: 'hasHashtagMatchOf';
-	pattern: string;
+	pattern: string | string[];
 };
 
 export type ProhibitedNoteFormulaValue = (

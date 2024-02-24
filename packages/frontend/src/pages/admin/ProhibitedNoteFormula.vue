@@ -76,9 +76,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 	<MkInput v-else-if="['mentionCountIs', 'mentionCountMoreThanOrEq', 'mentionCountLessThan', 'fileCountIs', 'fileCountMoreThanOrEq', 'fileCountLessThan', 'hashtagCountIs', 'hashtagCountMoreThanOrEq', 'hashtagCountLessThan'].includes(type)" v-model="count" type="number"/>
 
-	<MkInput v-else-if="['textMatchOf', 'hasHashtagMatchOf'].includes(type)" v-model="pattern" type="text">
+	<MkTextarea v-else-if="['textMatchOf', 'hasHashtagMatchOf'].includes(type)" v-model="pattern" type="text">
 		<template #caption>{{ i18n.ts._prohibitedNote.patternEditDescription }}</template>
-	</MkInput>
+	</MkTextarea>
 
 	<div v-else-if="type === 'hasLikelyBlurhash'">
 		<MkInput v-model="blurhash" type="text">
@@ -96,6 +96,7 @@ import * as Misskey from 'misskey-js';
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { v4 as uuid } from 'uuid';
 import MkInput from '@/components/MkInput.vue';
+import MkTextarea from '@/components/MkTextarea.vue';
 import MkSelect from '@/components/MkSelect.vue';
 import MkButton from '@/components/MkButton.vue';
 import { i18n } from '@/i18n.js';
@@ -238,8 +239,11 @@ const count = computed({
 	set: (nv) => (formula.value as Misskey.entities.ProhibitedNoteFormulaCountComp).value = nv,
 });
 const pattern = computed({
-	get: () => (formula.value as Misskey.entities.ProhibitedNoteFormulaPatternMatch).pattern,
-	set: (nv) => (formula.value as Misskey.entities.ProhibitedNoteFormulaPatternMatch).pattern = nv,
+	get: () => {
+		const p = (formula.value as Misskey.entities.ProhibitedNoteFormulaPatternMatch).pattern;
+		return Array.isArray(p) ? p.join('\n') : p;
+	},
+	set: (nv) => (formula.value as Misskey.entities.ProhibitedNoteFormulaPatternMatch).pattern = nv.split('\n'),
 });
 const blurhash = computed({
 	get: () => (formula.value as Misskey.entities.ProhibitedNoteFormulaBlurhashLikely).hash,
