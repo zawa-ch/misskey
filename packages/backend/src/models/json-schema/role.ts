@@ -43,23 +43,6 @@ export const packedRoleCondFormulaValueNot = {
 	},
 } as const;
 
-export const packedRoleCondFormulaValueAssignsRoleSchema = {
-	type: 'object',
-	properties: {
-		type: {
-			type: 'string',
-			nullable: false, optional: false,
-			enum: ['roleAssignedOf'],
-		},
-		roleId: {
-			type: 'string',
-			nullable: false, optional: false,
-			format: 'id',
-			example: 'xxxxxxxxxx',
-		},
-	},
-} as const;
-
 export const packedRoleCondFormulaValueIsLocalOrRemoteSchema = {
 	type: 'object',
 	properties: {
@@ -70,6 +53,26 @@ export const packedRoleCondFormulaValueIsLocalOrRemoteSchema = {
 			type: 'string',
 			nullable: false, optional: false,
 			enum: ['isLocal', 'isRemote', 'isFederated', 'isSubscribing', 'isPublishing', 'isForeign'],
+		},
+	},
+} as const;
+
+export const packedRoleCondFormulaValueAssignedRoleSchema = {
+	type: 'object',
+	properties: {
+		id: {
+			type: 'string', optional: false,
+		},
+		type: {
+			type: 'string',
+			nullable: false, optional: false,
+			enum: ['roleAssignedTo'],
+		},
+		roleId: {
+			type: 'string',
+			nullable: false, optional: false,
+			format: 'id',
+			example: 'xxxxxxxxxx',
 		},
 	},
 } as const;
@@ -165,6 +168,9 @@ export const packedRoleCondFormulaValueSchema = {
 			ref: 'RoleCondFormulaValueIsLocalOrRemote',
 		},
 		{
+			ref: 'RoleCondFormulaValueAssignedRole',
+		},
+		{
 			ref: 'RoleCondFormulaValueCreated',
 		},
 		{
@@ -207,6 +213,10 @@ export const packedRolePoliciesSchema = {
 		},
 		canDirectMessage: {
 			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		mentionLimit: {
+			type: 'integer',
 			optional: false, nullable: false,
 		},
 		canInvite: {

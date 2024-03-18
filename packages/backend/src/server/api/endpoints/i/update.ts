@@ -458,12 +458,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (Object.keys(updates).length > 0) {
 				await this.usersRepository.update(user.id, updates);
-				// Cache clear
-				this.cacheService.userByIdCache.delete(user.id);
-				this.cacheService.localUserByIdCache.delete(user.id);
-			}
-			if (Object.keys(updates).includes('alsoKnownAs')) {
-				this.cacheService.uriPersonCache.set(this.userEntityService.genLocalUserUri(user.id), { ...user, ...updates });
+				this.globalEventService.publishInternalEvent('localUserUpdated', { id: user.id });
 			}
 
 			await this.userProfilesRepository.update(user.id, {

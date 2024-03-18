@@ -21,11 +21,6 @@ type CondFormulaValueNot = {
 	value: RoleCondFormulaValue;
 };
 
-type CondFormulaValueRoleAssignedOf = {
-	type: 'roleAssignedOf';
-	roleId: string;
-};
-
 type CondFormulaValueIsLocal = {
 	type: 'isLocal';
 };
@@ -48,6 +43,11 @@ type CondFormulaValueIsPublishing = {
 
 type CondFormulaValueIsForeign = {
 	type: 'isForeign';
+};
+
+type CondFormulaValueRoleAssignedTo = {
+	type: 'roleAssignedTo';
+	roleId: string;
 };
 
 type CondFormulaValueCreatedLessThan = {
@@ -108,13 +108,13 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueAnd |
 	CondFormulaValueOr |
 	CondFormulaValueNot |
-	CondFormulaValueRoleAssignedOf |
 	CondFormulaValueIsLocal |
 	CondFormulaValueIsRemote |
 	CondFormulaValueIsFederated |
 	CondFormulaValueIsSubscribing |
 	CondFormulaValueIsPublishing |
 	CondFormulaValueIsForeign |
+	CondFormulaValueRoleAssignedTo |
 	CondFormulaValueCreatedLessThan |
 	CondFormulaValueCreatedMoreThan |
 	CondFormulaValueFollowersLessThanOrEq |
