@@ -121,7 +121,7 @@ function save() {
 		preservedUsernames: preservedUsernames.value.split('\n'),
 		prohibitedNotePattern: prohibitedNotePattern.value,
 	}).then(() => {
-		fetchInstance();
+		fetchInstance(true);
 	});
 }
 

@@ -45,6 +45,7 @@ export type RolePolicies = {
 	canReply: boolean;
 	canQuote: boolean;
 	canDirectMessage: boolean;
+	mentionLimit: number;
 	canInvite: boolean;
 	inviteLimit: number;
 	inviteLimitCycle: number;
@@ -77,6 +78,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canReply: true,
 	canQuote: true,
 	canDirectMessage: true,
+	mentionLimit: 20,
 	canInvite: false,
 	inviteLimit: 0,
 	inviteLimitCycle: 60 * 24 * 7,
@@ -232,7 +234,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				case 'not': {
 					return !this.evalCond(user, instance, roles, value.value);
 				}
-				case 'roleAssignedOf': {
+				case 'roleAssignedTo': {
 					return roles.some(r => r.id === value.roleId);
 				}
 				case 'isLocal': {
@@ -376,6 +378,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			canReply: calc('canReply', vs => vs.some(v => v === true)),
 			canQuote: calc('canQuote', vs => vs.some(v => v === true)),
 			canDirectMessage: calc('canDirectMessage', vs => vs.some(v => v === true)),
+			mentionLimit: calc('mentionLimit', vs => Math.max(...vs)),
 			canInvite: calc('canInvite', vs => vs.some(v => v === true)),
 			inviteLimit: calc('inviteLimit', vs => Math.max(...vs)),
 			inviteLimitCycle: calc('inviteLimitCycle', vs => Math.max(...vs)),

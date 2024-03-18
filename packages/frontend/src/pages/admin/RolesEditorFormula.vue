@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<option value="isSubscribing">{{ i18n.ts._role._condition.isSubscribing }}</option>
 			<option value="isPublishing">{{ i18n.ts._role._condition.isPublishing }}</option>
 			<option value="isForeign">{{ i18n.ts._role._condition.isForeign }}</option>
-			<option value="roleAssignedOf">{{ i18n.ts._role._condition.roleAssignedOf }}</option>
+			<option value="roleAssignedTo">{{ i18n.ts._role._condition.roleAssignedTo }}</option>
 			<option value="usernameMatchOf">{{ i18n.ts._role._condition.usernameMatchOf }}</option>
 			<option value="nameMatchOf">{{ i18n.ts._role._condition.nameMatchOf }}</option>
 			<option value="nameIsDefault">{{ i18n.ts._role._condition.nameIsDefault }}</option>
@@ -64,7 +64,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #caption>{{ i18n.ts._role.patternEditDescription }}</template>
 	</MkInput>
 
-	<MkSelect v-else-if="type === 'roleAssignedOf'" v-model="v.roleId">
+	<MkSelect v-else-if="type === 'roleAssignedTo'" v-model="v.roleId">
 		<option v-for="role in roles.filter(r => r.target === 'manual')" :key="role.id" :value="role.id">{{ role.name }}</option>
 	</MkSelect>
 </div>
@@ -82,8 +82,6 @@ import { rolesCache } from '@/cache.js';
 
 const Sortable = defineAsyncComponent(() => import('vuedraggable').then(x => x.default));
 
-const roles = await rolesCache.fetch();
-
 const emit = defineEmits<{
 	(ev: 'update:modelValue', value: any): void;
 	(ev: 'remove'): void;
@@ -95,6 +93,8 @@ const props = defineProps<{
 }>();
 
 const v = ref(deepClone(props.modelValue));
+
+const roles = await rolesCache.fetch();
 
 watch(() => props.modelValue, () => {
 	if (JSON.stringify(props.modelValue) === JSON.stringify(v.value)) return;
@@ -111,7 +111,7 @@ const type = computed({
 		if (t === 'and') v.value.values = [];
 		if (t === 'or') v.value.values = [];
 		if (t === 'not') v.value.value = { id: uuid(), type: 'isRemote' };
-		if (t === 'roleAssignedOf') v.value.roleId = '';
+		if (t === 'roleAssignedTo') v.value.roleId = '';
 		if (t === 'usernameMatchOf') v.value.pattern = '';
 		if (t === 'nameMatchOf') v.value.pattern = '';
 		if (t === 'nameIsDefault') v.value.pattern = '';
