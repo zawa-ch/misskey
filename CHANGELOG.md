@@ -75,9 +75,6 @@
 - Feat: 画像のBlurhashをコピーする機能を追加
 - Fix: a8ad5dd8 で自身への返信を行うことができないのを修正
 
-## Server
-- Experimental: AP Inboxでモデレーションにより作成失敗した投稿をキューに戻さないように
-
 ## 2024.2.0-geoplantery.5
 
 ## Note

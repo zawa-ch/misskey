@@ -28,8 +28,6 @@ import type { UsersRepository, NotesRepository, FollowingsRepository, AbuseUserR
 import { bindThis } from '@/decorators.js';
 import type { MiRemoteUser } from '@/models/User.js';
 import { isNotNull } from '@/misc/is-not-null.js';
-import { CacheService } from '@/core/CacheService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { getApHrefNullable, getApId, getApIds, getApType, isAccept, isActor, isAdd, isAnnounce, isBlock, isCollection, isCollectionOrOrderedCollection, isCreate, isDelete, isFlag, isFollow, isLike, isMove, isPost, isReject, isRemove, isTombstone, isUndo, isUpdate, validActor, validPost } from './type.js';
 import { ApNoteService } from './models/ApNoteService.js';
 import { ApLoggerService } from './ApLoggerService.js';
@@ -38,6 +36,8 @@ import { ApResolverService } from './ApResolverService.js';
 import { ApAudienceService } from './ApAudienceService.js';
 import { ApPersonService } from './models/ApPersonService.js';
 import { ApQuestionService } from './models/ApQuestionService.js';
+import { CacheService } from '@/core/CacheService.js';
+import { GlobalEventService } from '@/core/GlobalEventService.js';
 import type { Resolver } from './ApResolverService.js';
 import type { IAccept, IAdd, IAnnounce, IBlock, ICreate, IDelete, IFlag, IFollow, ILike, IObject, IReject, IRemove, IUndo, IUpdate, IMove } from './type.js';
 
@@ -319,53 +319,13 @@ export class ApInboxService {
 				return;
 			}
 
-			try {
-				await this.noteCreateService.create(actor, {
-					createdAt,
-					renote,
-					visibility: activityAudience.visibility,
-					visibleUsers: activityAudience.visibleUsers,
-					uri,
-				});
-			} catch (e) {
-				// モデレーションによって拒否されたノートはスキップ
-				if (e instanceof NoteCreateService.ContainsProhibitedWordsError) {
-					this.logger.warn('skip: Contains prohibited words', {
-						user: actor,
-						data: { createdAt, renote, visibility: activityAudience.visibility, visibleUsers: activityAudience.visibleUsers, uri },
-					});
-					return;
-				}
-				if (e instanceof NoteCreateService.MatchedProhibitedPatternsError) {
-					this.logger.warn('skip: Matched prohibited note patterns', {
-						user: actor,
-						data: { createdAt, renote, visibility: activityAudience.visibility, visibleUsers: activityAudience.visibleUsers, uri },
-					});
-					return;
-				}
-				if (e instanceof NoteCreateService.QuoteProhibitedUserError) {
-					this.logger.warn('skip: Actor cannot quote', {
-						user: actor,
-						data: { createdAt, renote, visibility: activityAudience.visibility, visibleUsers: activityAudience.visibleUsers, uri },
-					});
-					return;
-				}
-				if (e instanceof NoteCreateService.ReplyProhibitedUserError) {
-					this.logger.warn('skip: Actor cannot reply', {
-						user: actor,
-						data: { createdAt, renote, visibility: activityAudience.visibility, visibleUsers: activityAudience.visibleUsers, uri },
-					});
-					return;
-				}
-				if (e instanceof NoteCreateService.DirectMessageProhibitedUserError) {
-					this.logger.warn('skip: Actor cannot direct message', {
-						user: actor,
-						data: { createdAt, renote, visibility: activityAudience.visibility, visibleUsers: activityAudience.visibleUsers, uri },
-					});
-					return;
-				}
-				throw e;
-			}
+			await this.noteCreateService.create(actor, {
+				createdAt,
+				renote,
+				visibility: activityAudience.visibility,
+				visibleUsers: activityAudience.visibleUsers,
+				uri,
+			});
 		} finally {
 			unlock();
 		}
@@ -450,27 +410,6 @@ export class ApInboxService {
 			await this.apNoteService.createNote(note, resolver, silent);
 			return 'ok';
 		} catch (err) {
-			// モデレーションによって拒否されたノートはスキップ
-			if (err instanceof NoteCreateService.ContainsProhibitedWordsError) {
-				this.logger.warn('skip: Contains prohibited words', { note });
-				return 'skip: Contains prohibited words';
-			}
-			if (err instanceof NoteCreateService.MatchedProhibitedPatternsError) {
-				this.logger.warn('skip: Matched prohibited note patterns', { note });
-				return 'skip: Matched prohibited note patterns';
-			}
-			if (err instanceof NoteCreateService.QuoteProhibitedUserError) {
-				this.logger.warn('skip: Actor cannot quote', { note });
-				return 'skip: Actor cannot quote';
-			}
-			if (err instanceof NoteCreateService.ReplyProhibitedUserError) {
-				this.logger.warn('skip: Actor cannot reply', { note });
-				return 'skip: Actor cannot reply';
-			}
-			if (err instanceof NoteCreateService.DirectMessageProhibitedUserError) {
-				this.logger.warn('skip: Actor cannot direct message', { note });
-				return 'skip: Actor cannot direct message';
-			}
 			if (err instanceof StatusError && !err.isRetryable) {
 				return `skip ${err.statusCode}`;
 			} else {
