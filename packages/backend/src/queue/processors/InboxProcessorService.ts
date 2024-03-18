@@ -27,6 +27,7 @@ import { bindThis } from '@/decorators.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type { InboxJobData } from '../types.js';
+import { NoteCreateService } from '@/core/NoteCreateService.js';
 
 @Injectable()
 export class InboxProcessorService {
@@ -189,6 +190,18 @@ export class InboxProcessorService {
 					return 'blocked notes with prohibited words';
 				}
 				if (e.id === '85ab9bd7-3a41-4530-959d-f07073900109') return 'actor has been suspended';
+			}
+			if (e instanceof NoteCreateService.MatchedProhibitedPatternsError) {
+				return 'matches prohibited note patterns';
+			}
+			if (e instanceof NoteCreateService.QuoteProhibitedUserError) {
+				return 'actor cannot quote';
+			}
+			if (e instanceof NoteCreateService.ReplyProhibitedUserError) {
+				return 'actor cannot reply';
+			}
+			if (e instanceof NoteCreateService.DirectMessageProhibitedUserError) {
+				return 'actor cannot direct message';
 			}
 			throw e;
 		}

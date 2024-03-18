@@ -12,6 +12,11 @@
 
 -->
 
+## 2024.3.1-geoplanetary.7
+
+### Server
+- Fix: 「禁止キーワードを含むノートがDelayed Queueに追加されて再処理される問題を修正」をロールと投稿禁止パターンに対しても適用
+
 ## 2024.3.1-geoplanetary.6
 
 ### Note
