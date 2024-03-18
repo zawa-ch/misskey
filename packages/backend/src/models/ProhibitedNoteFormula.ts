@@ -30,8 +30,8 @@ type ProhibitedNoteFormulaValueNot = {
 	value: ProhibitedNoteFormulaValue;
 };
 
-type ProhibitedNoteFormulaValueRoleAssignedOf = {
-	type: 'roleAssignedOf';
+type ProhibitedNoteFormulaValueRoleAssignedTo = {
+	type: 'roleAssignedTo';
 	roleId: string;
 };
 
@@ -160,7 +160,7 @@ export type ProhibitedNoteFormulaValue = (
 	ProhibitedNoteFormulaValueAnd |
 	ProhibitedNoteFormulaValueOr |
 	ProhibitedNoteFormulaValueNot |
-	ProhibitedNoteFormulaValueRoleAssignedOf |
+	ProhibitedNoteFormulaValueRoleAssignedTo |
 	ProhibitedNoteFormulaValueHasText |
 	ProhibitedNoteFormulaValueTextMatchOf |
 	ProhibitedNoteFormulaValueHasMentions |

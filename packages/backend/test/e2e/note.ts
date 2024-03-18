@@ -1727,7 +1727,7 @@ describe('Note', () => {
 			const note = await api('/notes/create', {
 				text: 'potentially annoying text',
 				visibility: 'specified',
-				visibleUserIds: [ bob.id ],
+				visibleUserIds: [bob.id],
 			}, alice);
 
 			assert.strictEqual(note.status, 400);
@@ -1783,7 +1783,7 @@ describe('Note', () => {
 			const note = await api('/notes/create', {
 				text: '@bob potentially annoying text',
 				visibility: 'specified',
-				visibleUserIds: [ bob.id ],
+				visibleUserIds: [bob.id],
 			}, alice);
 
 			assert.strictEqual(note.status, 200);
@@ -1855,7 +1855,7 @@ describe('Note', () => {
 
 		const prohibited = await api('admin/update-meta', {
 			prohibitedNotePattern: {
-				type: 'roleAssignedOf',
+				type: 'roleAssignedTo',
 				roleId: role.body.id,
 			},
 		}, alice);

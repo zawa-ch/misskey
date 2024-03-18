@@ -6733,7 +6733,7 @@ export interface Locale extends ILocale {
             /**
              * ロールにアサイン済み
              */
-            "roleAssignedOf": string;
+            "roleAssignedTo": string;
             /**
              * テキストを含む
              */

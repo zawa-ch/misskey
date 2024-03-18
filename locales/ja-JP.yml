@@ -1740,7 +1740,7 @@ _prohibitedNote:
     and: "〜かつ〜"
     or: "〜または〜"
     not: "～ではない"
-    roleAssignedOf: "ロールにアサイン済み"
+    roleAssignedTo: "ロールにアサイン済み"
     hasText: "テキストを含む"
     textMatchOf: "テキストが〜にマッチ"
     hasMentions: "メンションを含む"

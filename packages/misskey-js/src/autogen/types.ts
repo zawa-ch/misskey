@@ -4590,7 +4590,7 @@ export type components = {
     };
     ProhibitedNoteFormulaAssignsRole: {
       /** @enum {string} */
-      type: 'roleAssignedOf';
+      type: 'roleAssignedTo';
       /**
        * Format: id
        * @example xxxxxxxxxx

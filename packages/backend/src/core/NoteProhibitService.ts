@@ -66,7 +66,7 @@ export class NoteProhibitService {
 				case 'not': {
 					return !this.evalcond(subject, roles, blurhashes, formula.value);
 				}
-				case 'roleAssignedOf': {
+				case 'roleAssignedTo': {
 					return roles.some(r => r.id === formula.roleId);
 				}
 				case 'hasText': {

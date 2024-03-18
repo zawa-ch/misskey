@@ -92,7 +92,7 @@ export const packedProhibitedNoteFormulaAssignsRoleSchema = {
 		type: {
 			type: 'string',
 			nullable: false, optional: false,
-			enum: ['roleAssignedOf'],
+			enum: ['roleAssignedTo'],
 		},
 		roleId: {
 			type: 'string',

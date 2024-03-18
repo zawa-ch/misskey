@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<option value="and">{{ i18n.ts._prohibitedNote._condition.and }}</option>
 			<option value="or">{{ i18n.ts._prohibitedNote._condition.or }}</option>
 			<option value="not">{{ i18n.ts._prohibitedNote._condition.not }}</option>
-			<option value="roleAssignedOf">{{ i18n.ts._prohibitedNote._condition.roleAssignedOf }}</option>
+			<option value="roleAssignedTo">{{ i18n.ts._prohibitedNote._condition.roleAssignedTo }}</option>
 			<option value="hasText">{{ i18n.ts._prohibitedNote._condition.hasText }}</option>
 			<option value="textMatchOf">{{ i18n.ts._prohibitedNote._condition.textMatchOf }}</option>
 			<option value="hasMentions">{{ i18n.ts._prohibitedNote._condition.hasMentions }}</option>
@@ -64,7 +64,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<ProhibitedNoteFormula v-model="subformula" child/>
 	</div>
 
-	<MkSelect v-else-if="type === 'roleAssignedOf'" v-model="roleId">
+	<MkSelect v-else-if="type === 'roleAssignedTo'" v-model="roleId">
 		<option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
 	</MkSelect>
 
@@ -192,7 +192,7 @@ const type = computed({
 				formula.value = { type: t, size: 10240 };
 				break;
 			}
-			case 'roleAssignedOf': {
+			case 'roleAssignedTo': {
 				formula.value = { type: t, roleId: '' };
 				break;
 			}
