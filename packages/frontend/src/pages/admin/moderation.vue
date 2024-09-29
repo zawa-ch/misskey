@@ -69,9 +69,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkFolder>
 
 					<MkFolder>
+						<template #icon><i class="ti ti-ban"></i></template>
 						<template #label>{{ i18n.ts._prohibitedNote.title }}</template>
-						<div :class="$style.caption">{{ i18n.ts._prohibitedNote.description }}</div>
-						<ProhibitedNoteFormula v-model="prohibitedNotePattern"></ProhibitedNoteFormula>
+
+						<div class="_gaps">
+							<ProhibitedNoteFormula v-model="prohibitedNotePattern">
+								<template #caption>{{ i18n.ts._prohibitedNote.description }}</template>
+							</ProhibitedNoteFormula>
+							<MkButton primary @click="save_prohibitedNotePattern">{{ i18n.ts.save }}</MkButton>
+						</div>
 					</MkFolder>
 
 					<MkFolder>
@@ -121,7 +127,6 @@ import { ref, computed } from 'vue';
 import XHeader from './_header_.vue';
 import ProhibitedNoteFormula from './ProhibitedNoteFormula.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
-import MkInput from '@/components/MkInput.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import FormSuspense from '@/components/form/suspense.vue';
 import * as os from '@/os.js';
@@ -201,6 +206,14 @@ function save_prohibitedWords() {
 function save_hiddenTags() {
 	os.apiWithDialog('admin/update-meta', {
 		hiddenTags: hiddenTags.value.split('\n'),
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
+function save_prohibitedNotePattern() {
+	os.apiWithDialog('admin/update-meta', {
+		prohibitedNotePattern: prohibitedNotePattern.value,
 	}).then(() => {
 		fetchInstance(true);
 	});
