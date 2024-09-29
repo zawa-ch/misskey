@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { Repository } from "typeorm";
+import type { Repository } from 'typeorm';
 
 process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
 import { expect } from '@jest/globals';
-import { MiNote } from '@/models/Note.js';
-import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { api, castAsError, initTestDb, post, role, signup, uploadFile, uploadUrl } from '../utils.js';
 import type * as misskey from 'misskey-js';
+import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
+import { MiNote } from '@/models/Note.js';
 
 describe('Note', () => {
 	let Notes: Repository<MiNote>;
@@ -2159,7 +2159,7 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const file = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 
 		const note1 = await api('/notes/create', {
 			text: 'foo',
@@ -2189,7 +2189,7 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
 
 		const note1 = await api('/notes/create', {
@@ -2221,7 +2221,7 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
 
 		const note1 = await api('/notes/create', {
@@ -2253,7 +2253,7 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
 
 		const note1 = await api('/notes/create', {
@@ -2284,7 +2284,7 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/kick_gaba7.wav');
 
 		const note1 = await api('/notes/create', {
@@ -2316,7 +2316,7 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
 
 		const note1 = await api('/notes/create', {
@@ -2348,7 +2348,7 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/kick_gaba7.wav');
 
 		const note1 = await api('/notes/create', {
@@ -2380,7 +2380,7 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
 
 		const note1 = await api('/notes/create', {
@@ -2403,7 +2403,7 @@ describe('Note', () => {
 
 	test('禁止パターンを含む投稿はエラーになる (ファイルMD5一致)', async () => {
 		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
-		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 
 		const prohibited = await api('admin/update-meta', {
 			prohibitedNotePattern: {
@@ -2443,7 +2443,7 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
 
 		const note1 = await api('/notes/create', {
@@ -2475,7 +2475,7 @@ describe('Note', () => {
 		await new Promise(x => setTimeout(x, 2));
 
 		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
-		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 
 		const note1 = await api('/notes/create', {
 			text: 'foo',
@@ -2497,7 +2497,7 @@ describe('Note', () => {
 
 	test('禁止パターンを含む投稿はエラーになる (Blurhash近似)', async () => {
 		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/with-alpha.png');
-		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/Lenna.jpg');
+		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		assert.notEqual(file2.blurhash, null);
 
 		const prohibited = await api('admin/update-meta', {
