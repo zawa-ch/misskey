@@ -160,6 +160,7 @@ const props = withDefaults(defineProps<{
 	initialVisibleUsers: () => [],
 	autofocus: true,
 	mock: false,
+	initialLocalOnly: undefined,
 });
 
 provide('mock', props.mock);
@@ -189,11 +190,11 @@ watch(showPreview, () => defaultStore.set('showPreview', showPreview.value));
 const showAddMfmFunction = ref(defaultStore.state.enableQuickAddMfmFunction);
 watch(showAddMfmFunction, () => defaultStore.set('enableQuickAddMfmFunction', showAddMfmFunction.value));
 const cw = ref<string | null>(props.initialCw ?? null);
-const localOnly = ref<boolean>(props.initialLocalOnly ?? defaultStore.state.rememberNoteVisibility ? defaultStore.state.localOnly : defaultStore.state.defaultNoteLocalOnly);
-const visibility = ref(props.initialVisibility ?? (defaultStore.state.rememberNoteVisibility ? defaultStore.state.visibility : defaultStore.state.defaultNoteVisibility) as typeof Misskey.noteVisibilities[number]);
+const localOnly = ref(props.initialLocalOnly ?? (defaultStore.state.rememberNoteVisibility ? defaultStore.state.localOnly : defaultStore.state.defaultNoteLocalOnly));
+const visibility = ref(props.initialVisibility ?? (defaultStore.state.rememberNoteVisibility ? defaultStore.state.visibility : defaultStore.state.defaultNoteVisibility));
 const visibleUsers = ref<Misskey.entities.UserDetailed[]>([]);
 if (props.initialVisibleUsers) {
-	props.initialVisibleUsers.forEach(pushVisibleUser);
+	props.initialVisibleUsers.forEach(u => pushVisibleUser(u));
 }
 const reactionAcceptance = ref(defaultStore.state.reactionAcceptance);
 const autocomplete = ref(null);
@@ -259,7 +260,13 @@ const canPost = computed((): boolean => {
 	const ast = mfm.parse(text.value);
 	const has_mention = extractMentions(ast).filter(u => u.username !== $i.username || u.host !== $i.host).length > 0;
 	return !props.mock && !posting.value && !posted.value &&
-		(1 <= textLength.value || 1 <= files.value.length || !!poll.value || !!props.renote) &&
+		(
+			1 <= textLength.value ||
+			1 <= files.value.length ||
+			poll.value != null ||
+			props.renote != null ||
+			(props.reply != null && quoteId.value != null)
+		) &&
 		(textLength.value <= maxTextLength.value) &&
 		(!poll.value || poll.value.choices.length >= 2) &&
 		(has_mention ? $i.policies.canReply : true) &&
@@ -340,7 +347,7 @@ if (props.reply && ['home', 'followers', 'specified'].includes(props.reply.visib
 			misskeyApi('users/show', {
 				userIds: props.reply.visibleUserIds.filter(uid => uid !== $i.id && uid !== props.reply?.userId),
 			}).then(users => {
-				users.forEach(pushVisibleUser);
+				users.forEach(u => pushVisibleUser(u));
 			});
 		}
 
@@ -393,7 +400,7 @@ function addMissingMention() {
 	for (const x of extractMentions(ast)) {
 		if (!visibleUsers.value.some(u => (u.username === x.username) && (u.host === x.host))) {
 			misskeyApi('users/show', { username: x.username, host: x.host }).then(user => {
-				visibleUsers.value.push(user);
+				pushVisibleUser(user);
 			});
 		}
 	}
@@ -523,6 +530,9 @@ async function toggleLocalOnly() {
 	}
 
 	localOnly.value = !localOnly.value;
+	if (defaultStore.state.rememberNoteVisibility) {
+		defaultStore.set('localOnly', localOnly.value);
+	}
 }
 
 async function toggleReactionAcceptance() {
@@ -613,6 +623,23 @@ async function onPaste(ev: ClipboardEvent) {
 			quoteId.value = paste.substring(url.length).match(/^\/notes\/(.+?)\/?$/)?.[1] ?? null;
 		});
 	}
+
+	if (paste.length > 1000) {
+		ev.preventDefault();
+		os.confirm({
+			type: 'info',
+			text: i18n.ts.attachAsFileQuestion,
+		}).then(({ canceled }) => {
+			if (canceled) {
+				insertTextAtCursor(textareaEl.value, paste);
+				return;
+			}
+
+			const fileName = formatTimeString(new Date(), defaultStore.state.pastedFileName).replace(/{{number}}/g, "0");
+			const file = new File([paste], `${fileName}.txt`, { type: "text/plain" });
+			upload(file, `${fileName}.txt`);
+		});
+	}
 }
 
 function onDragover(ev) {
@@ -684,6 +711,7 @@ function saveDraft() {
 			localOnly: localOnly.value,
 			files: files.value,
 			poll: poll.value,
+			visibleUserIds: visibility.value === 'specified' ? visibleUsers.value.map(x => x.id) : undefined,
 		},
 	};
 
@@ -964,6 +992,11 @@ onMounted(() => {
 				files.value = (draft.data.files || []).filter(draftFile => draftFile);
 				if (draft.data.poll) {
 					poll.value = draft.data.poll;
+				}
+				if (draft.data.visibleUserIds) {
+					misskeyApi('users/show', { userIds: draft.data.visibleUserIds }).then(users => {
+						users.forEach(u => pushVisibleUser(u));
+					});
 				}
 			}
 		}
