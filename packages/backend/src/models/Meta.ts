@@ -93,6 +93,11 @@ export class MiMeta {
 	public prohibitedNotePattern : ProhibitedNoteFormulaValue;
 
 	@Column('varchar', {
+		length: 1024, array: true, default: '{}',
+	})
+	public mediaSilencedHosts: string[];
+
+	@Column('varchar', {
 		length: 1024,
 		nullable: true,
 	})

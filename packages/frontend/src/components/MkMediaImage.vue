@@ -54,7 +54,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { watch, ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { getStaticImageUrl } from '@/scripts/media-proxy.js';
-import copyToClipboard from '@/scripts/copy-to-clipboard.js';
+import { copyToClipboard } from '@/scripts/copy-to-clipboard.js';
 import bytes from '@/filters/bytes.js';
 import ImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
 import { defaultStore } from '@/store.js';
@@ -84,11 +84,21 @@ const url = computed(() => (props.raw || defaultStore.state.loadRawImages)
 		: props.image.thumbnailUrl,
 );
 
-function onclick() {
+async function onclick(ev: MouseEvent) {
 	if (!props.controls) {
 		return;
 	}
+
 	if (hide.value) {
+		ev.stopPropagation();
+		if (props.image.isSensitive && defaultStore.state.confirmWhenRevealingSensitiveMedia) {
+			const { canceled } = await os.confirm({
+				type: 'question',
+				text: i18n.ts.sensitiveMediaRevealConfirm,
+			});
+			if (canceled) return;
+		}
+
 		hide.value = false;
 	}
 }
