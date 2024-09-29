@@ -24,7 +24,6 @@ import { MiMeta, MiNote, UserProfilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';
 import { DownloadService } from '@/core/DownloadService.js';
-import { MetaService } from '@/core/MetaService.js';
 import type { MiRemoteUser } from '@/models/User.js';
 import { genAidx } from '@/misc/id/aidx.js';
 import { NoteProhibitService } from '@/core/NoteProhibitService.js';
@@ -109,7 +108,14 @@ describe('ActivityPub', () => {
 		prohibitedWords: [] as string[],
 		prohibitedNotePattern: { type: undefined },
 	} as MiMeta;
-	let meta = metaInitial;
+	const meta = { ...metaInitial };
+
+	function updateMeta(newMeta: Partial<MiMeta>): void {
+		for (const key in meta) {
+			delete (meta as any)[key];
+		}
+		Object.assign(meta, newMeta);
+	}
 
 	beforeAll(async () => {
 		const app = await Test.createTestingModule({
@@ -122,11 +128,8 @@ describe('ActivityPub', () => {
 					};
 				},
 			})
-			.overrideProvider(MetaService).useValue({
-				async fetch(): Promise<MiMeta> {
-					return meta;
-				},
-			}).compile();
+			.overrideProvider(DI.meta).useFactory({ factory: () => meta })
+			.compile();
 
 		await app.init();
 		app.enableShutdownHooks();
@@ -369,7 +372,7 @@ describe('ActivityPub', () => {
 		});
 
 		test('cacheRemoteFiles=false disables caching', async () => {
-			meta = { ...metaInitial, cacheRemoteFiles: false };
+			updateMeta({ ...metaInitial, cacheRemoteFiles: false });
 
 			const imageObject: IApDocument = {
 				type: 'Document',
@@ -398,7 +401,7 @@ describe('ActivityPub', () => {
 		});
 
 		test('cacheRemoteSensitiveFiles=false only affects sensitive files', async () => {
-			meta = { ...metaInitial, cacheRemoteSensitiveFiles: false };
+			updateMeta({ ...metaInitial, cacheRemoteSensitiveFiles: false });
 
 			const imageObject: IApDocument = {
 				type: 'Document',
