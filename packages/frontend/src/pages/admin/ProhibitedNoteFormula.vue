@@ -88,6 +88,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #label>{{ i18n.ts._prohibitedNote.allowDifference }}</template>
 		</MkInput>
 	</div>
+
+	<div :class="$style.caption"><slot name="caption"></slot></div>
 </div>
 </template>
 
@@ -294,6 +296,16 @@ function removeSelf() {
 
 	.remove {
 		margin-left: 10px;
+	}
+
+	.caption {
+		font-size: 0.85em;
+		padding: 8px 0 0 0;
+		color: var(--fgTransparentWeak);
+
+		&:empty {
+			display: none;
+		}
 	}
 
 	.item {
