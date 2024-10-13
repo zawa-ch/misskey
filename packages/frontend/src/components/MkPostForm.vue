@@ -78,7 +78,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<input v-show="withHashtags" ref="hashtagsInputEl" v-model="hashtags" :class="$style.hashtags" :placeholder="i18n.ts.hashtags" list="hashtags">
 	<XPostFormAttaches v-model="files" @detach="detachFile" @changeSensitive="updateFileSensitive" @changeName="updateFileName" @replaceFile="replaceFile"/>
 	<MkPollEditor v-if="poll" v-model="poll" @destroyed="poll = null"/>
-	<MkNotePreview v-if="showPreview" :class="$style.preview" :text="text" :files="files" :poll="poll ?? undefined" :useCw="useCw" :cw="cw" :user="postAccount ?? $i"/>
+	<MkNotePreview v-if="showPreview" :class="[$style.preview, defaultStore.state.postformPreviewBackgroundStyle === 'darken' ? $style.darkenPreview : defaultStore.state.postformPreviewBackgroundStyle === 'obliqueStripe' ? $style.obliqueStripedPreview : $style.plainPreview]" :text="text" :files="files" :poll="poll ?? undefined" :useCw="useCw" :cw="cw" :user="postAccount ?? $i"/>
 	<div v-if="showingOptions" style="padding: 8px 16px;">
 	</div>
 	<footer :class="$style.footer">
@@ -1193,11 +1193,19 @@ defineExpose({
 	background-size: auto auto;
 }
 
-html[data-color-scheme=dark] .preview {
+.plainPreview {
+	background-image: transparent;
+}
+
+.darkenPreview {
+	background-color: var(--shadow);
+}
+
+html[data-color-scheme=dark] .obliqueStripedPreview {
 	background-image: repeating-linear-gradient(135deg, transparent, transparent 5px, #0004 5px, #0004 10px);
 }
 
-html[data-color-scheme=light] .preview {
+html[data-color-scheme=light] .obliqueStripedPreview {
 	background-image: repeating-linear-gradient(135deg, transparent, transparent 5px, #00000005 5px, #00000005 10px);
 }
 

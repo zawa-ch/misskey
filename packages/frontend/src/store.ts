@@ -276,6 +276,10 @@ export const defaultStore = markRaw(new Storage('base', {
 		where: 'device',
 		default: 'meter' as 'counter' | 'counterLegacy' | 'meter',
 	},
+	postformPreviewBackgroundStyle: {
+		where: 'device',
+		default: 'darken' as 'darken' | 'obliqueStripe' | 'plain',
+	},
 	enableInfiniteScroll: {
 		where: 'device',
 		default: true,

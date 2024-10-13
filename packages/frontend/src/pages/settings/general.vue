@@ -162,6 +162,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<option value="counterLegacy">{{ i18n.ts.postformRemainCharacterDisplayCounterLegacy }}</option>
 				<option value="meter">{{ i18n.ts.postformRemainCharacterDisplayMeter }}</option>
 			</MkRadios>
+
+			<MkRadios v-model="postformPreviewBackgroundStyle">
+				<template #label>{{ i18n.ts.postformPreviewBackgroundStyle }}<span class="_tips">Geoplanetary unique</span></template>
+				<option value="darken">{{ i18n.ts.postformPreviewBackgroundStyleObliqueDarken }}</option>
+				<option value="obliqueStripe">{{ i18n.ts.postformPreviewBackgroundStyleObliqueStripe }}</option>
+				<option value="plain">{{ i18n.ts.postformPreviewBackgroundStylePlain }}</option>
+			</MkRadios>
 		</div>
 	</FormSection>
 
@@ -312,6 +319,7 @@ const nsfw = computed(defaultStore.makeGetterSetter('nsfw'));
 const showFixedPostForm = computed(defaultStore.makeGetterSetter('showFixedPostForm'));
 const showFixedPostFormInChannel = computed(defaultStore.makeGetterSetter('showFixedPostFormInChannel'));
 const postformRemainCharacterDisplay = computed(defaultStore.makeGetterSetter('postformRemainCharacterDisplay'));
+const postformPreviewBackgroundStyle = computed(defaultStore.makeGetterSetter('postformPreviewBackgroundStyle'));
 const numberOfPageCache = computed(defaultStore.makeGetterSetter('numberOfPageCache'));
 const instanceTicker = computed(defaultStore.makeGetterSetter('instanceTicker'));
 const enableInfiniteScroll = computed(defaultStore.makeGetterSetter('enableInfiniteScroll'));
