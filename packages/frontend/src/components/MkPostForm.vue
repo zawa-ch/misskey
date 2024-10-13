@@ -65,8 +65,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<button class="_buttonPrimary" style="padding: 4px; border-radius: 8px;" @click="addVisibleUser"><i class="ti ti-plus ti-fw"></i></button>
 		</div>
 	</div>
-	<MkInfo v-if="!localOnly && 8192 < textLength" warn :class="$style.textLengthReachUpstreamHardLimit">{{ i18n.ts.textLengthReachUpstreamHardLimitWarning }}</MkInfo>
-	<MkInfo v-if="hasNotSpecifiedMentions" warn :class="$style.hasNotSpecifiedMentions">{{ i18n.ts.notSpecifiedMentionWarning }} - <button class="_textButton" @click="addMissingMention()">{{ i18n.ts.add }}</button></MkInfo>
+	<MkInfo v-if="annoying && visibility === 'public'" warn :class="$style.noteWarnings">{{ i18n.ts.thisPostMayBeAnnoying }} - <button class="_textButton" @click="visibility = 'home'">{{ i18n.ts.thisPostMayBeAnnoyingHome }}</button></MkInfo>
+	<MkInfo v-if="!localOnly && 8192 < textLength" warn :class="$style.noteWarnings">{{ i18n.ts.textLengthReachUpstreamHardLimitWarning }}</MkInfo>
+	<MkInfo v-if="hasNotSpecifiedMentions" warn :class="$style.noteWarnings">{{ i18n.ts.notSpecifiedMentionWarning }} - <button class="_textButton" @click="addMissingMention()">{{ i18n.ts.add }}</button></MkInfo>
 	<input v-show="useCw" ref="cwInputEl" v-model="cw" :class="$style.cw" :placeholder="i18n.ts.annotation" @keydown="onKeydown">
 	<div :class="[$style.textOuter, { [$style.withCw]: useCw }]">
 		<div v-if="channel" :class="$style.colorBar" :style="{ background: channel.color }"></div>
@@ -77,7 +78,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<input v-show="withHashtags" ref="hashtagsInputEl" v-model="hashtags" :class="$style.hashtags" :placeholder="i18n.ts.hashtags" list="hashtags">
 	<XPostFormAttaches v-model="files" @detach="detachFile" @changeSensitive="updateFileSensitive" @changeName="updateFileName" @replaceFile="replaceFile"/>
 	<MkPollEditor v-if="poll" v-model="poll" @destroyed="poll = null"/>
-	<MkNotePreview v-if="showPreview" :class="$style.preview" :text="text" :files="files" :poll="poll ?? undefined" :useCw="useCw" :cw="cw" :user="postAccount ?? $i"/>
+	<MkNotePreview v-if="showPreview" :class="[$style.preview, defaultStore.state.postformPreviewBackgroundStyle === 'darken' ? $style.darkenPreview : defaultStore.state.postformPreviewBackgroundStyle === 'obliqueStripe' ? $style.obliqueStripedPreview : $style.plainPreview]" :text="text" :files="files" :poll="poll ?? undefined" :useCw="useCw" :cw="cw" :user="postAccount ?? $i"/>
 	<div v-if="showingOptions" style="padding: 8px 16px;">
 	</div>
 	<footer :class="$style.footer">
@@ -274,6 +275,14 @@ const canPost = computed((): boolean => {
 		(quoteId.value ? $i.policies.canQuote : true) &&
 		(props.renote ? $i.policies.canQuote : true) &&
 		(visibility.value === 'specified' ? ((has_mention || visibleUsers.value.filter(u => u.id !== $i.id).length > 0) ? $i.policies.canDirectMessage : true) : true);
+});
+
+const annoying = computed((): boolean => {
+	return text.value.includes('$[x2') ||
+		text.value.includes('$[x3') ||
+		text.value.includes('$[x4') ||
+		text.value.includes('$[scale') ||
+		text.value.includes('$[position');
 });
 
 const withHashtags = computed(defaultStore.makeGetterSetter('postFormWithHashtags'));
@@ -756,37 +765,6 @@ async function post(ev?: MouseEvent) {
 
 	if (props.mock) return;
 
-	const annoying =
-		text.value.includes('$[x2') ||
-		text.value.includes('$[x3') ||
-		text.value.includes('$[x4') ||
-		text.value.includes('$[scale') ||
-		text.value.includes('$[position');
-
-	if (annoying && visibility.value === 'public') {
-		const { canceled, result } = await os.actions({
-			type: 'warning',
-			text: i18n.ts.thisPostMayBeAnnoying,
-			actions: [{
-				value: 'home',
-				text: i18n.ts.thisPostMayBeAnnoyingHome,
-				primary: true,
-			}, {
-				value: 'cancel',
-				text: i18n.ts.thisPostMayBeAnnoyingCancel,
-			}, {
-				value: 'ignore',
-				text: i18n.ts.thisPostMayBeAnnoyingIgnore,
-			}],
-		});
-
-		if (canceled) return;
-		if (result === 'cancel') return;
-		if (result === 'home') {
-			visibility.value = 'home';
-		}
-	}
-
 	let postData = {
 		text: text.value === '' ? null : text.value,
 		fileIds: files.value.length > 0 ? files.value.map(f => f.id) : undefined,
@@ -1215,11 +1193,19 @@ defineExpose({
 	background-size: auto auto;
 }
 
-html[data-color-scheme=dark] .preview {
+.plainPreview {
+	background-image: transparent;
+}
+
+.darkenPreview {
+	background-color: var(--shadow);
+}
+
+html[data-color-scheme=dark] .obliqueStripedPreview {
 	background-image: repeating-linear-gradient(135deg, transparent, transparent 5px, #0004 5px, #0004 10px);
 }
 
-html[data-color-scheme=light] .preview {
+html[data-color-scheme=light] .obliqueStripedPreview {
 	background-image: repeating-linear-gradient(135deg, transparent, transparent 5px, #00000005 5px, #00000005 10px);
 }
 
@@ -1252,11 +1238,7 @@ html[data-color-scheme=light] .preview {
 	background: var(--X4);
 }
 
-.textLengthReachUpstreamHardLimit {
-	margin: 0 20px 16px 20px;
-}
-
-.hasNotSpecifiedMentions {
+.noteWarnings {
 	margin: 0 20px 16px 20px;
 }
 

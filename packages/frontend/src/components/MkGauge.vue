@@ -21,18 +21,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed } from 'vue';
 
-const props = withDefaults(defineProps<{
+export interface Props {
 	value: number;
-	mode: 'percentage' | 'fraction' | 'value' | 'remain' | 'none';
-	label: string | null;
-	minValue: number;
-	maxValue: number;
-	color: string;
-	backgroundColor: string;
-	overflowColor: string;
-	checkPositiveOverflow: boolean;
-	checkNegativeOverflow: boolean;
-}>(), {
+	mode?: 'percentage' | 'fraction' | 'value' | 'remain' | 'none';
+	label?: string | null;
+	minValue?: number;
+	maxValue?: number;
+	color?: string;
+	backgroundColor?: string;
+	overflowColor?: string;
+	checkPositiveOverflow?: boolean;
+	checkNegativeOverflow?: boolean;
+};
+const props = withDefaults(defineProps<Props>(), {
 	mode: 'percentage',
 	label: null,
 	minValue: 0,

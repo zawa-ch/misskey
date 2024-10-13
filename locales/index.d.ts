@@ -2321,6 +2321,22 @@ export interface Locale extends ILocale {
      */
     "postformRemainCharacterDisplayMeter": string;
     /**
+     * 投稿フォームのプレビュー背景
+     */
+    "postformPreviewBackgroundStyle": string;
+    /**
+     * 暗くする
+     */
+    "postformPreviewBackgroundStyleObliqueDarken": string;
+    /**
+     * 斜めストライプ
+     */
+    "postformPreviewBackgroundStyleObliqueStripe": string;
+    /**
+     * プレーン(レガシー)
+     */
+    "postformPreviewBackgroundStylePlain": string;
+    /**
      * フォローする際、デフォルトで返信をTLに含むようにする
      */
     "withRepliesByDefaultForNewlyFollowed": string;
