@@ -6873,6 +6873,10 @@ export interface Locale extends ILocale {
              */
             "webhookMax": string;
             /**
+             * クリップ機能の使用可否
+             */
+            "clipAvailable": string;
+            /**
              * クリップの作成可能数
              */
             "clipMax": string;

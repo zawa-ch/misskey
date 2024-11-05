@@ -594,6 +594,26 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</MkFolder>
 
+			<MkFolder v-if="matchQuery([i18n.ts._role._options.clipAvailable, 'clipAvailable'])">
+				<template #label>{{ i18n.ts._role._options.clipAvailable }}</template>
+				<template #suffix>
+					<span v-if="role.policies.clipAvailable.useDefault" :class="$style.useDefaultLabel">{{ i18n.ts._role.useBaseValue }}</span>
+					<span v-else>{{ role.policies.clipAvailable.value ? i18n.ts.yes : i18n.ts.no }}</span>
+					<span :class="$style.priorityIndicator"><i :class="getPriorityIcon(role.policies.clipAvailable)"></i></span>
+				</template>
+				<div class="_gaps">
+					<MkSwitch v-model="role.policies.clipAvailable.useDefault" :readonly="readonly">
+						<template #label>{{ i18n.ts._role.useBaseValue }}</template>
+					</MkSwitch>
+					<MkSwitch v-model="role.policies.clipAvailable.value" :disabled="role.policies.clipAvailable.useDefault" :readonly="readonly">
+						<template #label>{{ i18n.ts.enable }}</template>
+					</MkSwitch>
+					<MkRange v-model="role.policies.clipAvailable.priority" :min="0" :max="2" :step="1" easing :textConverter="(v) => v === 0 ? i18n.ts._role._priority.low : v === 1 ? i18n.ts._role._priority.middle : v === 2 ? i18n.ts._role._priority.high : ''">
+						<template #label>{{ i18n.ts._role.priority }}</template>
+					</MkRange>
+				</div>
+			</MkFolder>
+
 			<MkFolder v-if="matchQuery([i18n.ts._role._options.clipMax, 'clipLimit'])">
 				<template #label>{{ i18n.ts._role._options.clipMax }}</template>
 				<template #suffix>

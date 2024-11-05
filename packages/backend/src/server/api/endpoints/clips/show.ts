@@ -14,6 +14,7 @@ export const meta = {
 	tags: ['clips', 'account'],
 
 	requireCredential: false,
+	requireRolePolicy: 'clipAvailable',
 
 	kind: 'read:account',
 

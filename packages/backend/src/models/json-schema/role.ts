@@ -304,6 +304,10 @@ export const packedRolePoliciesSchema = {
 			type: 'integer',
 			optional: false, nullable: false,
 		},
+		clipAvailable: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 		clipLimit: {
 			type: 'integer',
 			optional: false, nullable: false,

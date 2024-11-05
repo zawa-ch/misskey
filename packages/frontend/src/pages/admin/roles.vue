@@ -221,6 +221,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkInput>
 						</MkFolder>
 
+						<MkFolder v-if="matchQuery([i18n.ts._role._options.clipAvailable, 'clipAvailable'])">
+							<template #label>{{ i18n.ts._role._options.clipAvailable }}</template>
+							<template #suffix>{{ policies.clipAvailable ? i18n.ts.yes : i18n.ts.no }}</template>
+							<MkSwitch v-model="policies.clipAvailable">
+								<template #label>{{ i18n.ts.enable }}</template>
+							</MkSwitch>
+						</MkFolder>
+
 						<MkFolder v-if="matchQuery([i18n.ts._role._options.clipMax, 'clipLimit'])">
 							<template #label>{{ i18n.ts._role._options.clipMax }}</template>
 							<template #suffix>{{ policies.clipLimit }}</template>

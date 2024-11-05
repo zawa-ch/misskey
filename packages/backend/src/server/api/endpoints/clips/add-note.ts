@@ -13,6 +13,7 @@ export const meta = {
 	tags: ['account', 'notes', 'clips'],
 
 	requireCredential: true,
+	requireRolePolicy: 'clipAvailable',
 
 	prohibitMoved: true,
 

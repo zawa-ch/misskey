@@ -64,6 +64,7 @@ export type RolePolicies = {
 	antennaLimit: number;
 	wordMuteLimit: number;
 	webhookLimit: number;
+	clipAvailable: boolean;
 	clipLimit: number;
 	noteEachClipsLimit: number;
 	userListLimit: number;
@@ -104,6 +105,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	antennaLimit: 5,
 	wordMuteLimit: 200,
 	webhookLimit: 3,
+	clipAvailable: true,
 	clipLimit: 10,
 	noteEachClipsLimit: 200,
 	userListLimit: 10,
@@ -485,6 +487,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			antennaLimit: calc('antennaLimit', vs => Math.max(...vs)),
 			wordMuteLimit: calc('wordMuteLimit', vs => Math.max(...vs)),
 			webhookLimit: calc('webhookLimit', vs => Math.max(...vs)),
+			clipAvailable: calc('clipAvailable', vs => vs.some(v => v === true)),
 			clipLimit: calc('clipLimit', vs => Math.max(...vs)),
 			noteEachClipsLimit: calc('noteEachClipsLimit', vs => Math.max(...vs)),
 			userListLimit: calc('userListLimit', vs => Math.max(...vs)),

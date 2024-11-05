@@ -12,6 +12,7 @@ export const meta = {
 	tags: ['clips'],
 
 	requireCredential: true,
+	requireRolePolicy: 'clipAvailable',
 
 	kind: 'write:account',
 

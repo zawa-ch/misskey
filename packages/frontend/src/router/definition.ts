@@ -9,6 +9,7 @@ import { Router } from '@/nirax.js';
 import { $i, iAmModerator } from '@/account.js';
 import MkLoading from '@/pages/_loading_.vue';
 import MkError from '@/pages/_error_.vue';
+import { instance } from '@/instance.js';
 
 export const page = (loader: AsyncComponentLoader<any>) => defineAsyncComponent({
 	loader: loader,
@@ -42,7 +43,7 @@ const routes: RouteDef[] = [{
 	component: page(() => import('@/pages/list.vue')),
 }, {
 	path: '/clips/:clipId',
-	component: page(() => import('@/pages/clip.vue')),
+	component: ($i ? $i.isAdmin as boolean || $i.policies.clipAvailable : instance.policies.clipAvailable) ? page(() => import('@/pages/clip.vue')) : page(() => import('@/pages/not-found.vue')),
 }, {
 	path: '/instance-info/:host',
 	component: page(() => import('@/pages/instance-info.vue')),
@@ -528,7 +529,7 @@ const routes: RouteDef[] = [{
 	loginRequired: true,
 }, {
 	path: '/my/clips',
-	component: page(() => import('@/pages/my-clips/index.vue')),
+	component: ($i ? ($i.isAdmin ?? false) || $i.policies.clipAvailable : instance.policies.clipAvailable) ? page(() => import('@/pages/my-clips/index.vue')) : page(() => import('@/pages/not-found.vue')),
 	loginRequired: true,
 }, {
 	path: '/my/antennas/create',
