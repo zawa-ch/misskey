@@ -92,6 +92,7 @@ export const ROLE_POLICIES = [
 	'canSearchNotes',
 	'canUseTranslator',
 	'canHideAds',
+	'driveWritable',
 	'driveCapacityMb',
 	'alwaysMarkNsfw',
 	'canUpdateBioMedia',

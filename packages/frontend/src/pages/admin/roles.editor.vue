@@ -437,6 +437,26 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</MkFolder>
 
+			<MkFolder v-if="matchQuery([i18n.ts._role._options.driveWritable, 'driveWritable'])">
+				<template #label>{{ i18n.ts._role._options.driveWritable }}</template>
+				<template #suffix>
+					<span v-if="role.policies.driveWritable.useDefault" :class="$style.useDefaultLabel">{{ i18n.ts._role.useBaseValue }}</span>
+					<span v-else>{{ role.policies.driveWritable.value ? i18n.ts.yes : i18n.ts.no }}</span>
+					<span :class="$style.priorityIndicator"><i :class="getPriorityIcon(role.policies.driveWritable)"></i></span>
+				</template>
+				<div class="_gaps">
+					<MkSwitch v-model="role.policies.driveWritable.useDefault" :readonly="readonly">
+						<template #label>{{ i18n.ts._role.useBaseValue }}</template>
+					</MkSwitch>
+					<MkSwitch v-model="role.policies.driveWritable.value" :disabled="role.policies.driveWritable.useDefault" :readonly="readonly">
+						<template #label>{{ i18n.ts.enable }}</template>
+					</MkSwitch>
+					<MkRange v-model="role.policies.driveWritable.priority" :min="0" :max="2" :step="1" easing :textConverter="(v) => v === 0 ? i18n.ts._role._priority.low : v === 1 ? i18n.ts._role._priority.middle : v === 2 ? i18n.ts._role._priority.high : ''">
+						<template #label>{{ i18n.ts._role.priority }}</template>
+					</MkRange>
+				</div>
+			</MkFolder>
+
 			<MkFolder v-if="matchQuery([i18n.ts._role._options.driveCapacity, 'driveCapacityMb'])">
 				<template #label>{{ i18n.ts._role._options.driveCapacity }}</template>
 				<template #suffix>
@@ -797,6 +817,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { watch, ref, computed } from 'vue';
 import { throttle } from 'throttle-debounce';
+import { ROLE_POLICIES } from '@@/js/const.js';
 import RolesEditorFormula from './RolesEditorFormula.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkColorInput from '@/components/MkColorInput.vue';
@@ -807,7 +828,6 @@ import MkSwitch from '@/components/MkSwitch.vue';
 import MkRange from '@/components/MkRange.vue';
 import FormSlot from '@/components/form/slot.vue';
 import { i18n } from '@/i18n.js';
-import { ROLE_POLICIES } from '@@/js/const.js';
 import { instance } from '@/instance.js';
 import { deepClone } from '@/scripts/clone.js';
 

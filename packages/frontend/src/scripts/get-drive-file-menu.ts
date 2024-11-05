@@ -5,12 +5,13 @@
 
 import * as Misskey from 'misskey-js';
 import { defineAsyncComponent } from 'vue';
+import type { MenuItem } from '@/types/menu.js';
 import { i18n } from '@/i18n.js';
 import { copyToClipboard } from '@/scripts/copy-to-clipboard.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
-import type { MenuItem } from '@/types/menu.js';
 import { defaultStore } from '@/store.js';
+import { $i } from '@/account';
 
 function rename(file: Misskey.entities.DriveFile) {
 	os.inputText({
@@ -87,6 +88,7 @@ async function deleteFile(file: Misskey.entities.DriveFile) {
 
 export function getDriveFileMenu(file: Misskey.entities.DriveFile, folder?: Misskey.entities.DriveFolder | null): MenuItem[] {
 	const isImage = file.type.startsWith('image/');
+	const isDriveWritable = $i?.policies.driveWritable ?? $i?.isAdmin ?? true;
 
 	const menuItems: MenuItem[] = [];
 
@@ -95,25 +97,29 @@ export function getDriveFileMenu(file: Misskey.entities.DriveFile, folder?: Miss
 		to: `/my/drive/file/${file.id}`,
 		text: i18n.ts._fileViewer.title,
 		icon: 'ti ti-info-circle',
-	}, { type: 'divider' }, {
-		text: i18n.ts.rename,
-		icon: 'ti ti-forms',
-		action: () => rename(file),
-	}, {
-		text: i18n.ts.move,
-		icon: 'ti ti-folder-symlink',
-		action: () => move(file),
-	}, {
-		text: file.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
-		icon: file.isSensitive ? 'ti ti-eye' : 'ti ti-eye-exclamation',
-		action: () => toggleSensitive(file),
-	}, {
-		text: i18n.ts.describeFile,
-		icon: 'ti ti-text-caption',
-		action: () => describe(file),
 	});
 
-	if (isImage) {
+	if (isDriveWritable) {
+		menuItems.push({
+			text: i18n.ts.rename,
+			icon: 'ti ti-forms',
+			action: () => rename(file),
+		}, {
+			text: i18n.ts.move,
+			icon: 'ti ti-folder-symlink',
+			action: () => move(file),
+		}, {
+			text: file.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
+			icon: file.isSensitive ? 'ti ti-eye' : 'ti ti-eye-exclamation',
+			action: () => toggleSensitive(file),
+		}, {
+			text: i18n.ts.describeFile,
+			icon: 'ti ti-text-caption',
+			action: () => describe(file),
+		});
+	}
+
+	if (isDriveWritable && isImage) {
 		menuItems.push({
 			text: i18n.ts.cropImage,
 			icon: 'ti ti-crop',
@@ -141,12 +147,16 @@ export function getDriveFileMenu(file: Misskey.entities.DriveFile, folder?: Miss
 		text: i18n.ts.download,
 		icon: 'ti ti-download',
 		download: file.name,
-	}, { type: 'divider' }, {
-		text: i18n.ts.delete,
-		icon: 'ti ti-trash',
-		danger: true,
-		action: () => deleteFile(file),
 	});
+
+	if (isDriveWritable) {
+		menuItems.push({ type: 'divider' }, {
+			text: i18n.ts.delete,
+			icon: 'ti ti-trash',
+			danger: true,
+			action: () => deleteFile(file),
+		});
+	}
 
 	if (defaultStore.state.devMode) {
 		menuItems.push({ type: 'divider' }, {

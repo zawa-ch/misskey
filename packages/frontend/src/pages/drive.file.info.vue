@@ -20,36 +20,46 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<button v-tooltip="i18n.ts.createNoteFromTheFile" class="_button" :class="$style.fileQuickActionsOthersButton" @click="postThis()">
 					<i class="ti ti-pencil"></i>
 				</button>
-				<button v-if="isImage" v-tooltip="i18n.ts.cropImage" class="_button" :class="$style.fileQuickActionsOthersButton" @click="crop()">
+				<button v-if="isDriveWritable && isImage" v-tooltip="i18n.ts.cropImage" class="_button" :class="$style.fileQuickActionsOthersButton" @click="crop()">
 					<i class="ti ti-crop"></i>
 				</button>
-				<button v-if="file.isSensitive" v-tooltip="i18n.ts.unmarkAsSensitive" class="_button" :class="$style.fileQuickActionsOthersButton" @click="toggleSensitive()">
-					<i class="ti ti-eye"></i>
-				</button>
-				<button v-else v-tooltip="i18n.ts.markAsSensitive" class="_button" :class="$style.fileQuickActionsOthersButton" @click="toggleSensitive()">
-					<i class="ti ti-eye-exclamation"></i>
-				</button>
+				<div v-if="isDriveWritable">
+					<button v-if="file.isSensitive" v-tooltip="i18n.ts.unmarkAsSensitive" class="_button" :class="$style.fileQuickActionsOthersButton" @click="toggleSensitive()">
+						<i class="ti ti-eye"></i>
+					</button>
+					<button v-else v-tooltip="i18n.ts.markAsSensitive" class="_button" :class="$style.fileQuickActionsOthersButton" @click="toggleSensitive()">
+						<i class="ti ti-eye-exclamation"></i>
+					</button>
+				</div>
 				<a v-tooltip="i18n.ts.download" :href="file.url" :download="file.name" class="_button" :class="$style.fileQuickActionsOthersButton">
 					<i class="ti ti-download"></i>
 				</a>
-				<button v-tooltip="i18n.ts.delete" class="_button" :class="[$style.fileQuickActionsOthersButton, $style.danger]" @click="deleteFile()">
+				<button v-if="isDriveWritable" v-tooltip="i18n.ts.delete" class="_button" :class="[$style.fileQuickActionsOthersButton, $style.danger]" @click="deleteFile()">
 					<i class="ti ti-trash"></i>
 				</button>
 			</div>
 		</div>
 		<div class="_gaps_s">
-			<button class="_button" :class="$style.kvEditBtn" @click="move()">
+			<button v-if="isDriveWritable" class="_button" :class="$style.kvEditBtn" @click="move()">
 				<MkKeyValue>
 					<template #key>{{ i18n.ts.folder }}</template>
 					<template #value>{{ folderHierarchy.join(' > ') }}<i class="ti ti-pencil" :class="$style.kvEditIcon"></i></template>
 				</MkKeyValue>
 			</button>
-			<button class="_button" :class="$style.kvEditBtn" @click="describe()">
+			<MkKeyValue v-else :class="$style.fileMetaDataChildren">
+				<template #key>{{ i18n.ts.folder }}</template>
+				<template #value>{{ folderHierarchy.join(' > ') }}</template>
+			</MkKeyValue>
+			<button v-if="isDriveWritable" class="_button" :class="$style.kvEditBtn" @click="describe()">
 				<MkKeyValue :class="$style.multiline">
 					<template #key>{{ i18n.ts.description }}</template>
 					<template #value>{{ file.comment ? file.comment : `(${i18n.ts.none})` }}<i class="ti ti-pencil" :class="$style.kvEditIcon"></i></template>
 				</MkKeyValue>
 			</button>
+			<MkKeyValue v-else :class="[$style.multiline, $style.fileMetaDataChildren]">
+				<template #key>{{ i18n.ts.description }}</template>
+				<template #value>{{ file.comment ? file.comment : `(${i18n.ts.none})` }}</template>
+			</MkKeyValue>
 			<MkKeyValue :class="$style.fileMetaDataChildren">
 				<template #key>{{ i18n.ts._fileViewer.uploadedAt }}</template>
 				<template #value><MkTime :time="file.createdAt" mode="detail"/></template>
@@ -87,6 +97,7 @@ import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
 import { useRouter } from '@/router/supplier.js';
+import { $i } from '@/account';
 
 const router = useRouter();
 
@@ -109,6 +120,8 @@ const folderHierarchy = computed(() => {
 	return folderNames;
 });
 const isImage = computed(() => file.value?.type.startsWith('image/'));
+
+const isDriveWritable = ref<boolean>(!$i || ($i.isAdmin ?? false) || $i.policies.driveWritable);
 
 async function fetch() {
 	fetching.value = true;

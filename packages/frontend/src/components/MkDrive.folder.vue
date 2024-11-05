@@ -36,13 +36,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, ref } from 'vue';
 import * as Misskey from 'misskey-js';
+import type { MenuItem } from '@/types/menu.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { defaultStore } from '@/store.js';
 import { claimAchievement } from '@/scripts/achievements.js';
 import { copyToClipboard } from '@/scripts/copy-to-clipboard.js';
-import type { MenuItem } from '@/types/menu.js';
+import { $i } from '@/account';
 
 const props = withDefaults(defineProps<{
 	folder: Misskey.entities.DriveFolder;
@@ -67,6 +68,8 @@ const emit = defineEmits<{
 const hover = ref(false);
 const draghover = ref(false);
 const isDragging = ref(false);
+
+const isDriveWritable = ref<boolean>(!$i || ($i.isAdmin ?? false) || $i.policies.driveWritable);
 
 const title = computed(() => props.folder.name);
 
@@ -281,20 +284,23 @@ function onContextmenu(ev: MouseEvent) {
 				closed: () => dispose(),
 			});
 		},
-	}, { type: 'divider' }, {
-		text: i18n.ts.rename,
-		icon: 'ti ti-forms',
-		action: rename,
-	}, {
-		text: i18n.ts.move,
-		icon: 'ti ti ti-folder-symlink',
-		action: move,
-	}, { type: 'divider' }, {
-		text: i18n.ts.delete,
-		icon: 'ti ti-trash',
-		danger: true,
-		action: deleteFolder,
 	}];
+	if (isDriveWritable.value) {
+		menu = menu.concat([{ type: 'divider' }, {
+			text: i18n.ts.rename,
+			icon: 'ti ti-forms',
+			action: rename,
+		}, {
+			text: i18n.ts.move,
+			icon: 'ti ti ti-folder-symlink',
+			action: move,
+		}, { type: 'divider' }, {
+			text: i18n.ts.delete,
+			icon: 'ti ti-trash',
+			danger: true,
+			action: deleteFolder,
+		}]);
+	}
 	if (defaultStore.state.devMode) {
 		menu = menu.concat([{ type: 'divider' }, {
 			icon: 'ti ti-id',

@@ -10,14 +10,15 @@ import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
 import { DriveService } from '@/core/DriveService.js';
-import { ApiError } from '../../../error.js';
 import { MiMeta } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
+import { ApiError } from '../../../error.js';
 
 export const meta = {
 	tags: ['drive'],
 
 	requireCredential: true,
+	requireRolePolicy: 'driveWritable',
 
 	prohibitMoved: true,
 

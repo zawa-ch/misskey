@@ -6841,6 +6841,10 @@ export interface Locale extends ILocale {
              */
             "canManageAvatarDecorations": string;
             /**
+             * ドライブに書き込み可能
+             */
+            "driveWritable": string;
+            /**
              * ドライブ容量
              */
             "driveCapacity": string;

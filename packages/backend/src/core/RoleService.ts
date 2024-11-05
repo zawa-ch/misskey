@@ -56,6 +56,7 @@ export type RolePolicies = {
 	canSearchNotes: boolean;
 	canUseTranslator: boolean;
 	canHideAds: boolean;
+	driveWritable: boolean;
 	driveCapacityMb: number;
 	alwaysMarkNsfw: boolean;
 	canUpdateBioMedia: boolean;
@@ -95,6 +96,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canSearchNotes: false,
 	canUseTranslator: true,
 	canHideAds: false,
+	driveWritable: true,
 	driveCapacityMb: 100,
 	alwaysMarkNsfw: false,
 	canUpdateBioMedia: true,
@@ -475,6 +477,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			canSearchNotes: calc('canSearchNotes', vs => vs.some(v => v === true)),
 			canUseTranslator: calc('canUseTranslator', vs => vs.some(v => v === true)),
 			canHideAds: calc('canHideAds', vs => vs.some(v => v === true)),
+			driveWritable: calc('driveWritable', vs => vs.some(v => v === true)),
 			driveCapacityMb: calc('driveCapacityMb', vs => Math.max(...vs)),
 			alwaysMarkNsfw: calc('alwaysMarkNsfw', vs => vs.some(v => v === true)),
 			canUpdateBioMedia: calc('canUpdateBioMedia', vs => vs.some(v => v === true)),
