@@ -7,6 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In } from 'typeorm';
 import { ModuleRef } from '@nestjs/core';
+import { decode } from 'blurhash';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import type {
 	MiInstance,
@@ -325,11 +326,55 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				case 'usernameMatchOf': {
 					return this.utilityService.isKeyWordIncluded(user.username, [value.pattern]);
 				}
+				case 'hostMatchOf': {
+					return instance !== null && this.utilityService.isKeyWordIncluded(instance.host, [value.pattern]);
+				}
 				case 'nameMatchOf': {
 					return this.utilityService.isKeyWordIncluded(user.name ?? '', [value.pattern]);
 				}
 				case 'nameIsDefault': {
 					return (user.name ?? user.username) === user.username;
+				}
+				case 'avatarUnset': {
+					return !user.avatarId;
+				}
+				case 'avatarLikelyBlurhash': {
+					if (!user.avatarBlurhash) { return false; }
+					try {
+						const bhash = decode(user.avatarBlurhash, 5, 5);
+						const k = decode(value.hash, 5, 5);
+						return bhash.reduce((v, j, n) => v + (j >= k[n] ? j - k[n] : k[n] - j), 0) <= value.diff;
+					} catch (e) {
+						return false;
+					}
+				}
+				case 'bannerUnset': {
+					return !user.bannerId;
+				}
+				case 'bannerLikelyBlurhash': {
+					if (!user.bannerBlurhash) { return false; }
+					try {
+						const bhash = decode(user.bannerBlurhash, 5, 5);
+						const k = decode(value.hash, 5, 5);
+						return bhash.reduce((v, j, n) => v + (j >= k[n] ? j - k[n] : k[n] - j), 0) <= value.diff;
+					} catch (e) {
+						return false;
+					}
+				}
+				case 'hasTags': {
+					return user.tags.length > 0;
+				}
+				case 'tagCountIs': {
+					return (user.tags.length) === value.value;
+				}
+				case 'tagCountMoreThanOrEq': {
+					return (user.tags.length) >= value.value;
+				}
+				case 'tagCountLessThan': {
+					return (user.tags.length) < value.value;
+				}
+				case 'hasTagMatchOf': {
+					return (user.tags).some(h => this.utilityService.isKeyWordIncluded(h, [value.pattern]));
 				}
 				default:
 					return false;

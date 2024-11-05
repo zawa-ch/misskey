@@ -172,6 +172,11 @@ type CondFormulaValueUsernameMatchOf = {
 	pattern: string;
 };
 
+type CondFormulaValueHostMatchOf = {
+	type: 'hostMatchOf';
+	pattern: string;
+};
+
 type CondFormulaValueNameMatchOf = {
 	type: 'nameMatchOf';
 	pattern: string;
@@ -179,6 +184,50 @@ type CondFormulaValueNameMatchOf = {
 
 type CondFormulaValueNameIsDefault = {
 	type: 'nameIsDefault';
+};
+
+type CondFormulaValueAvatarUnset = {
+	type: 'avatarUnset';
+};
+
+type CondFormulaValueAvatarLikelyBlurhash = {
+	type: 'avatarLikelyBlurhash';
+	hash: string;
+	diff: number;
+};
+
+type CondFormulaValueBannerUnset = {
+	type: 'bannerUnset';
+};
+
+type CondFormulaValueBannerLikelyBlurhash = {
+	type: 'bannerLikelyBlurhash';
+	hash: string;
+	diff: number;
+};
+
+type CondFormulaValueHasTags = {
+	type: 'hasTags';
+};
+
+type CondFormulaValueHashtagCountIs = {
+	type: 'tagCountIs';
+	value: number;
+};
+
+type CondFormulaValueHashtagCountMoreThanOrEq = {
+	type: 'tagCountMoreThanOrEq';
+	value: number;
+};
+
+type CondFormulaValueHashtagCountLessThan = {
+	type: 'tagCountLessThan';
+	value: number;
+};
+
+type CondFormulaValueHasHashtagMatchOf = {
+	type: 'hasTagMatchOf';
+	pattern: string;
 };
 
 export type RoleCondFormulaValue = { id: string } & (
@@ -206,8 +255,18 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueNotesLessThanOrEq |
 	CondFormulaValueNotesMoreThanOrEq |
 	CondFormulaValueUsernameMatchOf |
+	CondFormulaValueHostMatchOf |
 	CondFormulaValueNameMatchOf |
-	CondFormulaValueNameIsDefault
+	CondFormulaValueNameIsDefault |
+	CondFormulaValueAvatarUnset |
+	CondFormulaValueAvatarLikelyBlurhash |
+	CondFormulaValueBannerUnset |
+	CondFormulaValueBannerLikelyBlurhash |
+	CondFormulaValueHasTags |
+	CondFormulaValueHashtagCountIs |
+	CondFormulaValueHashtagCountMoreThanOrEq |
+	CondFormulaValueHashtagCountLessThan |
+	CondFormulaValueHasHashtagMatchOf
 );
 
 @Entity('role')

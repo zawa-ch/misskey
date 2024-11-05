@@ -1,3 +1,8 @@
+## 2024.9.0-geoplanetary.9
+
+### General
+- Enhance: コンディショナルロールの条件をさらに拡充
+
 ## 2024.9.0-geoplanetary.8
 
 ### Client

@@ -6754,6 +6754,14 @@ export interface Locale extends ILocale {
          */
         "patternEditDescription": string;
         /**
+         * ハッシュ
+         */
+        "hash": string;
+        /**
+         * 許容する誤差
+         */
+        "allowDifference": string;
+        /**
          * 優先度
          */
         "priority": string;
@@ -6935,6 +6943,10 @@ export interface Locale extends ILocale {
              */
             "nameMatchOf": string;
             /**
+             * ユーザーのホスト名が〜にマッチ
+             */
+            "hostMatchOf": string;
+            /**
              * ユーザーの表示名が初期状態
              */
             "nameIsDefault": string;
@@ -7014,6 +7026,42 @@ export interface Locale extends ILocale {
              * 投稿数が～以上
              */
             "notesMoreThanOrEq": string;
+            /**
+             * アバター画像が未設定
+             */
+            "avatarUnset": string;
+            /**
+             * アバター画像のBlurhashが〜に近似
+             */
+            "avatarLikelyBlurhash": string;
+            /**
+             * バナー画像が未設定
+             */
+            "bannerUnset": string;
+            /**
+             * バナー画像のBlurhashが〜に近似
+             */
+            "bannerLikelyBlurhash": string;
+            /**
+             * タグを含む
+             */
+            "hasTags": string;
+            /**
+             * タグの数が～に一致
+             */
+            "tagCountIs": string;
+            /**
+             * タグの数が～以上
+             */
+            "tagCountMoreThanOrEq": string;
+            /**
+             * タグの数が～未満
+             */
+            "tagCountLessThan": string;
+            /**
+             * 〜にマッチするタグを含む
+             */
+            "hasTagMatchOf": string;
             /**
              * ～かつ～
              */
