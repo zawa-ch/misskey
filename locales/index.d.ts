@@ -6885,6 +6885,10 @@ export interface Locale extends ILocale {
              */
             "noteEachClipsMax": string;
             /**
+             * ユーザーリスト機能の使用可否
+             */
+            "userListAvailable": string;
+            /**
              * ユーザーリストの作成可能数
              */
             "userListMax": string;

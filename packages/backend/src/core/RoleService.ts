@@ -67,6 +67,7 @@ export type RolePolicies = {
 	clipAvailable: boolean;
 	clipLimit: number;
 	noteEachClipsLimit: number;
+	userListAvailable: boolean;
 	userListLimit: number;
 	userEachUserListsLimit: number;
 	rateLimitFactor: number;
@@ -108,6 +109,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	clipAvailable: true,
 	clipLimit: 10,
 	noteEachClipsLimit: 200,
+	userListAvailable: true,
 	userListLimit: 10,
 	userEachUserListsLimit: 50,
 	rateLimitFactor: 1,
@@ -490,6 +492,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			clipAvailable: calc('clipAvailable', vs => vs.some(v => v === true)),
 			clipLimit: calc('clipLimit', vs => Math.max(...vs)),
 			noteEachClipsLimit: calc('noteEachClipsLimit', vs => Math.max(...vs)),
+			userListAvailable: calc('userListAvailable', vs => vs.some(v => v === true)),
 			userListLimit: calc('userListLimit', vs => Math.max(...vs)),
 			userEachUserListsLimit: calc('userEachUserListsLimit', vs => Math.max(...vs)),
 			rateLimitFactor: calc('rateLimitFactor', vs => Math.max(...vs)),

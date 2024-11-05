@@ -316,6 +316,10 @@ export const packedRolePoliciesSchema = {
 			type: 'integer',
 			optional: false, nullable: false,
 		},
+		userListAvailable: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 		userListLimit: {
 			type: 'integer',
 			optional: false, nullable: false,

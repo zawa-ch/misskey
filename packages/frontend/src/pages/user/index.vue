@@ -104,11 +104,11 @@ const headerTabs = computed(() => user.value ? [{
 	key: 'clips',
 	title: i18n.ts.clips,
 	icon: 'ti ti-paperclip',
-}] : [], {
+}] : [], ...($i && ($i.policies.userListAvailable || $i.isAdmin)) ? [{
 	key: 'lists',
 	title: i18n.ts.lists,
 	icon: 'ti ti-list',
-}, {
+}] : [], {
 	key: 'pages',
 	title: i18n.ts.pages,
 	icon: 'ti ti-news',

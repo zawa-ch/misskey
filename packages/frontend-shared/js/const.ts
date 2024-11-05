@@ -103,6 +103,7 @@ export const ROLE_POLICIES = [
 	'clipAvailable',
 	'clipLimit',
 	'noteEachClipsLimit',
+	'userListAvailable',
 	'userListLimit',
 	'userEachUserListsLimit',
 	'rateLimitFactor',

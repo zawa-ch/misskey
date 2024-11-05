@@ -1778,6 +1778,7 @@ _role:
     clipAvailable: "クリップ機能の使用可否"
     clipMax: "クリップの作成可能数"
     noteEachClipsMax: "クリップ内のノートの最大数"
+    userListAvailable: "ユーザーリスト機能の使用可否"
     userListMax: "ユーザーリストの作成可能数"
     userEachUserListsMax: "ユーザーリスト内のユーザーの最大数"
     rateLimitFactor: "レートリミット"
