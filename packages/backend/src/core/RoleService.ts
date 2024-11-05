@@ -14,6 +14,7 @@ import type {
 	MiMeta,
 	MiRole,
 	MiRoleAssignment,
+	MiUserProfile,
 	RoleAssignmentsRepository,
 	RolesRepository,
 	UsersRepository,
@@ -238,20 +239,21 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	private evalCond(user: MiUser, instance: MiInstance | null, roles: MiRole[], value: RoleCondFormulaValue): boolean {
+	private evalCond(user: MiUser | null, profile: MiUserProfile | null, instance: MiInstance | null, roles: MiRole[], value: RoleCondFormulaValue): boolean {
+		if (!user) { return false; }
 		try {
 			switch (value.type) {
 				// ～かつ～
 				case 'and': {
-					return value.values.every(v => this.evalCond(user, instance, roles, v));
+					return value.values.every(v => this.evalCond(user, profile, instance, roles, v));
 				}
 				// ～または～
 				case 'or': {
-					return value.values.some(v => this.evalCond(user, instance, roles, v));
+					return value.values.some(v => this.evalCond(user, profile, instance, roles, v));
 				}
 				// ～ではない
 				case 'not': {
-					return !this.evalCond(user, instance, roles, value.value);
+					return !this.evalCond(user, profile, instance, roles, value.value);
 				}
 				// マニュアルロールがアサインされている
 				case 'roleAssignedTo': {
@@ -297,6 +299,21 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				case 'isExplorable': {
 					return user.isExplorable;
 				}
+				case 'isMfaEnabled': {
+					return (profile?.twoFactorEnabled) ?? false;
+				}
+				case 'isSecurityKeyAvailable': {
+					return (profile?.securityKeysAvailable) ?? false;
+				}
+				case 'isUsingPwlessLogin': {
+					return (profile?.usePasswordLessLogin) ?? false;
+				}
+				case 'isNoCrawle': {
+					return (profile?.noCrawle) ?? false;
+				}
+				case 'isNoAI': {
+					return (profile?.preventAiLearning) ?? false;
+				}
 				// ユーザが作成されてから指定期間経過した
 				case 'createdLessThan': {
 					return this.idService.parse(user.id).date.getTime() > (Date.now() - (value.sec * 1000));
@@ -304,6 +321,12 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				// ユーザが作成されてから指定期間経っていない
 				case 'createdMoreThan': {
 					return this.idService.parse(user.id).date.getTime() < (Date.now() - (value.sec * 1000));
+				}
+				case 'loggedInLessThanOrEq': {
+					return profile ? (profile.loggedInDates.length <= value.day) : false;
+				}
+				case 'loggedInMoreThanOrEq': {
+					return profile ? (profile.loggedInDates.length >= value.day) : false;
 				}
 				// フォロワー数が指定値以下
 				case 'followersLessThanOrEq': {
@@ -340,6 +363,12 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				}
 				case 'nameIsDefault': {
 					return (user.name ?? user.username) === user.username;
+				}
+				case 'emailVerified': {
+					return (profile?.emailVerified) ?? false;
+				}
+				case 'emailMatchOf': {
+					return profile?.email ? this.utilityService.isKeyWordIncluded(profile.email, [value.pattern]) : false;
 				}
 				case 'avatarUnset': {
 					return !user.avatarId;
@@ -412,8 +441,9 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		const assigns = await this.getUserAssigns(userId);
 		const assignedRoles = roles.filter(r => assigns.map(x => x.roleId).includes(r.id));
 		const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
+		const profile = user && this.userEntityService.isLocalUser(user) ? await this.cacheService.userProfileCache.fetch(user.id) : null;
 		const instance = user ? await this.federatedInstanceService.fetch(user.host ?? this.config.host) : null;
-		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, instance, assignedRoles, r.condFormula));
+		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user, profile, instance, assignedRoles, r.condFormula));
 		return [...assignedRoles, ...matchedCondRoles];
 	}
 
@@ -432,8 +462,9 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		const badgeCondRoles = roles.filter(r => r.asBadge && (r.target === 'conditional'));
 		if (badgeCondRoles.length > 0) {
 			const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
+			const profile = user && this.userEntityService.isLocalUser(user) ? await this.cacheService.userProfileCache.fetch(user.id) : null;
 			const instance = user ? await this.federatedInstanceService.fetch(user.host ?? this.config.host) : null;
-			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user!, instance, assignedRoles, r.condFormula));
+			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user, profile, instance, assignedRoles, r.condFormula));
 			return [...assignedBadgeRoles, ...matchedBadgeCondRoles];
 		} else {
 			return assignedBadgeRoles;

@@ -6963,6 +6963,14 @@ export interface Locale extends ILocale {
              */
             "nameIsDefault": string;
             /**
+             * メールアドレスを確認済み
+             */
+            "emailVerified": string;
+            /**
+             * メールアドレスが〜にマッチ
+             */
+            "emailMatchOf": string;
+            /**
              * ローカルユーザー
              */
             "isLocal": string;
@@ -7007,6 +7015,26 @@ export interface Locale extends ILocale {
              */
             "isExplorable": string;
             /**
+             * 多要素認証が有効なユーザー
+             */
+            "isMfaEnabled": string;
+            /**
+             * セキュリティキーが有効なユーザー
+             */
+            "isSecurityKeyAvailable": string;
+            /**
+             * パスワードレスログインが有効なユーザー
+             */
+            "isUsingPwlessLogin": string;
+            /**
+             * クローラーbotを拒否しているユーザー
+             */
+            "isNoCrawle": string;
+            /**
+             * NoAIポリシーのユーザー
+             */
+            "isNoAI": string;
+            /**
              * アカウント作成から～以内
              */
             "createdLessThan": string;
@@ -7014,6 +7042,14 @@ export interface Locale extends ILocale {
              * アカウント作成から～経過
              */
             "createdMoreThan": string;
+            /**
+             * ログイン日数が～以下
+             */
+            "loggedInLessThanOrEq": string;
+            /**
+             * ログイン日数が～以上
+             */
+            "loggedInMoreThanOrEq": string;
             /**
              * フォロワー数が～以下
              */

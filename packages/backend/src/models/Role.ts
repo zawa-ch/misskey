@@ -103,6 +103,26 @@ type CondFormulaValueIsExplorable = {
 	type: 'isExplorable';
 };
 
+type CondFormulaValueIsMfaEnabled = {
+	type: 'isMfaEnabled';
+};
+
+type CondFormulaValueIsSecurityKeyAvailable = {
+	type: 'isSecurityKeyAvailable';
+};
+
+type CondFormulaValueIsUsingPwlessLogin = {
+	type: 'isUsingPwlessLogin';
+};
+
+type CondFormulaValueIsNoCrawle = {
+	type: 'isNoCrawle';
+};
+
+type CondFormulaValueIsNoAI = {
+	type: 'isNoAI';
+};
+
 /**
  * ユーザが作成されてから指定期間経過した場合のみ成立とする
  */
@@ -117,6 +137,16 @@ type CondFormulaValueCreatedLessThan = {
 type CondFormulaValueCreatedMoreThan = {
 	type: 'createdMoreThan';
 	sec: number;
+};
+
+type CondFormulaValueLoggedInLessThanOrEq = {
+	type: 'loggedInLessThanOrEq';
+	day: number;
+};
+
+type CondFormulaValueLoggedInMoreThanOrEq = {
+	type: 'loggedInMoreThanOrEq';
+	day: number;
 };
 
 /**
@@ -186,6 +216,15 @@ type CondFormulaValueNameIsDefault = {
 	type: 'nameIsDefault';
 };
 
+type CondFormulaValueEmailVerified = {
+	type: 'emailVerified';
+};
+
+type CondFormulaValueEmailMatchOf = {
+	type: 'emailMatchOf';
+	pattern: string;
+};
+
 type CondFormulaValueAvatarUnset = {
 	type: 'avatarUnset';
 };
@@ -245,9 +284,16 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueIsBot |
 	CondFormulaValueIsCat |
 	CondFormulaValueIsExplorable |
+	CondFormulaValueIsMfaEnabled |
+	CondFormulaValueIsSecurityKeyAvailable |
+	CondFormulaValueIsUsingPwlessLogin |
+	CondFormulaValueIsNoCrawle |
+	CondFormulaValueIsNoAI |
 	CondFormulaValueRoleAssignedTo |
 	CondFormulaValueCreatedLessThan |
 	CondFormulaValueCreatedMoreThan |
+	CondFormulaValueLoggedInLessThanOrEq |
+	CondFormulaValueLoggedInMoreThanOrEq |
 	CondFormulaValueFollowersLessThanOrEq |
 	CondFormulaValueFollowersMoreThanOrEq |
 	CondFormulaValueFollowingLessThanOrEq |
@@ -258,6 +304,8 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueHostMatchOf |
 	CondFormulaValueNameMatchOf |
 	CondFormulaValueNameIsDefault |
+	CondFormulaValueEmailVerified |
+	CondFormulaValueEmailMatchOf |
 	CondFormulaValueAvatarUnset |
 	CondFormulaValueAvatarLikelyBlurhash |
 	CondFormulaValueBannerUnset |

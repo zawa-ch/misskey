@@ -18,13 +18,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<option value="isBot">{{ i18n.ts._role._condition.isBot }}</option>
 			<option value="isCat">{{ i18n.ts._role._condition.isCat }}</option>
 			<option value="isExplorable">{{ i18n.ts._role._condition.isExplorable }}</option>
+			<option value="isMfaEnabled">{{ i18n.ts._role._condition.isMfaEnabled }}</option>
+			<option value="isSecurityKeyAvailable">{{ i18n.ts._role._condition.isSecurityKeyAvailable }}</option>
+			<option value="isUsingPwlessLogin">{{ i18n.ts._role._condition.isUsingPwlessLogin }}</option>
+			<option value="isNoCrawle">{{ i18n.ts._role._condition.isNoCrawle }}</option>
+			<option value="isNoAI">{{ i18n.ts._role._condition.isNoAI }}</option>
 			<option value="roleAssignedTo">{{ i18n.ts._role._condition.roleAssignedTo }}</option>
 			<option value="usernameMatchOf">{{ i18n.ts._role._condition.usernameMatchOf }}</option>
 			<option value="nameMatchOf">{{ i18n.ts._role._condition.nameMatchOf }}</option>
 			<option value="hostMatchOf">{{ i18n.ts._role._condition.hostMatchOf }}</option>
 			<option value="nameIsDefault">{{ i18n.ts._role._condition.nameIsDefault }}</option>
+			<option value="emailVerified">{{ i18n.ts._role._condition.emailVerified }}</option>
+			<option value="emailMatchOf">{{ i18n.ts._role._condition.emailMatchOf }}</option>
 			<option value="createdLessThan">{{ i18n.ts._role._condition.createdLessThan }}</option>
 			<option value="createdMoreThan">{{ i18n.ts._role._condition.createdMoreThan }}</option>
+			<option value="loggedInLessThanOrEq">{{ i18n.ts._role._condition.loggedInLessThanOrEq }}</option>
+			<option value="loggedInMoreThanOrEq">{{ i18n.ts._role._condition.loggedInMoreThanOrEq }}</option>
 			<option value="followersLessThanOrEq">{{ i18n.ts._role._condition.followersLessThanOrEq }}</option>
 			<option value="followersMoreThanOrEq">{{ i18n.ts._role._condition.followersMoreThanOrEq }}</option>
 			<option value="followingLessThanOrEq">{{ i18n.ts._role._condition.followingLessThanOrEq }}</option>
@@ -72,10 +81,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #suffix>sec</template>
 	</MkInput>
 
+	<MkInput v-else-if="type === 'loggedInMoreThanOrEq' || type === 'loggedInLessThanOrEq'" v-model="v.day" type="number">
+		<template #suffix>day</template>
+	</MkInput>
+
 	<MkInput v-else-if="['followersLessThanOrEq', 'followersMoreThanOrEq', 'followingLessThanOrEq', 'followingMoreThanOrEq', 'notesLessThanOrEq', 'notesMoreThanOrEq', 'tagCountIs', 'tagCountMoreThanOrEq', 'tagCountLessThan'].includes(type)" v-model="v.value" type="number">
 	</MkInput>
 
-	<MkInput v-else-if="['usernameMatchOf', 'nameMatchOf', 'hostMatchOf', 'hasTagMatchOf'].includes(type)" v-model="v.pattern" type="text">
+	<MkInput v-else-if="['usernameMatchOf', 'nameMatchOf', 'hostMatchOf', 'hasTagMatchOf', 'emailMatchOf'].includes(type)" v-model="v.pattern" type="text">
 		<template #caption>{{ i18n.ts._role.patternEditDescription }}</template>
 	</MkInput>
 
@@ -139,8 +152,11 @@ const type = computed({
 		if (t === 'usernameMatchOf') v.value.pattern = '';
 		if (t === 'nameMatchOf') v.value.pattern = '';
 		if (t === 'hostMatchOf') v.value.pattern = '';
+		if (t === 'emailMatchOf') v.value.pattern = '';
 		if (t === 'createdLessThan') v.value.sec = 86400;
 		if (t === 'createdMoreThan') v.value.sec = 86400;
+		if (t === 'loggedInMoreThanOrEq') v.value.day = 10;
+		if (t === 'loggedInLessThanOrEq') v.value.day = 10;
 		if (t === 'followersLessThanOrEq') v.value.value = 10;
 		if (t === 'followersMoreThanOrEq') v.value.value = 10;
 		if (t === 'followingLessThanOrEq') v.value.value = 10;
