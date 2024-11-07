@@ -21,8 +21,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 						<MkFolder v-if="matchQuery([i18n.ts._role._options.rateLimitFactor, 'rateLimitFactor'])">
 							<template #label>{{ i18n.ts._role._options.rateLimitFactor }}</template>
-							<template #suffix>{{ Math.floor(policies.rateLimitFactor * 100) }}%</template>
-							<MkRange :modelValue="policies.rateLimitFactor * 100" :min="30" :max="300" :step="10" :textConverter="(v) => `${v}%`" @update:modelValue="v => policies.rateLimitFactor = (v / 100)">
+							<template #suffix>{{ Math.round(policies.rateLimitFactor * 100) }}%</template>
+							<MkRange :modelValue="Math.round(Math.log2(policies.rateLimitFactor) * 4)" :min="-8" :max="8" :step="1" :textConverter="(v) => `${Math.round(Math.pow(2, v / 4) * 100)}%`" @update:modelValue="v => policies.rateLimitFactor = Math.pow(2, v / 4)">
 								<template #caption>{{ i18n.ts._role._options.descriptionOfRateLimitFactor }}</template>
 							</MkRange>
 						</MkFolder>
@@ -86,6 +86,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #label>{{ i18n.ts._role._options.canDirectMessage }}</template>
 							<template #suffix>{{ policies.canDirectMessage ? i18n.ts.yes : i18n.ts.no }}</template>
 							<MkSwitch v-model="policies.canDirectMessage">
+								<template #label>{{ i18n.ts.enable }}</template>
+							</MkSwitch>
+						</MkFolder>
+
+						<MkFolder v-if="matchQuery([i18n.ts._role._options.canFederateNote, 'canFederateNote'])">
+							<template #label>{{ i18n.ts._role._options.canFederateNote }}</template>
+							<template #suffix>{{ policies.canFederateNote ? i18n.ts.yes : i18n.ts.no }}</template>
+							<MkSwitch v-model="policies.canFederateNote">
+								<template #label>{{ i18n.ts.enable }}</template>
+							</MkSwitch>
+						</MkFolder>
+
+						<MkFolder v-if="matchQuery([i18n.ts._role._options.canAttachFiles, 'canAttachFiles'])">
+							<template #label>{{ i18n.ts._role._options.canAttachFiles }}</template>
+							<template #suffix>{{ policies.canAttachFiles ? i18n.ts.yes : i18n.ts.no }}</template>
+							<MkSwitch v-model="policies.canAttachFiles">
 								<template #label>{{ i18n.ts.enable }}</template>
 							</MkSwitch>
 						</MkFolder>
@@ -160,6 +176,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkSwitch>
 						</MkFolder>
 
+						<MkFolder v-if="matchQuery([i18n.ts._role._options.driveWritable, 'driveWritable'])">
+							<template #label>{{ i18n.ts._role._options.driveWritable }}</template>
+							<template #suffix>{{ policies.driveWritable ? i18n.ts.yes : i18n.ts.no }}</template>
+							<MkSwitch v-model="policies.driveWritable">
+								<template #label>{{ i18n.ts.enable }}</template>
+							</MkSwitch>
+						</MkFolder>
+
 						<MkFolder v-if="matchQuery([i18n.ts._role._options.driveCapacity, 'driveCapacityMb'])">
 							<template #label>{{ i18n.ts._role._options.driveCapacity }}</template>
 							<template #suffix>{{ policies.driveCapacityMb }}MB</template>
@@ -213,6 +237,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkInput>
 						</MkFolder>
 
+						<MkFolder v-if="matchQuery([i18n.ts._role._options.clipAvailable, 'clipAvailable'])">
+							<template #label>{{ i18n.ts._role._options.clipAvailable }}</template>
+							<template #suffix>{{ policies.clipAvailable ? i18n.ts.yes : i18n.ts.no }}</template>
+							<MkSwitch v-model="policies.clipAvailable">
+								<template #label>{{ i18n.ts.enable }}</template>
+							</MkSwitch>
+						</MkFolder>
+
 						<MkFolder v-if="matchQuery([i18n.ts._role._options.clipMax, 'clipLimit'])">
 							<template #label>{{ i18n.ts._role._options.clipMax }}</template>
 							<template #suffix>{{ policies.clipLimit }}</template>
@@ -225,6 +257,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #suffix>{{ policies.noteEachClipsLimit }}</template>
 							<MkInput v-model="policies.noteEachClipsLimit" type="number">
 							</MkInput>
+						</MkFolder>
+
+						<MkFolder v-if="matchQuery([i18n.ts._role._options.userListAvailable, 'userListAvailable'])">
+							<template #label>{{ i18n.ts._role._options.userListAvailable }}</template>
+							<template #suffix>{{ policies.userListAvailable ? i18n.ts.yes : i18n.ts.no }}</template>
+							<MkSwitch v-model="policies.userListAvailable">
+								<template #label>{{ i18n.ts.enable }}</template>
+							</MkSwitch>
 						</MkFolder>
 
 						<MkFolder v-if="matchQuery([i18n.ts._role._options.userListMax, 'userListLimit'])">

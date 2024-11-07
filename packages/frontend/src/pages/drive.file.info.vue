@@ -12,44 +12,54 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkMediaList :mediaList="[file]"></MkMediaList>
 		</div>
 		<div :class="$style.fileQuickActionsRoot">
-			<button class="_button" :class="$style.fileNameEditBtn" @click="rename()">
+			<button class="_button" :class="$style.fileNameEditBtn" :disabled="!isDriveWritable" @click="rename()">
 				<h2 class="_nowrap" :class="$style.fileName">{{ file.name }}</h2>
 				<i class="ti ti-pencil" :class="$style.fileNameEditIcon"></i>
 			</button>
 			<div :class="$style.fileQuickActionsOthers">
-				<button v-tooltip="i18n.ts.createNoteFromTheFile" class="_button" :class="$style.fileQuickActionsOthersButton" @click="postThis()">
+				<button v-if="canAttachFiles" v-tooltip="i18n.ts.createNoteFromTheFile" class="_button" :class="$style.fileQuickActionsOthersButton" @click="postThis()">
 					<i class="ti ti-pencil"></i>
 				</button>
-				<button v-if="isImage" v-tooltip="i18n.ts.cropImage" class="_button" :class="$style.fileQuickActionsOthersButton" @click="crop()">
+				<button v-if="isDriveWritable && isImage" v-tooltip="i18n.ts.cropImage" class="_button" :class="$style.fileQuickActionsOthersButton" @click="crop()">
 					<i class="ti ti-crop"></i>
 				</button>
-				<button v-if="file.isSensitive" v-tooltip="i18n.ts.unmarkAsSensitive" class="_button" :class="$style.fileQuickActionsOthersButton" @click="toggleSensitive()">
-					<i class="ti ti-eye"></i>
-				</button>
-				<button v-else v-tooltip="i18n.ts.markAsSensitive" class="_button" :class="$style.fileQuickActionsOthersButton" @click="toggleSensitive()">
-					<i class="ti ti-eye-exclamation"></i>
-				</button>
+				<div v-if="isDriveWritable">
+					<button v-if="file.isSensitive" v-tooltip="i18n.ts.unmarkAsSensitive" class="_button" :class="$style.fileQuickActionsOthersButton" @click="toggleSensitive()">
+						<i class="ti ti-eye"></i>
+					</button>
+					<button v-else v-tooltip="i18n.ts.markAsSensitive" class="_button" :class="$style.fileQuickActionsOthersButton" @click="toggleSensitive()">
+						<i class="ti ti-eye-exclamation"></i>
+					</button>
+				</div>
 				<a v-tooltip="i18n.ts.download" :href="file.url" :download="file.name" class="_button" :class="$style.fileQuickActionsOthersButton">
 					<i class="ti ti-download"></i>
 				</a>
-				<button v-tooltip="i18n.ts.delete" class="_button" :class="[$style.fileQuickActionsOthersButton, $style.danger]" @click="deleteFile()">
+				<button v-if="isDriveWritable" v-tooltip="i18n.ts.delete" class="_button" :class="[$style.fileQuickActionsOthersButton, $style.danger]" @click="deleteFile()">
 					<i class="ti ti-trash"></i>
 				</button>
 			</div>
 		</div>
 		<div class="_gaps_s">
-			<button class="_button" :class="$style.kvEditBtn" @click="move()">
+			<button v-if="isDriveWritable" class="_button" :class="$style.kvEditBtn" @click="move()">
 				<MkKeyValue>
 					<template #key>{{ i18n.ts.folder }}</template>
 					<template #value>{{ folderHierarchy.join(' > ') }}<i class="ti ti-pencil" :class="$style.kvEditIcon"></i></template>
 				</MkKeyValue>
 			</button>
-			<button class="_button" :class="$style.kvEditBtn" @click="describe()">
+			<MkKeyValue v-else :class="$style.fileMetaDataChildren">
+				<template #key>{{ i18n.ts.folder }}</template>
+				<template #value>{{ folderHierarchy.join(' > ') }}</template>
+			</MkKeyValue>
+			<button v-if="isDriveWritable" class="_button" :class="$style.kvEditBtn" @click="describe()">
 				<MkKeyValue :class="$style.multiline">
 					<template #key>{{ i18n.ts.description }}</template>
 					<template #value>{{ file.comment ? file.comment : `(${i18n.ts.none})` }}<i class="ti ti-pencil" :class="$style.kvEditIcon"></i></template>
 				</MkKeyValue>
 			</button>
+			<MkKeyValue v-else :class="[$style.multiline, $style.fileMetaDataChildren]">
+				<template #key>{{ i18n.ts.description }}</template>
+				<template #value>{{ file.comment ? file.comment : `(${i18n.ts.none})` }}</template>
+			</MkKeyValue>
 			<MkKeyValue :class="$style.fileMetaDataChildren">
 				<template #key>{{ i18n.ts._fileViewer.uploadedAt }}</template>
 				<template #value><MkTime :time="file.createdAt" mode="detail"/></template>
@@ -87,6 +97,7 @@ import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
 import { useRouter } from '@/router/supplier.js';
+import { $i } from '@/account';
 
 const router = useRouter();
 
@@ -109,6 +120,9 @@ const folderHierarchy = computed(() => {
 	return folderNames;
 });
 const isImage = computed(() => file.value?.type.startsWith('image/'));
+
+const isDriveWritable = ref<boolean>(!$i || ($i.isAdmin ?? false) || $i.policies.driveWritable);
+const canAttachFiles = ref<boolean>(!$i || $i.policies.canAttachFiles);
 
 async function fetch() {
 	fetching.value = true;
@@ -231,8 +245,8 @@ onMounted(async () => {
 <style lang="scss" module>
 
 .filePreviewRoot {
-	background: var(--panel);
-	border-radius: var(--radius);
+	background: var(--MI_THEME-panel);
+	border-radius: var(--MI-radius);
 	// MkMediaList 内の上部マージン 4px
 	padding: calc(1rem - 4px) 1rem 1rem;
 }
@@ -262,8 +276,8 @@ onMounted(async () => {
 
 		&:hover,
 		&:focus-visible {
-			background-color: var(--accentedBg);
-			color: var(--accent);
+			background-color: var(--MI_THEME-accentedBg);
+			color: var(--MI_THEME-accent);
 			text-decoration: none;
 			outline: none;
 		}
@@ -285,7 +299,7 @@ onMounted(async () => {
 	align-items: center;
 	min-width: 0;
 	font-weight: 700;
-	border-radius: var(--radius);
+	border-radius: var(--MI-radius);
 	font-size: .8rem;
 
 	>.fileNameEditIcon {
@@ -299,12 +313,12 @@ onMounted(async () => {
 	}
 
 	&:hover {
-		background-color: var(--accentedBg);
+		background-color: var(--MI_THEME-accentedBg);
 
 		>.fileName,
 		>.fileNameEditIcon {
 			visibility: visible;
-			color: var(--accent);
+			color: var(--MI_THEME-accent);
 		}
 	}
 }
@@ -322,7 +336,7 @@ onMounted(async () => {
 	display: block;
 	width: 100%;
 	padding: .5rem 1rem;
-	border-radius: var(--radius);
+	border-radius: var(--MI-radius);
 
 	.kvEditIcon {
 		display: inline-block;
@@ -332,11 +346,11 @@ onMounted(async () => {
 	}
 
 	&:hover {
-		color: var(--accent);
-		background-color: var(--accentedBg);
+		color: var(--MI_THEME-accent);
+		background-color: var(--MI_THEME-accentedBg);
 
 		.kvEditIcon {
-			color: var(--accent);
+			color: var(--MI_THEME-accent);
 			visibility: visible;
 		}
 	}

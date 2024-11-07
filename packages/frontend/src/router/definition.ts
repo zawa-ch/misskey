@@ -9,6 +9,7 @@ import { Router } from '@/nirax.js';
 import { $i, iAmModerator } from '@/account.js';
 import MkLoading from '@/pages/_loading_.vue';
 import MkError from '@/pages/_error_.vue';
+import { instance } from '@/instance.js';
 
 export const page = (loader: AsyncComponentLoader<any>) => defineAsyncComponent({
 	loader: loader,
@@ -39,10 +40,10 @@ const routes: RouteDef[] = [{
 }, {
 	name: 'list',
 	path: '/list/:listId',
-	component: page(() => import('@/pages/list.vue')),
+	component: ($i ? $i.isAdmin as boolean || $i.policies.userListAvailable : instance.policies.userListAvailable) ? page(() => import('@/pages/list.vue')) : page(() => import('@/pages/not-found.vue')),
 }, {
 	path: '/clips/:clipId',
-	component: page(() => import('@/pages/clip.vue')),
+	component: ($i ? $i.isAdmin as boolean || $i.policies.clipAvailable : instance.policies.clipAvailable) ? page(() => import('@/pages/clip.vue')) : page(() => import('@/pages/not-found.vue')),
 }, {
 	path: '/instance-info/:host',
 	component: page(() => import('@/pages/instance-info.vue')),
@@ -520,15 +521,15 @@ const routes: RouteDef[] = [{
 	loginRequired: true,
 }, {
 	path: '/my/lists/:listId',
-	component: page(() => import('@/pages/my-lists/list.vue')),
+	component: ($i ? ($i.isAdmin ?? false) || $i.policies.userListAvailable : instance.policies.userListAvailable) ? page(() => import('@/pages/my-lists/list.vue')) : page(() => import('@/pages/not-found.vue')),
 	loginRequired: true,
 }, {
 	path: '/my/lists',
-	component: page(() => import('@/pages/my-lists/index.vue')),
+	component: ($i ? ($i.isAdmin ?? false) || $i.policies.userListAvailable : instance.policies.userListAvailable) ? page(() => import('@/pages/my-lists/index.vue')) : page(() => import('@/pages/not-found.vue')),
 	loginRequired: true,
 }, {
 	path: '/my/clips',
-	component: page(() => import('@/pages/my-clips/index.vue')),
+	component: ($i ? ($i.isAdmin ?? false) || $i.policies.clipAvailable : instance.policies.clipAvailable) ? page(() => import('@/pages/my-clips/index.vue')) : page(() => import('@/pages/not-found.vue')),
 	loginRequired: true,
 }, {
 	path: '/my/antennas/create',
@@ -544,7 +545,7 @@ const routes: RouteDef[] = [{
 	loginRequired: true,
 }, {
 	path: '/timeline/list/:listId',
-	component: page(() => import('@/pages/user-list-timeline.vue')),
+	component: ($i ? ($i.isAdmin ?? false) || $i.policies.userListAvailable : instance.policies.userListAvailable) ? page(() => import('@/pages/user-list-timeline.vue')) : page(() => import('@/pages/not-found.vue')),
 	loginRequired: true,
 }, {
 	path: '/timeline/antenna/:antennaId',

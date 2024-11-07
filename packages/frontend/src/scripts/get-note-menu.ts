@@ -5,19 +5,19 @@
 
 import { defineAsyncComponent, Ref, ShallowRef } from 'vue';
 import * as Misskey from 'misskey-js';
+import { url } from '@@/js/config.js';
 import { claimAchievement } from './achievements.js';
+import type { MenuItem } from '@/types/menu.js';
 import { $i } from '@/account.js';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
 import { copyToClipboard } from '@/scripts/copy-to-clipboard.js';
-import { url } from '@@/js/config.js';
 import { defaultStore, noteActions } from '@/store.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { getUserMenu } from '@/scripts/get-user-menu.js';
 import { clipsCache, favoritedChannelsCache } from '@/cache.js';
-import type { MenuItem } from '@/types/menu.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import { isSupportShare } from '@/scripts/navigator.js';
 import { getAppearNote } from '@/scripts/get-appear-note.js';
@@ -245,13 +245,10 @@ export function getNoteMenu(props: {
 	function togglePin(pin: boolean): void {
 		os.apiWithDialog(pin ? 'i/pin' : 'i/unpin', {
 			noteId: appearNote.id,
-		}, undefined, null, res => {
-			if (res.id === '72dab508-c64d-498f-8740-a8eec1ba385a') {
-				os.alert({
-					type: 'error',
-					text: i18n.ts.pinLimitExceeded,
-				});
-			}
+		}, undefined, {
+			'72dab508-c64d-498f-8740-a8eec1ba385a': {
+				text: i18n.ts.pinLimitExceeded,
+			},
 		});
 	}
 
@@ -363,12 +360,14 @@ export function getNoteMenu(props: {
 			action: () => toggleFavorite(true),
 		}));
 
-		menuItems.push({
-			type: 'parent',
-			icon: 'ti ti-paperclip',
-			text: i18n.ts.clip,
-			children: () => getNoteClipMenu(props),
-		});
+		if ($i.policies.clipAvailable || $i.isAdmin) {
+			menuItems.push({
+				type: 'parent',
+				icon: 'ti ti-paperclip',
+				text: i18n.ts.clip,
+				children: () => getNoteClipMenu(props),
+			});
+		}
 
 		menuItems.push(statePromise.then(state => state.isMutedThread ? {
 			icon: 'ti ti-message-off',

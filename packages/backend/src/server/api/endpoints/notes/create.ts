@@ -427,6 +427,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if (e instanceof NoteCreateService.MatchedProhibitedPatternsError) {
 					throw new ApiError(meta.errors.matchedProhibitedPatterns);
 				}
+				if (e instanceof NoteCreateService.AttachFileProhibitedUserError) {
+					throw new ApiError(meta.errors.restrictedByRole);
+				}
 				if (e instanceof NoteCreateService.QuoteProhibitedUserError) {
 					throw new ApiError(meta.errors.restrictedByRole);
 				}

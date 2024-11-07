@@ -152,6 +152,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 	public static QuoteProhibitedUserError = class extends Error {};
 	public static ReplyProhibitedUserError = class extends Error {};
 	public static DirectMessageProhibitedUserError = class extends Error {};
+	public static AttachFileProhibitedUserError = class extends Error {};
 	private updateNotesCountQueue: CollapsedQueue<MiNote['id'], number>;
 
 	constructor(
@@ -224,7 +225,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		private userBlockingService: UserBlockingService,
 		private noteProhibitService: NoteProhibitService,
 	) {
-		this.updateNotesCountQueue = new CollapsedQueue(60 * 1000 * 5, this.collapseNotesCount, this.performUpdateNotesCount);
+		this.updateNotesCountQueue = new CollapsedQueue(process.env.NODE_ENV !== 'test' ? 60 * 1000 * 5 : 0, this.collapseNotesCount, this.performUpdateNotesCount);
 	}
 
 	@bindThis
@@ -284,6 +285,10 @@ export class NoteCreateService implements OnApplicationShutdown {
 			data.visibility = 'home';
 		}
 
+		if (data.files && data.files.length > 0 && !policies.canAttachFiles) {
+			throw new NoteCreateService.AttachFileProhibitedUserError();
+		}
+
 		if (data.renote) {
 			// 引用/Renote可能なユーザーか調べる
 			if (policies.canQuote === false) {
@@ -338,6 +343,11 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 		// ローカルのみにリプライしたらローカルのみにする
 		if (data.reply && data.reply.localOnly && data.channel == null) {
+			data.localOnly = true;
+		}
+
+		// 連合ノートを無効化されているユーザーはローカルのみにする
+		if (!policies.canFederateNote) {
 			data.localOnly = true;
 		}
 
@@ -552,13 +562,15 @@ export class NoteCreateService implements OnApplicationShutdown {
 		}
 
 		// Register host
-		if (this.userEntityService.isRemoteUser(user)) {
-			this.federatedInstanceService.fetch(user.host).then(async i => {
-				this.updateNotesCountQueue.enqueue(i.id, 1);
-				if (this.meta.enableChartsForFederatedInstances) {
-					this.instanceChart.updateNote(i.host, note, true);
-				}
-			});
+		if (this.meta.enableStatsForFederatedInstances) {
+			if (this.userEntityService.isRemoteUser(user)) {
+				this.federatedInstanceService.fetchOrRegister(user.host).then(async i => {
+					this.updateNotesCountQueue.enqueue(i.id, 1);
+					if (this.meta.enableChartsForFederatedInstances) {
+						this.instanceChart.updateNote(i.host, note, true);
+					}
+				});
+			}
 		}
 
 		// ハッシュタグ更新

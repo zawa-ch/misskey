@@ -30,7 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<span v-if="folder != null" :class="[$style.navPathItem, $style.navSeparator]"><i class="ti ti-chevron-right"></i></span>
 			<span v-if="folder != null" :class="[$style.navPathItem, $style.navCurrent]">{{ folder.name }}</span>
 		</div>
-		<button class="_button" :class="$style.navMenu" @click="showMenu"><i class="ti ti-dots"></i></button>
+		<button v-if="isDriveWritable" class="_button" :class="$style.navMenu" @click="showMenu"><i class="ti ti-dots"></i></button>
 	</nav>
 	<div
 		ref="main"
@@ -110,6 +110,7 @@ import { defaultStore } from '@/store.js';
 import { i18n } from '@/i18n.js';
 import { uploadFile, uploads } from '@/scripts/upload.js';
 import { claimAchievement } from '@/scripts/achievements.js';
+import { $i } from '@/account';
 
 const props = withDefaults(defineProps<{
 	initialFolder?: Misskey.entities.DriveFolder;
@@ -143,6 +144,8 @@ const selectedFolders = ref<Misskey.entities.DriveFolder[]>([]);
 const uploadings = uploads;
 const connection = useStream().useChannel('drive');
 const keepOriginal = ref<boolean>(defaultStore.state.keepOriginalUploading); // 外部渡しが多いので$refは使わないほうがよい
+
+const isDriveWritable = ref<boolean>(!$i || ($i.isAdmin ?? false) || $i.policies.driveWritable);
 
 // ドロップされようとしているか
 const draghover = ref(false);
@@ -668,7 +671,9 @@ function showMenu(ev: MouseEvent) {
 }
 
 function onContextmenu(ev: MouseEvent) {
-	os.contextMenu(getMenu(), ev);
+	if (isDriveWritable.value) {
+		os.contextMenu(getMenu(), ev);
+	}
 }
 
 onMounted(() => {
@@ -721,7 +726,7 @@ onBeforeUnmount(() => {
 	box-sizing: border-box;
 	overflow: auto;
 	font-size: 0.9em;
-	box-shadow: 0 1px 0 var(--divider);
+	box-shadow: 0 1px 0 var(--MI_THEME-divider);
 	user-select: none;
 }
 
@@ -768,7 +773,7 @@ onBeforeUnmount(() => {
 .main {
 	flex: 1;
 	overflow: auto;
-	padding: var(--margin);
+	padding: var(--MI-margin);
 	user-select: none;
 
 	&.fetching {
@@ -815,7 +820,7 @@ onBeforeUnmount(() => {
 	top: 38px;
 	width: 100%;
 	height: calc(100% - 38px);
-	border: dashed 2px var(--focus);
+	border: dashed 2px var(--MI_THEME-focus);
 	pointer-events: none;
 }
 </style>

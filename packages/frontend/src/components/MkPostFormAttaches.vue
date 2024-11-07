@@ -7,7 +7,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div v-show="props.modelValue.length != 0" :class="$style.root">
 	<Sortable :modelValue="props.modelValue" :class="$style.files" itemKey="id" :animation="150" :delay="100" :delayOnTouchOnly="true" @update:modelValue="v => emit('update:modelValue', v)">
 		<template #item="{element}">
-			<div :class="$style.file" @click="showFileMenu(element, $event)" @contextmenu.prevent="showFileMenu(element, $event)">
+			<div
+				:class="$style.file"
+				role="button"
+				tabindex="0"
+				@click="showFileMenu(element, $event)"
+				@keydown.space.enter="showFileMenu(element, $event)"
+				@contextmenu.prevent="showFileMenu(element, $event)"
+			>
 				<MkDriveFileThumbnail :data-id="element.id" :class="$style.thumbnail" :file="element" fit="cover"/>
 				<div v-if="element.isSensitive" :class="$style.sensitive">
 					<i class="ti ti-eye-exclamation" style="margin: auto;"></i>
@@ -20,13 +27,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, inject } from 'vue';
+import { defineAsyncComponent, inject, ref } from 'vue';
 import * as Misskey from 'misskey-js';
+import type { MenuItem } from '@/types/menu.js';
 import MkDriveFileThumbnail from '@/components/MkDriveFileThumbnail.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
 import { i18n } from '@/i18n.js';
-import type { MenuItem } from '@/types/menu.js';
+import { $i } from '@/account';
 
 const Sortable = defineAsyncComponent(() => import('vuedraggable').then(x => x.default));
 
@@ -133,28 +141,31 @@ async function crop(file: Misskey.entities.DriveFile): Promise<void> {
 	emit('replaceFile', file, newFile);
 }
 
-function showFileMenu(file: Misskey.entities.DriveFile, ev: MouseEvent): void {
+function showFileMenu(file: Misskey.entities.DriveFile, ev: MouseEvent | KeyboardEvent): void {
 	if (menuShowing) return;
 
 	const isImage = file.type.startsWith('image/');
+	const isDriveWritable = !$i || ($i.isAdmin ?? false) || $i.policies.driveWritable;
 
 	const menuItems: MenuItem[] = [];
 
-	menuItems.push({
-		text: i18n.ts.renameFile,
-		icon: 'ti ti-forms',
-		action: () => { rename(file); },
-	}, {
-		text: file.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
-		icon: file.isSensitive ? 'ti ti-eye-exclamation' : 'ti ti-eye',
-		action: () => { toggleSensitive(file); },
-	}, {
-		text: i18n.ts.describeFile,
-		icon: 'ti ti-text-caption',
-		action: () => { describe(file); },
-	});
+	if (isDriveWritable) {
+		menuItems.push({
+			text: i18n.ts.renameFile,
+			icon: 'ti ti-forms',
+			action: () => { rename(file); },
+		}, {
+			text: file.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
+			icon: file.isSensitive ? 'ti ti-eye-exclamation' : 'ti ti-eye',
+			action: () => { toggleSensitive(file); },
+		}, {
+			text: i18n.ts.describeFile,
+			icon: 'ti ti-text-caption',
+			action: () => { describe(file); },
+		});
+	}
 
-	if (isImage) {
+	if (isImage && isDriveWritable) {
 		menuItems.push({
 			text: i18n.ts.cropImage,
 			icon: 'ti ti-crop',
@@ -162,18 +173,24 @@ function showFileMenu(file: Misskey.entities.DriveFile, ev: MouseEvent): void {
 		});
 	}
 
+	if (isDriveWritable) {
+		menuItems.push({ type: 'divider' });
+	}
+
 	menuItems.push({
-		type: 'divider',
-	}, {
 		text: i18n.ts.attachCancel,
 		icon: 'ti ti-circle-x',
 		action: () => { detachMedia(file.id); },
-	}, {
-		text: i18n.ts.deleteFile,
-		icon: 'ti ti-trash',
-		danger: true,
-		action: () => { detachAndDeleteMedia(file); },
 	});
+
+	if (isDriveWritable) {
+		menuItems.push({
+			text: i18n.ts.deleteFile,
+			icon: 'ti ti-trash',
+			danger: true,
+			action: () => { detachAndDeleteMedia(file); },
+		});
+	}
 
 	os.popupMenu(menuItems, ev.currentTarget ?? ev.target).then(() => menuShowing = false);
 	menuShowing = true;
@@ -199,13 +216,17 @@ function showFileMenu(file: Misskey.entities.DriveFile, ev: MouseEvent): void {
 	border-radius: 4px;
 	overflow: hidden;
 	cursor: move;
+
+	&:focus-visible {
+		outline-offset: 4px;
+	}
 }
 
 .thumbnail {
 	width: 100%;
 	height: 100%;
 	z-index: 1;
-	color: var(--fg);
+	color: var(--MI_THEME-fg);
 }
 
 .sensitive {

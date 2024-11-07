@@ -232,6 +232,14 @@ export const packedRolePoliciesSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		canFederateNote: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		canAttachFiles: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 		mentionLimit: {
 			type: 'integer',
 			optional: false, nullable: false,
@@ -272,6 +280,10 @@ export const packedRolePoliciesSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		driveWritable: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 		driveCapacityMb: {
 			type: 'integer',
 			optional: false, nullable: false,
@@ -300,12 +312,20 @@ export const packedRolePoliciesSchema = {
 			type: 'integer',
 			optional: false, nullable: false,
 		},
+		clipAvailable: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 		clipLimit: {
 			type: 'integer',
 			optional: false, nullable: false,
 		},
 		noteEachClipsLimit: {
 			type: 'integer',
+			optional: false, nullable: false,
+		},
+		userListAvailable: {
+			type: 'boolean',
 			optional: false, nullable: false,
 		},
 		userListLimit: {

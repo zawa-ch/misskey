@@ -18,18 +18,37 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<option value="isBot">{{ i18n.ts._role._condition.isBot }}</option>
 			<option value="isCat">{{ i18n.ts._role._condition.isCat }}</option>
 			<option value="isExplorable">{{ i18n.ts._role._condition.isExplorable }}</option>
+			<option value="isMfaEnabled">{{ i18n.ts._role._condition.isMfaEnabled }}</option>
+			<option value="isSecurityKeyAvailable">{{ i18n.ts._role._condition.isSecurityKeyAvailable }}</option>
+			<option value="isUsingPwlessLogin">{{ i18n.ts._role._condition.isUsingPwlessLogin }}</option>
+			<option value="isNoCrawle">{{ i18n.ts._role._condition.isNoCrawle }}</option>
+			<option value="isNoAI">{{ i18n.ts._role._condition.isNoAI }}</option>
 			<option value="roleAssignedTo">{{ i18n.ts._role._condition.roleAssignedTo }}</option>
 			<option value="usernameMatchOf">{{ i18n.ts._role._condition.usernameMatchOf }}</option>
 			<option value="nameMatchOf">{{ i18n.ts._role._condition.nameMatchOf }}</option>
+			<option value="hostMatchOf">{{ i18n.ts._role._condition.hostMatchOf }}</option>
 			<option value="nameIsDefault">{{ i18n.ts._role._condition.nameIsDefault }}</option>
+			<option value="emailVerified">{{ i18n.ts._role._condition.emailVerified }}</option>
+			<option value="emailMatchOf">{{ i18n.ts._role._condition.emailMatchOf }}</option>
 			<option value="createdLessThan">{{ i18n.ts._role._condition.createdLessThan }}</option>
 			<option value="createdMoreThan">{{ i18n.ts._role._condition.createdMoreThan }}</option>
+			<option value="loggedInLessThanOrEq">{{ i18n.ts._role._condition.loggedInLessThanOrEq }}</option>
+			<option value="loggedInMoreThanOrEq">{{ i18n.ts._role._condition.loggedInMoreThanOrEq }}</option>
 			<option value="followersLessThanOrEq">{{ i18n.ts._role._condition.followersLessThanOrEq }}</option>
 			<option value="followersMoreThanOrEq">{{ i18n.ts._role._condition.followersMoreThanOrEq }}</option>
 			<option value="followingLessThanOrEq">{{ i18n.ts._role._condition.followingLessThanOrEq }}</option>
 			<option value="followingMoreThanOrEq">{{ i18n.ts._role._condition.followingMoreThanOrEq }}</option>
 			<option value="notesLessThanOrEq">{{ i18n.ts._role._condition.notesLessThanOrEq }}</option>
 			<option value="notesMoreThanOrEq">{{ i18n.ts._role._condition.notesMoreThanOrEq }}</option>
+			<option value="avatarUnset">{{ i18n.ts._role._condition.avatarUnset }}</option>
+			<option value="avatarLikelyBlurhash">{{ i18n.ts._role._condition.avatarLikelyBlurhash }}</option>
+			<option value="bannerUnset">{{ i18n.ts._role._condition.bannerUnset }}</option>
+			<option value="bannerLikelyBlurhash">{{ i18n.ts._role._condition.bannerLikelyBlurhash }}</option>
+			<option value="hasTags">{{ i18n.ts._role._condition.hasTags }}</option>
+			<option value="tagCountIs">{{ i18n.ts._role._condition.tagCountIs }}</option>
+			<option value="tagCountMoreThanOrEq">{{ i18n.ts._role._condition.tagCountMoreThanOrEq }}</option>
+			<option value="tagCountLessThan">{{ i18n.ts._role._condition.tagCountLessThan }}</option>
+			<option value="hasTagMatchOf">{{ i18n.ts._role._condition.hasTagMatchOf }}</option>
 			<option value="and">{{ i18n.ts._role._condition.and }}</option>
 			<option value="or">{{ i18n.ts._role._condition.or }}</option>
 			<option value="not">{{ i18n.ts._role._condition.not }}</option>
@@ -62,16 +81,29 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #suffix>sec</template>
 	</MkInput>
 
-	<MkInput v-else-if="['followersLessThanOrEq', 'followersMoreThanOrEq', 'followingLessThanOrEq', 'followingMoreThanOrEq', 'notesLessThanOrEq', 'notesMoreThanOrEq'].includes(type)" v-model="v.value" type="number">
+	<MkInput v-else-if="type === 'loggedInMoreThanOrEq' || type === 'loggedInLessThanOrEq'" v-model="v.day" type="number">
+		<template #suffix>day</template>
 	</MkInput>
 
-	<MkInput v-else-if="['usernameMatchOf', 'nameMatchOf'].includes(type)" v-model="v.pattern" type="text">
+	<MkInput v-else-if="['followersLessThanOrEq', 'followersMoreThanOrEq', 'followingLessThanOrEq', 'followingMoreThanOrEq', 'notesLessThanOrEq', 'notesMoreThanOrEq', 'tagCountIs', 'tagCountMoreThanOrEq', 'tagCountLessThan'].includes(type)" v-model="v.value" type="number">
+	</MkInput>
+
+	<MkInput v-else-if="['usernameMatchOf', 'nameMatchOf', 'hostMatchOf', 'hasTagMatchOf', 'emailMatchOf'].includes(type)" v-model="v.pattern" type="text">
 		<template #caption>{{ i18n.ts._role.patternEditDescription }}</template>
 	</MkInput>
 
 	<MkSelect v-else-if="type === 'roleAssignedTo'" v-model="v.roleId">
 		<option v-for="role in roles.filter(r => r.target === 'manual')" :key="role.id" :value="role.id">{{ role.name }}</option>
 	</MkSelect>
+
+	<div v-else-if="['avatarLikelyBlurhash', 'bannerLikelyBlurhash'].includes(type)">
+		<MkInput v-model="v.hash" type="text">
+			<template #label>{{ i18n.ts._role.hash }}</template>
+		</MkInput>
+		<MkInput v-model="v.diff" type="number">
+			<template #label>{{ i18n.ts._role.allowDifference }}</template>
+		</MkInput>
+	</div>
 </div>
 </template>
 
@@ -119,15 +151,26 @@ const type = computed({
 		if (t === 'roleAssignedTo') v.value.roleId = '';
 		if (t === 'usernameMatchOf') v.value.pattern = '';
 		if (t === 'nameMatchOf') v.value.pattern = '';
-		if (t === 'nameIsDefault') v.value.pattern = '';
+		if (t === 'hostMatchOf') v.value.pattern = '';
+		if (t === 'emailMatchOf') v.value.pattern = '';
 		if (t === 'createdLessThan') v.value.sec = 86400;
 		if (t === 'createdMoreThan') v.value.sec = 86400;
+		if (t === 'loggedInMoreThanOrEq') v.value.day = 10;
+		if (t === 'loggedInLessThanOrEq') v.value.day = 10;
 		if (t === 'followersLessThanOrEq') v.value.value = 10;
 		if (t === 'followersMoreThanOrEq') v.value.value = 10;
 		if (t === 'followingLessThanOrEq') v.value.value = 10;
 		if (t === 'followingMoreThanOrEq') v.value.value = 10;
 		if (t === 'notesLessThanOrEq') v.value.value = 10;
 		if (t === 'notesMoreThanOrEq') v.value.value = 10;
+		if (t === 'avatarLikelyBlurhash') v.value.hash = '';
+		if (t === 'avatarLikelyBlurhash') v.value.diff = 0;
+		if (t === 'bannerLikelyBlurhash') v.value.hash = '';
+		if (t === 'bannerLikelyBlurhash') v.value.diff = 0;
+		if (t === 'tagCountIs') v.value.value = 10;
+		if (t === 'tagCountMoreThanOrEq') v.value.value = 10;
+		if (t === 'tagCountLessThan') v.value.value = 10;
+		if (t === 'hasTagMatchOf') v.value.pattern = '';
 		v.value.type = t;
 	},
 });
@@ -169,12 +212,12 @@ function removeSelf() {
 }
 
 .item {
-	border: solid 2px var(--divider);
-	border-radius: var(--radius);
+	border: solid 2px var(--MI_THEME-divider);
+	border-radius: var(--MI-radius);
 	padding: 12px;
 
 	&:hover {
-		border-color: var(--accent);
+		border-color: var(--MI_THEME-accent);
 	}
 }
 </style>

@@ -7,12 +7,14 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In } from 'typeorm';
 import { ModuleRef } from '@nestjs/core';
+import { decode } from 'blurhash';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import type {
 	MiInstance,
 	MiMeta,
 	MiRole,
 	MiRoleAssignment,
+	MiUserProfile,
 	RoleAssignmentsRepository,
 	RolesRepository,
 	UsersRepository,
@@ -42,6 +44,8 @@ export type RolePolicies = {
 	canPostNote: boolean;
 	noteLengthLimit: number;
 	canPublicNote: boolean;
+	canFederateNote: boolean;
+	canAttachFiles: boolean;
 	canReply: boolean;
 	canQuote: boolean;
 	canDirectMessage: boolean;
@@ -55,6 +59,7 @@ export type RolePolicies = {
 	canSearchNotes: boolean;
 	canUseTranslator: boolean;
 	canHideAds: boolean;
+	driveWritable: boolean;
 	driveCapacityMb: number;
 	alwaysMarkNsfw: boolean;
 	canUpdateBioMedia: boolean;
@@ -62,8 +67,10 @@ export type RolePolicies = {
 	antennaLimit: number;
 	wordMuteLimit: number;
 	webhookLimit: number;
+	clipAvailable: boolean;
 	clipLimit: number;
 	noteEachClipsLimit: number;
+	userListAvailable: boolean;
 	userListLimit: number;
 	userEachUserListsLimit: number;
 	rateLimitFactor: number;
@@ -81,6 +88,8 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canPostNote: true,
 	noteLengthLimit: MAX_NOTE_TEXT_LENGTH,
 	canPublicNote: true,
+	canFederateNote: true,
+	canAttachFiles: true,
 	canReply: true,
 	canQuote: true,
 	canDirectMessage: true,
@@ -94,6 +103,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canSearchNotes: false,
 	canUseTranslator: true,
 	canHideAds: false,
+	driveWritable: true,
 	driveCapacityMb: 100,
 	alwaysMarkNsfw: false,
 	canUpdateBioMedia: true,
@@ -101,8 +111,10 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	antennaLimit: 5,
 	wordMuteLimit: 200,
 	webhookLimit: 3,
+	clipAvailable: true,
 	clipLimit: 10,
 	noteEachClipsLimit: 200,
+	userListAvailable: true,
 	userListLimit: 10,
 	userEachUserListsLimit: 50,
 	rateLimitFactor: 1,
@@ -116,6 +128,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 
 @Injectable()
 export class RoleService implements OnApplicationShutdown, OnModuleInit {
+	private rootUserIdCache: MemorySingleCache<MiUser['id']>;
 	private rolesCache: MemorySingleCache<MiRole[]>;
 	private roleAssignmentByUserIdCache: MemoryKVCache<MiRoleAssignment[]>;
 	private notificationService: NotificationService;
@@ -156,6 +169,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		private fanoutTimelineService: FanoutTimelineService,
 		private utilityService: UtilityService,
 	) {
+		this.rootUserIdCache = new MemorySingleCache<MiUser['id']>(1000 * 60 * 60 * 24 * 7); // 1week. rootユーザのIDは不変なので長めに
 		this.rolesCache = new MemorySingleCache<MiRole[]>(1000 * 60 * 60); // 1h
 		this.roleAssignmentByUserIdCache = new MemoryKVCache<MiRoleAssignment[]>(1000 * 60 * 5); // 5m
 
@@ -231,20 +245,21 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	private evalCond(user: MiUser, instance: MiInstance | null, roles: MiRole[], value: RoleCondFormulaValue): boolean {
+	private evalCond(user: MiUser | null, profile: MiUserProfile | null, instance: MiInstance | null, roles: MiRole[], value: RoleCondFormulaValue): boolean {
+		if (!user) { return false; }
 		try {
 			switch (value.type) {
 				// ～かつ～
 				case 'and': {
-					return value.values.every(v => this.evalCond(user, instance, roles, v));
+					return value.values.every(v => this.evalCond(user, profile, instance, roles, v));
 				}
 				// ～または～
 				case 'or': {
-					return value.values.some(v => this.evalCond(user, instance, roles, v));
+					return value.values.some(v => this.evalCond(user, profile, instance, roles, v));
 				}
 				// ～ではない
 				case 'not': {
-					return !this.evalCond(user, instance, roles, value.value);
+					return !this.evalCond(user, profile, instance, roles, value.value);
 				}
 				// マニュアルロールがアサインされている
 				case 'roleAssignedTo': {
@@ -290,6 +305,21 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				case 'isExplorable': {
 					return user.isExplorable;
 				}
+				case 'isMfaEnabled': {
+					return (profile?.twoFactorEnabled) ?? false;
+				}
+				case 'isSecurityKeyAvailable': {
+					return (profile?.securityKeysAvailable) ?? false;
+				}
+				case 'isUsingPwlessLogin': {
+					return (profile?.usePasswordLessLogin) ?? false;
+				}
+				case 'isNoCrawle': {
+					return (profile?.noCrawle) ?? false;
+				}
+				case 'isNoAI': {
+					return (profile?.preventAiLearning) ?? false;
+				}
 				// ユーザが作成されてから指定期間経過した
 				case 'createdLessThan': {
 					return this.idService.parse(user.id).date.getTime() > (Date.now() - (value.sec * 1000));
@@ -297,6 +327,12 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				// ユーザが作成されてから指定期間経っていない
 				case 'createdMoreThan': {
 					return this.idService.parse(user.id).date.getTime() < (Date.now() - (value.sec * 1000));
+				}
+				case 'loggedInLessThanOrEq': {
+					return profile ? (profile.loggedInDates.length <= value.day) : false;
+				}
+				case 'loggedInMoreThanOrEq': {
+					return profile ? (profile.loggedInDates.length >= value.day) : false;
 				}
 				// フォロワー数が指定値以下
 				case 'followersLessThanOrEq': {
@@ -325,11 +361,61 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				case 'usernameMatchOf': {
 					return this.utilityService.isKeyWordIncluded(user.username, [value.pattern]);
 				}
+				case 'hostMatchOf': {
+					return instance !== null && this.utilityService.isKeyWordIncluded(instance.host, [value.pattern]);
+				}
 				case 'nameMatchOf': {
 					return this.utilityService.isKeyWordIncluded(user.name ?? '', [value.pattern]);
 				}
 				case 'nameIsDefault': {
 					return (user.name ?? user.username) === user.username;
+				}
+				case 'emailVerified': {
+					return (profile?.emailVerified) ?? false;
+				}
+				case 'emailMatchOf': {
+					return profile?.email ? this.utilityService.isKeyWordIncluded(profile.email, [value.pattern]) : false;
+				}
+				case 'avatarUnset': {
+					return !user.avatarId;
+				}
+				case 'avatarLikelyBlurhash': {
+					if (!user.avatarBlurhash) { return false; }
+					try {
+						const bhash = decode(user.avatarBlurhash, 5, 5);
+						const k = decode(value.hash, 5, 5);
+						return bhash.reduce((v, j, n) => v + (j >= k[n] ? j - k[n] : k[n] - j), 0) <= value.diff;
+					} catch (e) {
+						return false;
+					}
+				}
+				case 'bannerUnset': {
+					return !user.bannerId;
+				}
+				case 'bannerLikelyBlurhash': {
+					if (!user.bannerBlurhash) { return false; }
+					try {
+						const bhash = decode(user.bannerBlurhash, 5, 5);
+						const k = decode(value.hash, 5, 5);
+						return bhash.reduce((v, j, n) => v + (j >= k[n] ? j - k[n] : k[n] - j), 0) <= value.diff;
+					} catch (e) {
+						return false;
+					}
+				}
+				case 'hasTags': {
+					return user.tags.length > 0;
+				}
+				case 'tagCountIs': {
+					return (user.tags.length) === value.value;
+				}
+				case 'tagCountMoreThanOrEq': {
+					return (user.tags.length) >= value.value;
+				}
+				case 'tagCountLessThan': {
+					return (user.tags.length) < value.value;
+				}
+				case 'hasTagMatchOf': {
+					return (user.tags).some(h => this.utilityService.isKeyWordIncluded(h, [value.pattern]));
 				}
 				default:
 					return false;
@@ -361,8 +447,9 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		const assigns = await this.getUserAssigns(userId);
 		const assignedRoles = roles.filter(r => assigns.map(x => x.roleId).includes(r.id));
 		const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
+		const profile = user && this.userEntityService.isLocalUser(user) ? await this.cacheService.userProfileCache.fetch(user.id) : null;
 		const instance = user ? await this.federatedInstanceService.fetch(user.host ?? this.config.host) : null;
-		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, instance, assignedRoles, r.condFormula));
+		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user, profile, instance, assignedRoles, r.condFormula));
 		return [...assignedRoles, ...matchedCondRoles];
 	}
 
@@ -381,8 +468,9 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		const badgeCondRoles = roles.filter(r => r.asBadge && (r.target === 'conditional'));
 		if (badgeCondRoles.length > 0) {
 			const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
+			const profile = user && this.userEntityService.isLocalUser(user) ? await this.cacheService.userProfileCache.fetch(user.id) : null;
 			const instance = user ? await this.federatedInstanceService.fetch(user.host ?? this.config.host) : null;
-			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user!, instance, assignedRoles, r.condFormula));
+			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user, profile, instance, assignedRoles, r.condFormula));
 			return [...assignedBadgeRoles, ...matchedBadgeCondRoles];
 		} else {
 			return assignedBadgeRoles;
@@ -417,6 +505,8 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			canPostNote: calc('canPostNote', vs => vs.some(v => v === true)),
 			noteLengthLimit: calc('noteLengthLimit', vs => Math.max(...vs)),
 			canPublicNote: calc('canPublicNote', vs => vs.some(v => v === true)),
+			canFederateNote: calc('canFederateNote', vs => vs.some(v => v === true)),
+			canAttachFiles: calc('canAttachFiles', vs => vs.some(v => v === true)),
 			canReply: calc('canReply', vs => vs.some(v => v === true)),
 			canQuote: calc('canQuote', vs => vs.some(v => v === true)),
 			canDirectMessage: calc('canDirectMessage', vs => vs.some(v => v === true)),
@@ -430,18 +520,21 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			canSearchNotes: calc('canSearchNotes', vs => vs.some(v => v === true)),
 			canUseTranslator: calc('canUseTranslator', vs => vs.some(v => v === true)),
 			canHideAds: calc('canHideAds', vs => vs.some(v => v === true)),
+			driveWritable: calc('driveWritable', vs => vs.some(v => v === true)),
 			driveCapacityMb: calc('driveCapacityMb', vs => Math.max(...vs)),
-			alwaysMarkNsfw: calc('alwaysMarkNsfw', vs => vs.some(v => v === true)),
+			alwaysMarkNsfw: calc('alwaysMarkNsfw', vs => vs.every(v => v === true)),
 			canUpdateBioMedia: calc('canUpdateBioMedia', vs => vs.some(v => v === true)),
 			pinLimit: calc('pinLimit', vs => Math.max(...vs)),
 			antennaLimit: calc('antennaLimit', vs => Math.max(...vs)),
 			wordMuteLimit: calc('wordMuteLimit', vs => Math.max(...vs)),
 			webhookLimit: calc('webhookLimit', vs => Math.max(...vs)),
+			clipAvailable: calc('clipAvailable', vs => vs.some(v => v === true)),
 			clipLimit: calc('clipLimit', vs => Math.max(...vs)),
 			noteEachClipsLimit: calc('noteEachClipsLimit', vs => Math.max(...vs)),
+			userListAvailable: calc('userListAvailable', vs => vs.some(v => v === true)),
 			userListLimit: calc('userListLimit', vs => Math.max(...vs)),
 			userEachUserListsLimit: calc('userEachUserListsLimit', vs => Math.max(...vs)),
-			rateLimitFactor: calc('rateLimitFactor', vs => Math.max(...vs)),
+			rateLimitFactor: calc('rateLimitFactor', vs => Math.min(...vs)),
 			avatarDecorationLimit: calc('avatarDecorationLimit', vs => Math.max(...vs)),
 			canImportAntennas: calc('canImportAntennas', vs => vs.some(v => v === true)),
 			canImportBlocking: calc('canImportBlocking', vs => vs.some(v => v === true)),
@@ -464,49 +557,78 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async isExplorable(role: { id: MiRole['id']} | null): Promise<boolean> {
+	public async isExplorable(role: { id: MiRole['id'] } | null): Promise<boolean> {
 		if (role == null) return false;
 		const check = await this.rolesRepository.findOneBy({ id: role.id });
 		if (check == null) return false;
 		return check.isExplorable;
 	}
 
+	/**
+	 * モデレーター権限のロールが割り当てられているユーザID一覧を取得する.
+	 *
+	 * @param opts.includeAdmins 管理者権限も含めるか(デフォルト: true)
+	 * @param opts.includeRoot rootユーザも含めるか(デフォルト: false)
+	 * @param opts.excludeExpire 期限切れのロールを除外するか(デフォルト: false)
+	 */
 	@bindThis
-	public async getModeratorIds(includeAdmins = true, excludeExpire = false): Promise<MiUser['id'][]> {
+	public async getModeratorIds(opts?: {
+		includeAdmins?: boolean,
+		includeRoot?: boolean,
+		excludeExpire?: boolean,
+	}): Promise<MiUser['id'][]> {
+		const includeAdmins = opts?.includeAdmins ?? true;
+		const includeRoot = opts?.includeRoot ?? false;
+		const excludeExpire = opts?.excludeExpire ?? false;
+
 		const roles = await this.rolesCache.fetch(() => this.rolesRepository.findBy({}));
 		const moderatorRoles = includeAdmins
 			? roles.filter(r => r.isModerator || r.isAdministrator)
 			: roles.filter(r => r.isModerator);
 
-		// TODO: isRootなアカウントも含める
 		const assigns = moderatorRoles.length > 0
 			? await this.roleAssignmentsRepository.findBy({ roleId: In(moderatorRoles.map(r => r.id)) })
 			: [];
 
+		// Setを経由して重複を除去（ユーザIDは重複する可能性があるので）
 		const now = Date.now();
-		const result = [
-			// Setを経由して重複を除去（ユーザIDは重複する可能性があるので）
-			...new Set(
-				assigns
-					.filter(it =>
-						(excludeExpire)
-							? (it.expiresAt == null || it.expiresAt.getTime() > now)
-							: true,
-					)
-					.map(a => a.userId),
-			),
-		];
+		const resultSet = new Set(
+			assigns
+				.filter(it =>
+					(excludeExpire)
+						? (it.expiresAt == null || it.expiresAt.getTime() > now)
+						: true,
+				)
+				.map(a => a.userId),
+		);
 
-		return result.sort((x, y) => x.localeCompare(y));
+		if (includeRoot) {
+			const rootUserId = await this.rootUserIdCache.fetch(async () => {
+				const it = await this.usersRepository.createQueryBuilder('users')
+					.select('id')
+					.where({ isRoot: true })
+					.getRawOne<{ id: string }>();
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				return it!.id;
+			});
+			resultSet.add(rootUserId);
+		}
+
+		return [...resultSet].sort((x, y) => x.localeCompare(y));
 	}
 
 	@bindThis
-	public async getModerators(includeAdmins = true): Promise<MiUser[]> {
-		const ids = await this.getModeratorIds(includeAdmins);
-		const users = ids.length > 0 ? await this.usersRepository.findBy({
-			id: In(ids),
-		}) : [];
-		return users;
+	public async getModerators(opts?: {
+		includeAdmins?: boolean,
+		includeRoot?: boolean,
+		excludeExpire?: boolean,
+	}): Promise<MiUser[]> {
+		const ids = await this.getModeratorIds(opts);
+		return ids.length > 0
+			? await this.usersRepository.findBy({
+				id: In(ids),
+			})
+			: [];
 	}
 
 	@bindThis

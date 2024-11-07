@@ -103,6 +103,26 @@ type CondFormulaValueIsExplorable = {
 	type: 'isExplorable';
 };
 
+type CondFormulaValueIsMfaEnabled = {
+	type: 'isMfaEnabled';
+};
+
+type CondFormulaValueIsSecurityKeyAvailable = {
+	type: 'isSecurityKeyAvailable';
+};
+
+type CondFormulaValueIsUsingPwlessLogin = {
+	type: 'isUsingPwlessLogin';
+};
+
+type CondFormulaValueIsNoCrawle = {
+	type: 'isNoCrawle';
+};
+
+type CondFormulaValueIsNoAI = {
+	type: 'isNoAI';
+};
+
 /**
  * ユーザが作成されてから指定期間経過した場合のみ成立とする
  */
@@ -117,6 +137,16 @@ type CondFormulaValueCreatedLessThan = {
 type CondFormulaValueCreatedMoreThan = {
 	type: 'createdMoreThan';
 	sec: number;
+};
+
+type CondFormulaValueLoggedInLessThanOrEq = {
+	type: 'loggedInLessThanOrEq';
+	day: number;
+};
+
+type CondFormulaValueLoggedInMoreThanOrEq = {
+	type: 'loggedInMoreThanOrEq';
+	day: number;
 };
 
 /**
@@ -172,6 +202,11 @@ type CondFormulaValueUsernameMatchOf = {
 	pattern: string;
 };
 
+type CondFormulaValueHostMatchOf = {
+	type: 'hostMatchOf';
+	pattern: string;
+};
+
 type CondFormulaValueNameMatchOf = {
 	type: 'nameMatchOf';
 	pattern: string;
@@ -179,6 +214,59 @@ type CondFormulaValueNameMatchOf = {
 
 type CondFormulaValueNameIsDefault = {
 	type: 'nameIsDefault';
+};
+
+type CondFormulaValueEmailVerified = {
+	type: 'emailVerified';
+};
+
+type CondFormulaValueEmailMatchOf = {
+	type: 'emailMatchOf';
+	pattern: string;
+};
+
+type CondFormulaValueAvatarUnset = {
+	type: 'avatarUnset';
+};
+
+type CondFormulaValueAvatarLikelyBlurhash = {
+	type: 'avatarLikelyBlurhash';
+	hash: string;
+	diff: number;
+};
+
+type CondFormulaValueBannerUnset = {
+	type: 'bannerUnset';
+};
+
+type CondFormulaValueBannerLikelyBlurhash = {
+	type: 'bannerLikelyBlurhash';
+	hash: string;
+	diff: number;
+};
+
+type CondFormulaValueHasTags = {
+	type: 'hasTags';
+};
+
+type CondFormulaValueHashtagCountIs = {
+	type: 'tagCountIs';
+	value: number;
+};
+
+type CondFormulaValueHashtagCountMoreThanOrEq = {
+	type: 'tagCountMoreThanOrEq';
+	value: number;
+};
+
+type CondFormulaValueHashtagCountLessThan = {
+	type: 'tagCountLessThan';
+	value: number;
+};
+
+type CondFormulaValueHasHashtagMatchOf = {
+	type: 'hasTagMatchOf';
+	pattern: string;
 };
 
 export type RoleCondFormulaValue = { id: string } & (
@@ -196,9 +284,16 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueIsBot |
 	CondFormulaValueIsCat |
 	CondFormulaValueIsExplorable |
+	CondFormulaValueIsMfaEnabled |
+	CondFormulaValueIsSecurityKeyAvailable |
+	CondFormulaValueIsUsingPwlessLogin |
+	CondFormulaValueIsNoCrawle |
+	CondFormulaValueIsNoAI |
 	CondFormulaValueRoleAssignedTo |
 	CondFormulaValueCreatedLessThan |
 	CondFormulaValueCreatedMoreThan |
+	CondFormulaValueLoggedInLessThanOrEq |
+	CondFormulaValueLoggedInMoreThanOrEq |
 	CondFormulaValueFollowersLessThanOrEq |
 	CondFormulaValueFollowersMoreThanOrEq |
 	CondFormulaValueFollowingLessThanOrEq |
@@ -206,8 +301,20 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueNotesLessThanOrEq |
 	CondFormulaValueNotesMoreThanOrEq |
 	CondFormulaValueUsernameMatchOf |
+	CondFormulaValueHostMatchOf |
 	CondFormulaValueNameMatchOf |
-	CondFormulaValueNameIsDefault
+	CondFormulaValueNameIsDefault |
+	CondFormulaValueEmailVerified |
+	CondFormulaValueEmailMatchOf |
+	CondFormulaValueAvatarUnset |
+	CondFormulaValueAvatarLikelyBlurhash |
+	CondFormulaValueBannerUnset |
+	CondFormulaValueBannerLikelyBlurhash |
+	CondFormulaValueHasTags |
+	CondFormulaValueHashtagCountIs |
+	CondFormulaValueHashtagCountMoreThanOrEq |
+	CondFormulaValueHashtagCountLessThan |
+	CondFormulaValueHasHashtagMatchOf
 );
 
 @Entity('role')

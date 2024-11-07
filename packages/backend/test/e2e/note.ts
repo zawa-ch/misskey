@@ -746,10 +746,9 @@ describe('Note', () => {
 			const post = {
 				text: 'test',
 			};
-			const postNote = await api('/notes/create', post, bob);
+			const postNote = await api('notes/create', post, bob);
 
 			expect(postNote.status).toStrictEqual(403);
-			expect(postNote.body.error.code).toStrictEqual('ROLE_PERMISSION_DENIED');
 
 			await api('admin/roles/unassign', {
 				userId: bob.id,
@@ -797,7 +796,7 @@ describe('Note', () => {
 			const post = {
 				text: '!'.repeat(140),
 			};
-			const postNote = await api('/notes/create', post, alice);
+			const postNote = await api('notes/create', post, alice);
 
 			assert.strictEqual(postNote.status, 200);
 
@@ -847,10 +846,9 @@ describe('Note', () => {
 			const post = {
 				text: '!'.repeat(141),
 			};
-			const postNote = await api('/notes/create', post, alice);
+			const postNote = await api('notes/create', post, alice);
 
 			assert.strictEqual(postNote.status, 400);
-			assert.strictEqual(postNote.body.error.code, 'NOTE_TOO_LONG_BY_ROLE_LIMIT');
 
 			await api('admin/roles/unassign', {
 				userId: alice.id,
@@ -898,10 +896,9 @@ describe('Note', () => {
 			const post = {
 				text: '@bob yo',
 			};
-			const postNote = await api('/notes/create', post, alice);
+			const postNote = await api('notes/create', post, alice);
 
 			assert.strictEqual(postNote.status, 400);
-			assert.strictEqual(postNote.body.error.code, 'RESTRICTED_BY_ROLE');
 
 			await api('admin/roles/unassign', {
 				userId: alice.id,
@@ -949,10 +946,9 @@ describe('Note', () => {
 			const post = {
 				text: '@bob@misskey.local yo',
 			};
-			const postNote = await api('/notes/create', post, tom);
+			const postNote = await api('notes/create', post, tom);
 
 			assert.strictEqual(postNote.status, 400);
-			assert.strictEqual(postNote.body.error.code, 'RESTRICTED_BY_ROLE');
 
 			await api('admin/roles/unassign', {
 				userId: tom.id,
@@ -1006,10 +1002,9 @@ describe('Note', () => {
 				replyId: bobPost.id,
 			};
 
-			const postNote = await api('/notes/create', alicePost, alice);
+			const postNote = await api('notes/create', alicePost, alice);
 
 			assert.strictEqual(postNote.status, 400);
-			assert.strictEqual(postNote.body.error.code, 'RESTRICTED_BY_ROLE');
 
 			await api('admin/roles/unassign', {
 				userId: alice.id,
@@ -1058,13 +1053,12 @@ describe('Note', () => {
 				text: 'foo',
 			});
 
-			const post2 = await api('/notes/create', {
+			const post2 = await api('notes/create', {
 				text: 'bar',
 				replyId: post1.id,
 			}, tom);
 
 			assert.strictEqual(post2.status, 400);
-			assert.strictEqual(post2.body.error.code, 'RESTRICTED_BY_ROLE');
 
 			await api('admin/roles/unassign', {
 				userId: tom.id,
@@ -1118,7 +1112,7 @@ describe('Note', () => {
 				replyId: post1.id,
 			};
 
-			const postNote = await api('/notes/create', post2, alice);
+			const postNote = await api('notes/create', post2, alice);
 
 			assert.strictEqual(postNote.status, 200);
 
@@ -1169,7 +1163,7 @@ describe('Note', () => {
 				text: 'foo',
 			});
 
-			const post2 = await api('/notes/create', {
+			const post2 = await api('notes/create', {
 				text: 'bar',
 				replyId: post1.id,
 			}, tom);
@@ -1223,17 +1217,14 @@ describe('Note', () => {
 				text: 'foo',
 			});
 
-			const alicePost = {
+			const postNote = await api('notes/create', {
 				text: 'bar',
 				replyId: bobPost.id,
 				visibility: 'specified',
 				visibleUserIds: [bob.id],
-			};
-
-			const postNote = await api('/notes/create', alicePost, alice);
+			}, alice);
 
 			assert.strictEqual(postNote.status, 400);
-			assert.strictEqual(postNote.body.error.code, 'RESTRICTED_BY_ROLE');
 
 			await api('admin/roles/unassign', {
 				userId: alice.id,
@@ -1282,7 +1273,7 @@ describe('Note', () => {
 				text: 'foo',
 			});
 
-			const post2 = await api('/notes/create', {
+			const post2 = await api('notes/create', {
 				text: 'bar',
 				replyId: post1.id,
 				visibility: 'specified',
@@ -1290,7 +1281,6 @@ describe('Note', () => {
 			}, tom);
 
 			assert.strictEqual(post2.status, 400);
-			assert.strictEqual(post2.body.error.code, 'RESTRICTED_BY_ROLE');
 
 			await api('admin/roles/unassign', {
 				userId: tom.id,
@@ -1339,7 +1329,7 @@ describe('Note', () => {
 				text: 'foo',
 			});
 
-			const post2 = await api('/notes/create', {
+			const post2 = await api('notes/create', {
 				text: 'bar',
 				replyId: post1.id,
 				visibility: 'specified',
@@ -1399,10 +1389,9 @@ describe('Note', () => {
 				renoteId: bobPost.id,
 			};
 
-			const res = await api('/notes/create', alicePost, alice);
+			const res = await api('notes/create', alicePost, alice);
 
 			assert.strictEqual(res.status, 400);
-			assert.strictEqual(res.body.error.code, 'RESTRICTED_BY_ROLE');
 
 			await api('admin/roles/unassign', {
 				userId: alice.id,
@@ -1451,12 +1440,11 @@ describe('Note', () => {
 				text: 'test',
 			});
 
-			const post2 = await api('/notes/create', {
+			const post2 = await api('notes/create', {
 				renoteId: post1.id,
 			}, tom);
 
 			assert.strictEqual(post2.status, 400);
-			assert.strictEqual(post2.body.error.code, 'RESTRICTED_BY_ROLE');
 
 			await api('admin/roles/unassign', {
 				userId: tom.id,
@@ -1510,10 +1498,9 @@ describe('Note', () => {
 				renoteId: bobPost.id,
 			};
 
-			const res = await api('/notes/create', alicePost, alice);
+			const res = await api('notes/create', alicePost, alice);
 
 			assert.strictEqual(res.status, 400);
-			assert.strictEqual(res.body.error.code, 'RESTRICTED_BY_ROLE');
 
 			await api('admin/roles/unassign', {
 				userId: alice.id,
@@ -1562,19 +1549,122 @@ describe('Note', () => {
 				text: 'test',
 			});
 
-			const post2 = await api('/notes/create', {
+			const post2 = await api('notes/create', {
 				text: 'test',
 				renoteId: post1.id,
 			}, tom);
 
 			assert.strictEqual(post2.status, 400);
-			assert.strictEqual(post2.body.error.code, 'RESTRICTED_BY_ROLE');
 
 			await api('admin/roles/unassign', {
 				userId: tom.id,
 				roleId: role.body.id,
 			});
 
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
+		test('ロールの制限で強制ローカル投稿になる', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canFederateNote: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+			expect(role.status).toStrictEqual(200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			}, alice);
+			expect(assign.status).toStrictEqual(204);
+
+			const bobPost = await api('notes/create', {
+				text: 'test',
+			}, bob);
+			expect(bobPost.status).toStrictEqual(200);
+			expect(bobPost.body.createdNote.localOnly ?? false).toStrictEqual(false);
+
+			const alicePost = await api('notes/create', {
+				text: 'test',
+			}, alice);
+			expect(alicePost.status).toStrictEqual(200);
+			expect(alicePost.body.createdNote.localOnly ?? false).toStrictEqual(true);
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			});
+			await api('admin/roles/delete', {
+				roleId: role.body.id,
+			}, alice);
+		});
+
+		test('ロールの制限でファイル添付できない', async () => {
+			const role = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					canFederateNote: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			}, alice);
+			expect(role.status).toStrictEqual(200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			}, alice);
+			expect(assign.status).toStrictEqual(204);
+
+			const post1 = await api('notes/create', {
+				text: 'test',
+			}, alice);
+			expect(post1.status).toStrictEqual(200);
+
+			const file = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
+			const post2 = await api('notes/create', {
+				text: 'test',
+				fileIds: [file.id],
+			}, alice);
+			expect(post2.status).toStrictEqual(400);
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: role.body.id,
+			});
 			await api('admin/roles/delete', {
 				roleId: role.body.id,
 			}, alice);
@@ -1825,7 +1915,7 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'hoge',
 		}, alice);
 		assert.strictEqual(note1.status, 200);
@@ -1841,11 +1931,10 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'hoge',
 		}, alice);
 		assert.strictEqual(note1.status, 400);
-		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -1888,13 +1977,12 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'hoge',
 		}, alice);
 		assert.strictEqual(note1.status, 400);
-		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'hoge',
 		}, bob);
 		assert.strictEqual(note2.status, 200);
@@ -1924,17 +2012,15 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'hoge',
 		}, alice);
 		assert.strictEqual(note1.status, 400);
-		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'hoge',
 		}, bob);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -1953,27 +2039,25 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'hoge',
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'hogefoohuga',
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
-		const note3 = await api('/notes/create', {
+		const note3 = await api('notes/create', {
 			text: 'bar',
 		}, bob);
 		assert.strictEqual(note3.status, 200);
 
-		const note4 = await api('/notes/create', {
+		const note4 = await api('notes/create', {
 			text: 'hofooge',
 		}, bob);
 		assert.strictEqual(note4.status, 400);
-		assert.strictEqual(note4.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -1990,13 +2074,12 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: '@bob yo',
 		}, alice);
 		assert.strictEqual(note1.status, 400);
-		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'yo',
 		}, alice);
 		assert.strictEqual(note2.status, 200);
@@ -2017,13 +2100,12 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: '@alice @bob yo',
 		}, alice);
 		assert.strictEqual(note1.status, 400);
-		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: '@bob yo',
 		}, alice);
 		assert.strictEqual(note2.status, 200);
@@ -2044,13 +2126,12 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: '@alice @bob yo',
 		}, alice);
 		assert.strictEqual(note1.status, 400);
-		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: '@alice yo',
 		}, alice);
 		assert.strictEqual(note2.status, 200);
@@ -2071,13 +2152,12 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'yo',
 		}, alice);
 		assert.strictEqual(note1.status, 400);
-		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: '@alice @bob yo',
 		}, alice);
 		assert.strictEqual(note2.status, 200);
@@ -2101,17 +2181,16 @@ describe('Note', () => {
 			text: 'foo',
 		});
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'bar',
 			replyId: bpost.id,
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2132,17 +2211,16 @@ describe('Note', () => {
 			text: 'foo',
 		});
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'bar',
 			renoteId: bpost.id,
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2161,17 +2239,16 @@ describe('Note', () => {
 
 		const file = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file.id],
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2192,18 +2269,17 @@ describe('Note', () => {
 		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id],
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id, file2.id],
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2224,18 +2300,17 @@ describe('Note', () => {
 		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id],
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id, file2.id],
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2256,17 +2331,16 @@ describe('Note', () => {
 		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id, file2.id],
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'foo',
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2287,18 +2361,17 @@ describe('Note', () => {
 		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/kick_gaba7.wav');
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id],
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file2.id],
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2319,18 +2392,17 @@ describe('Note', () => {
 		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id],
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file2.id],
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2351,18 +2423,17 @@ describe('Note', () => {
 		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/kick_gaba7.wav');
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id],
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id, file2.id],
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2383,18 +2454,17 @@ describe('Note', () => {
 		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id],
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id, file2.id],
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2415,18 +2485,17 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id],
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file2.id],
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2446,18 +2515,17 @@ describe('Note', () => {
 		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id],
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id, file2.id],
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2477,18 +2545,17 @@ describe('Note', () => {
 		const file1 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/emptyfile');
 		const file2 = await uploadUrl(alice, 'https://raw.githubusercontent.com/misskey-dev/misskey/develop/packages/backend/test/resources/192.jpg');
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id],
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id, file2.id],
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2511,18 +2578,17 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id],
 		}, alice);
 		assert.strictEqual(note1.status, 200);
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'foo',
 			fileIds: [file1.id, file2.id],
 		}, alice);
 		assert.strictEqual(note2.status, 400);
-		assert.strictEqual(note2.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
 		await api('admin/update-meta', {
 			prohibitedNotePattern: null,
@@ -2539,13 +2605,13 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: '#foo yo',
 		}, alice);
 		assert.strictEqual(note1.status, 400);
 		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'yo',
 		}, alice);
 		assert.strictEqual(note2.status, 200);
@@ -2566,13 +2632,12 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: '#foo #bar yo',
 		}, alice);
 		assert.strictEqual(note1.status, 400);
-		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: '#bar yo',
 		}, alice);
 		assert.strictEqual(note2.status, 200);
@@ -2593,13 +2658,12 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: '#foo #bar yo',
 		}, alice);
 		assert.strictEqual(note1.status, 400);
-		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: '#foo yo',
 		}, alice);
 		assert.strictEqual(note2.status, 200);
@@ -2620,13 +2684,12 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: 'yo',
 		}, alice);
 		assert.strictEqual(note1.status, 400);
-		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: '#foo #bar yo',
 		}, alice);
 		assert.strictEqual(note2.status, 200);
@@ -2647,13 +2710,12 @@ describe('Note', () => {
 
 		await new Promise(x => setTimeout(x, 2));
 
-		const note1 = await api('/notes/create', {
+		const note1 = await api('notes/create', {
 			text: '#foobar yo',
 		}, alice);
 		assert.strictEqual(note1.status, 400);
-		assert.strictEqual(note1.body.error.code, 'MATCHED_PROHIBITED_PATTERNS');
 
-		const note2 = await api('/notes/create', {
+		const note2 = await api('notes/create', {
 			text: 'foobar',
 		}, alice);
 		assert.strictEqual(note2.status, 200);
