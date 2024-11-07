@@ -29,9 +29,9 @@ import { CollapsedQueue } from '@/misc/collapsed-queue.js';
 import { MiNote } from '@/models/Note.js';
 import { MiMeta } from '@/models/Meta.js';
 import { DI } from '@/di-symbols.js';
+import { NoteCreateService } from '@/core/NoteCreateService.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type { InboxJobData } from '../types.js';
-import { NoteCreateService } from '@/core/NoteCreateService.js';
 
 type UpdateInstanceJob = {
 	latestRequestReceivedAt: Date,
@@ -231,6 +231,9 @@ export class InboxProcessorService implements OnApplicationShutdown {
 			}
 			if (e instanceof NoteCreateService.MatchedProhibitedPatternsError) {
 				return 'matches prohibited note patterns';
+			}
+			if (e instanceof NoteCreateService.AttachFileProhibitedUserError) {
+				return 'actor cannot attach files';
 			}
 			if (e instanceof NoteCreateService.QuoteProhibitedUserError) {
 				return 'actor cannot quote';

@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<i class="ti ti-pencil" :class="$style.fileNameEditIcon"></i>
 			</button>
 			<div :class="$style.fileQuickActionsOthers">
-				<button v-tooltip="i18n.ts.createNoteFromTheFile" class="_button" :class="$style.fileQuickActionsOthersButton" @click="postThis()">
+				<button v-if="canAttachFiles" v-tooltip="i18n.ts.createNoteFromTheFile" class="_button" :class="$style.fileQuickActionsOthersButton" @click="postThis()">
 					<i class="ti ti-pencil"></i>
 				</button>
 				<button v-if="isDriveWritable && isImage" v-tooltip="i18n.ts.cropImage" class="_button" :class="$style.fileQuickActionsOthersButton" @click="crop()">
@@ -122,6 +122,7 @@ const folderHierarchy = computed(() => {
 const isImage = computed(() => file.value?.type.startsWith('image/'));
 
 const isDriveWritable = ref<boolean>(!$i || ($i.isAdmin ?? false) || $i.policies.driveWritable);
+const canAttachFiles = ref<boolean>(!$i || $i.policies.canAttachFiles);
 
 async function fetch() {
 	fetching.value = true;

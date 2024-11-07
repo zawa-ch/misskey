@@ -33,7 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span :class="$style.headerRightButtonText">{{ channel.name }}</span>
 				</button>
 			</template>
-			<button v-click-anime v-tooltip="i18n.ts._visibility.disableFederation" class="_button" :class="[$style.headerRightItem, { [$style.danger]: localOnly }]" :disabled="channel != null || visibility === 'specified'" @click="toggleLocalOnly">
+			<button v-click-anime v-tooltip="i18n.ts._visibility.disableFederation" class="_button" :class="[$style.headerRightItem, { [$style.danger]: localOnly }]" :disabled="!$i.policies.canFederateNote || channel != null || visibility === 'specified'" @click="toggleLocalOnly">
 				<span v-if="!localOnly"><i class="ti ti-rocket"></i></span>
 				<span v-else><i class="ti ti-rocket-off"></i></span>
 			</button>
@@ -83,7 +83,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 	<footer :class="$style.footer">
 		<div :class="$style.footerLeft">
-			<button v-tooltip="i18n.ts.attachFile" class="_button" :class="$style.footerButton" @click="chooseFileFrom"><i class="ti ti-photo-plus"></i></button>
+			<button v-tooltip="i18n.ts.attachFile" class="_button" :class="$style.footerButton" :disabled="!$i.policies.canAttachFiles" @click="chooseFileFrom"><i class="ti ti-photo-plus"></i></button>
 			<button v-tooltip="i18n.ts.poll" class="_button" :class="[$style.footerButton, { [$style.footerButtonActive]: poll }]" @click="togglePoll"><i class="ti ti-chart-arrows"></i></button>
 			<button v-tooltip="i18n.ts.useCw" class="_button" :class="[$style.footerButton, { [$style.footerButtonActive]: useCw }]" @click="useCw = !useCw"><i class="ti ti-eye-off"></i></button>
 			<button v-tooltip="i18n.ts.mention" class="_button" :class="$style.footerButton" @click="insertMention"><i class="ti ti-at"></i></button>
@@ -341,6 +341,10 @@ if (props.channel) {
 	localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
 }
 
+if (!$i.policies.canFederateNote) {
+	localOnly.value = true;
+}
+
 // 公開以外へのリプライ時は元の公開範囲を引き継ぐ
 if (props.reply && ['home', 'followers', 'specified'].includes(props.reply.visibility)) {
 	if (props.reply.visibility === 'home' && visibility.value === 'followers') {
@@ -506,6 +510,11 @@ async function toggleLocalOnly() {
 	if (props.channel) {
 		visibility.value = 'public';
 		localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
+		return;
+	}
+
+	if (!$i.policies.canFederateNote) {
+		localOnly.value = true;
 		return;
 	}
 
@@ -695,6 +704,7 @@ function onDrop(ev: DragEvent): void {
 	// ファイルだったら
 	if (ev.dataTransfer && ev.dataTransfer.files.length > 0) {
 		ev.preventDefault();
+		if (!$i.policies.canAttachFiles) { return; }
 		for (const x of Array.from(ev.dataTransfer.files)) upload(x);
 		return;
 	}
@@ -702,6 +712,7 @@ function onDrop(ev: DragEvent): void {
 	//#region ドライブのファイル
 	const driveFile = ev.dataTransfer?.getData(_DATA_TRANSFER_DRIVE_FILE_);
 	if (driveFile != null && driveFile !== '') {
+		if (!$i.policies.canAttachFiles) { return; }
 		const file = JSON.parse(driveFile);
 		files.value.push(file);
 		ev.preventDefault();
@@ -767,13 +778,13 @@ async function post(ev?: MouseEvent) {
 
 	let postData = {
 		text: text.value === '' ? null : text.value,
-		fileIds: files.value.length > 0 ? files.value.map(f => f.id) : undefined,
+		fileIds: files.value.length > 0 && $i.policies.canAttachFiles ? files.value.map(f => f.id) : undefined,
 		replyId: props.reply ? props.reply.id : undefined,
 		renoteId: props.renote ? props.renote.id : quoteId.value ? quoteId.value : undefined,
 		channelId: props.channel ? props.channel.id : undefined,
 		poll: poll.value,
 		cw: useCw.value ? cw.value ?? '' : null,
-		localOnly: localOnly.value,
+		localOnly: localOnly.value || !$i.policies.canFederateNote,
 		visibility: visibility.value,
 		visibleUserIds: visibility.value === 'specified' ? visibleUsers.value.map(u => u.id) : undefined,
 		reactionAcceptance: reactionAcceptance.value,

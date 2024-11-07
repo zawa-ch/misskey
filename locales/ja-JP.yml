@@ -1760,6 +1760,8 @@ _role:
     canReply: "返信/メンションの許可"
     canQuote: "引用/Renoteの許可"
     canDirectMessage: "ダイレクトメッセージの許可"
+    canFederateNote: "連合ノートの許可"
+    canAttachFiles: "ファイル添付の許可"
     mentionMax: "ノート内の最大メンション数"
     canInvite: "サーバー招待コードの発行"
     inviteLimit: "招待コードの作成可能数"

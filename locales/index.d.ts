@@ -6813,6 +6813,14 @@ export interface Locale extends ILocale {
              */
             "canDirectMessage": string;
             /**
+             * 連合ノートの許可
+             */
+            "canFederateNote": string;
+            /**
+             * ファイル添付の許可
+             */
+            "canAttachFiles": string;
+            /**
              * ノート内の最大メンション数
              */
             "mentionMax": string;

@@ -89,6 +89,7 @@ async function deleteFile(file: Misskey.entities.DriveFile) {
 export function getDriveFileMenu(file: Misskey.entities.DriveFile, folder?: Misskey.entities.DriveFolder | null): MenuItem[] {
 	const isImage = file.type.startsWith('image/');
 	const isDriveWritable = $i?.policies.driveWritable ?? $i?.isAdmin ?? true;
+	const canAttachFiles = $i?.policies.canAttachFiles ?? true;
 
 	const menuItems: MenuItem[] = [];
 
@@ -130,13 +131,19 @@ export function getDriveFileMenu(file: Misskey.entities.DriveFile, folder?: Miss
 		});
 	}
 
-	menuItems.push({ type: 'divider' }, {
-		text: i18n.ts.createNoteFromTheFile,
-		icon: 'ti ti-pencil',
-		action: () => os.post({
-			initialFiles: [file],
-		}),
-	}, {
+	menuItems.push({ type: 'divider' });
+
+	if (canAttachFiles) {
+		menuItems.push({
+			text: i18n.ts.createNoteFromTheFile,
+			icon: 'ti ti-pencil',
+			action: () => os.post({
+				initialFiles: [file],
+			}),
+		});
+	}
+
+	menuItems.push({
 		text: i18n.ts.copyUrl,
 		icon: 'ti ti-link',
 		action: () => copyUrl(file),

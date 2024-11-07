@@ -90,6 +90,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkSwitch>
 						</MkFolder>
 
+						<MkFolder v-if="matchQuery([i18n.ts._role._options.canFederateNote, 'canFederateNote'])">
+							<template #label>{{ i18n.ts._role._options.canFederateNote }}</template>
+							<template #suffix>{{ policies.canFederateNote ? i18n.ts.yes : i18n.ts.no }}</template>
+							<MkSwitch v-model="policies.canFederateNote">
+								<template #label>{{ i18n.ts.enable }}</template>
+							</MkSwitch>
+						</MkFolder>
+
+						<MkFolder v-if="matchQuery([i18n.ts._role._options.canAttachFiles, 'canAttachFiles'])">
+							<template #label>{{ i18n.ts._role._options.canAttachFiles }}</template>
+							<template #suffix>{{ policies.canAttachFiles ? i18n.ts.yes : i18n.ts.no }}</template>
+							<MkSwitch v-model="policies.canAttachFiles">
+								<template #label>{{ i18n.ts.enable }}</template>
+							</MkSwitch>
+						</MkFolder>
+
 						<MkFolder v-if="matchQuery([i18n.ts._role._options.mentionMax, 'mentionLimit'])">
 							<template #label>{{ i18n.ts._role._options.mentionMax }}</template>
 							<template #suffix>{{ policies.mentionLimit }}</template>

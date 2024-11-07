@@ -82,6 +82,8 @@ export const ROLE_POLICIES = [
 	'canReply',
 	'canQuote',
 	'canDirectMessage',
+	'canFederateNote',
+	'canAttachFiles',
 	'mentionLimit',
 	'canInvite',
 	'inviteLimit',

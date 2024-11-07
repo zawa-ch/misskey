@@ -44,6 +44,8 @@ export type RolePolicies = {
 	canPostNote: boolean;
 	noteLengthLimit: number;
 	canPublicNote: boolean;
+	canFederateNote: boolean;
+	canAttachFiles: boolean;
 	canReply: boolean;
 	canQuote: boolean;
 	canDirectMessage: boolean;
@@ -86,6 +88,8 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canPostNote: true,
 	noteLengthLimit: MAX_NOTE_TEXT_LENGTH,
 	canPublicNote: true,
+	canFederateNote: true,
+	canAttachFiles: true,
 	canReply: true,
 	canQuote: true,
 	canDirectMessage: true,
@@ -499,6 +503,8 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			canPostNote: calc('canPostNote', vs => vs.some(v => v === true)),
 			noteLengthLimit: calc('noteLengthLimit', vs => Math.max(...vs)),
 			canPublicNote: calc('canPublicNote', vs => vs.some(v => v === true)),
+			canFederateNote: calc('canFederateNote', vs => vs.some(v => v === true)),
+			canAttachFiles: calc('canAttachFiles', vs => vs.some(v => v === true)),
 			canReply: calc('canReply', vs => vs.some(v => v === true)),
 			canQuote: calc('canQuote', vs => vs.some(v => v === true)),
 			canDirectMessage: calc('canDirectMessage', vs => vs.some(v => v === true)),
