@@ -51,7 +51,7 @@ export const paramDef = {
 				type: 'string',
 			},
 		},
-		prohibitedNotePattern: { type: 'object', nullable: true, ref: 'ProhibitedNoteFormulaValue' },
+		prohibitedNotePattern: { type: 'object', nullable: true },
 		themeColor: { type: 'string', nullable: true, pattern: '^#[0-9a-fA-F]{6}$' },
 		mascotImageUrl: { type: 'string', nullable: true },
 		bannerUrl: { type: 'string', nullable: true },
