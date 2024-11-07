@@ -1209,7 +1209,7 @@ defineExpose({
 }
 
 .darkenPreview {
-	background-color: var(--shadow);
+	background-color: var(--MI_THEME-shadow);
 }
 
 html[data-color-scheme=dark] .obliqueStripedPreview {
