@@ -2887,7 +2887,7 @@ type ProhibitedNoteFormulaValue = components['schemas']['ProhibitedNoteFormulaVa
 type ProhibitedNoteFormulaZeroArg = components['schemas']['ProhibitedNoteFormulaZeroArg'];
 
 // @public (undocumented)
-type PromoReadRequest = operations['promo/read']['requestBody']['content']['application/json'];
+type PromoReadRequest = operations['promo___read']['requestBody']['content']['application/json'];
 
 // Warning: (ae-forgotten-export) The symbol "AllNullRecord" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "NonNullableRecord" needs to be exported by the entry point index.d.ts
