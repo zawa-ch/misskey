@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkMediaList :mediaList="[file]"></MkMediaList>
 		</div>
 		<div :class="$style.fileQuickActionsRoot">
-			<button class="_button" :class="$style.fileNameEditBtn" @click="rename()">
+			<button class="_button" :class="$style.fileNameEditBtn" :disabled="!isDriveWritable" @click="rename()">
 				<h2 class="_nowrap" :class="$style.fileName">{{ file.name }}</h2>
 				<i class="ti ti-pencil" :class="$style.fileNameEditIcon"></i>
 			</button>

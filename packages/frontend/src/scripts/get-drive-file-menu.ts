@@ -88,7 +88,7 @@ async function deleteFile(file: Misskey.entities.DriveFile) {
 
 export function getDriveFileMenu(file: Misskey.entities.DriveFile, folder?: Misskey.entities.DriveFolder | null): MenuItem[] {
 	const isImage = file.type.startsWith('image/');
-	const isDriveWritable = $i?.policies.driveWritable ?? $i?.isAdmin ?? true;
+	const isDriveWritable = $i ? $i.policies.driveWritable || $i.isAdmin : true;
 	const canAttachFiles = $i?.policies.canAttachFiles ?? true;
 
 	const menuItems: MenuItem[] = [];
