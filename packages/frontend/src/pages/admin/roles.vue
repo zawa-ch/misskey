@@ -21,8 +21,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 						<MkFolder v-if="matchQuery([i18n.ts._role._options.rateLimitFactor, 'rateLimitFactor'])">
 							<template #label>{{ i18n.ts._role._options.rateLimitFactor }}</template>
-							<template #suffix>{{ Math.floor(policies.rateLimitFactor * 100) }}%</template>
-							<MkRange :modelValue="policies.rateLimitFactor * 100" :min="30" :max="300" :step="10" :textConverter="(v) => `${v}%`" @update:modelValue="v => policies.rateLimitFactor = (v / 100)">
+							<template #suffix>{{ Math.round(policies.rateLimitFactor * 100) }}%</template>
+							<MkRange :modelValue="Math.round(Math.log2(policies.rateLimitFactor) * 4)" :min="-8" :max="8" :step="1" :textConverter="(v) => `${Math.round(Math.pow(2, v / 4) * 100)}%`" @update:modelValue="v => policies.rateLimitFactor = Math.pow(2, v / 4)">
 								<template #caption>{{ i18n.ts._role._options.descriptionOfRateLimitFactor }}</template>
 							</MkRange>
 						</MkFolder>

@@ -83,14 +83,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>{{ i18n.ts._role._options.rateLimitFactor }}</template>
 				<template #suffix>
 					<span v-if="role.policies.rateLimitFactor.useDefault" :class="$style.useDefaultLabel">{{ i18n.ts._role.useBaseValue }}</span>
-					<span v-else>{{ `${Math.floor(role.policies.rateLimitFactor.value * 100)}%` }}</span>
+					<span v-else>{{ `${Math.round(role.policies.rateLimitFactor.value * 100)}%` }}</span>
 					<span :class="$style.priorityIndicator"><i :class="getPriorityIcon(role.policies.rateLimitFactor)"></i></span>
 				</template>
 				<div class="_gaps">
 					<MkSwitch v-model="role.policies.rateLimitFactor.useDefault" :readonly="readonly">
 						<template #label>{{ i18n.ts._role.useBaseValue }}</template>
 					</MkSwitch>
-					<MkRange :modelValue="role.policies.rateLimitFactor.value * 100" :min="0" :max="400" :step="10" :textConverter="(v) => `${v}%`" @update:modelValue="v => role.policies.rateLimitFactor.value = (v / 100)">
+					<MkSwitch :modelValue="role.policies.rateLimitFactor.value == 0" :disabled="role.policies.rateLimitFactor.useDefault" :readonly="readonly" @update:modelValue="v => { role.policies.rateLimitFactor.value = v ? 0 : instance.policies.rateLimitFactor }">
+						<template #label>{{ i18n.ts._role._options.rateLimitFactor }} 0%</template>
+					</MkSwitch>
+					<MkRange v-if="role.policies.rateLimitFactor.value != 0" :modelValue="Math.round(Math.log2(role.policies.rateLimitFactor.value) * 4)" :min="-20" :max="20" :step="1" :textConverter="(v) => `${Math.round(Math.pow(2, v / 4) * 100)}%`" @update:modelValue="v => role.policies.rateLimitFactor.value = Math.pow(2, v / 4)">
 						<template #label>{{ i18n.ts._role._options.rateLimitFactor }}</template>
 						<template #caption>{{ i18n.ts._role._options.descriptionOfRateLimitFactor }}</template>
 					</MkRange>
