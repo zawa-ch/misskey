@@ -346,8 +346,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 			data.localOnly = true;
 		}
 
-		// 連合ノートを無効化されているユーザーはローカルのみにする
-		if (!policies.canFederateNote) {
+		// 連合ノートを無効化されているローカルユーザーはローカルのみにする
+		if (!policies.canFederateNote && !user.host) {
 			data.localOnly = true;
 		}
 
