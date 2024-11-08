@@ -513,7 +513,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			mentionLimit: calc('mentionLimit', vs => Math.max(...vs)),
 			canInvite: calc('canInvite', vs => vs.some(v => v === true)),
 			inviteLimit: calc('inviteLimit', vs => Math.max(...vs)),
-			inviteLimitCycle: calc('inviteLimitCycle', vs => Math.max(...vs)),
+			inviteLimitCycle: calc('inviteLimitCycle', vs => Math.min(...vs)),
 			inviteExpirationTime: calc('inviteExpirationTime', vs => Math.max(...vs)),
 			canManageCustomEmojis: calc('canManageCustomEmojis', vs => vs.some(v => v === true)),
 			canManageAvatarDecorations: calc('canManageAvatarDecorations', vs => vs.some(v => v === true)),
