@@ -34,6 +34,7 @@ import type { Packed } from '@/misc/json-schema.js';
 import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import type { Config } from '@/config.js';
+import { calcEntropy } from '@/misc/string-entropy.js';
 import { FederatedInstanceService } from './FederatedInstanceService.js';
 import { UtilityService } from './UtilityService.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
@@ -360,6 +361,18 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				}
 				case 'usernameMatchOf': {
 					return this.utilityService.isKeyWordIncluded(user.username, [value.pattern]);
+				}
+				case 'usernameEntropyMoreThanOrEq': {
+					return this.meta.usernameEntropyTable ? calcEntropy(user.username, this.meta.usernameEntropyTable) >= value.value : false;
+				}
+				case 'usernameEntropyLessThanOrEq': {
+					return this.meta.usernameEntropyTable ? calcEntropy(user.username, this.meta.usernameEntropyTable) <= value.value : false;
+				}
+				case 'usernameEntropyMeanMoreThanOrEq': {
+					return this.meta.usernameEntropyTable ? calcEntropy(user.username, this.meta.usernameEntropyTable) / user.username.length >= value.value : false;
+				}
+				case 'usernameEntropyMeanLessThanOrEq': {
+					return this.meta.usernameEntropyTable ? calcEntropy(user.username, this.meta.usernameEntropyTable) / user.username.length <= value.value : false;
 				}
 				case 'hostMatchOf': {
 					return instance !== null && this.utilityService.isKeyWordIncluded(instance.host, [value.pattern]);

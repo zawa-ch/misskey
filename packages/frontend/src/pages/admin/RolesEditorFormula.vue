@@ -25,6 +25,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<option value="isNoAI">{{ i18n.ts._role._condition.isNoAI }}</option>
 			<option value="roleAssignedTo">{{ i18n.ts._role._condition.roleAssignedTo }}</option>
 			<option value="usernameMatchOf">{{ i18n.ts._role._condition.usernameMatchOf }}</option>
+			<option value="usernameEntropyMoreThanOrEq">{{ i18n.ts._role._condition.usernameEntropyMoreThanOrEq }}</option>
+			<option value="usernameEntropyLessThanOrEq">{{ i18n.ts._role._condition.usernameEntropyLessThanOrEq }}</option>
+			<option value="usernameEntropyMeanMoreThanOrEq">{{ i18n.ts._role._condition.usernameEntropyMeanMoreThanOrEq }}</option>
+			<option value="usernameEntropyMeanLessThanOrEq">{{ i18n.ts._role._condition.usernameEntropyMeanLessThanOrEq }}</option>
 			<option value="nameMatchOf">{{ i18n.ts._role._condition.nameMatchOf }}</option>
 			<option value="hostMatchOf">{{ i18n.ts._role._condition.hostMatchOf }}</option>
 			<option value="nameIsDefault">{{ i18n.ts._role._condition.nameIsDefault }}</option>
@@ -83,6 +87,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 	<MkInput v-else-if="type === 'loggedInMoreThanOrEq' || type === 'loggedInLessThanOrEq'" v-model="v.day" type="number">
 		<template #suffix>day</template>
+	</MkInput>
+
+	<MkInput v-else-if="['usernameEntropyMoreThanOrEq', 'usernameEntropyLessThanOrEq', 'usernameEntropyMeanMoreThanOrEq', 'usernameEntropyMeanLessThanOrEq'].includes(type)" v-model="v.value" :min="0" :step="0.1" type="number">
+		<template #suffix>bit</template>
 	</MkInput>
 
 	<MkInput v-else-if="['followersLessThanOrEq', 'followersMoreThanOrEq', 'followingLessThanOrEq', 'followingMoreThanOrEq', 'notesLessThanOrEq', 'notesMoreThanOrEq', 'tagCountIs', 'tagCountMoreThanOrEq', 'tagCountLessThan'].includes(type)" v-model="v.value" type="number">
@@ -150,6 +158,10 @@ const type = computed({
 		if (t === 'not') v.value.value = { id: uuid(), type: 'isRemote' };
 		if (t === 'roleAssignedTo') v.value.roleId = '';
 		if (t === 'usernameMatchOf') v.value.pattern = '';
+		if (t === 'usernameEntropyMoreThanOrEq') v.value.value = 47;
+		if (t === 'usernameEntropyLessThanOrEq') v.value.value = 47;
+		if (t === 'usernameEntropyMeanMoreThanOrEq') v.value.value = 4.7;
+		if (t === 'usernameEntropyMeanLessThanOrEq') v.value.value = 4.7;
 		if (t === 'nameMatchOf') v.value.pattern = '';
 		if (t === 'hostMatchOf') v.value.pattern = '';
 		if (t === 'emailMatchOf') v.value.pattern = '';

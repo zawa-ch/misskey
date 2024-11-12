@@ -7040,6 +7040,22 @@ export interface Locale extends ILocale {
              */
             "usernameMatchOf": string;
             /**
+             * ユーザー名の情報量が〜以上
+             */
+            "usernameEntropyMoreThanOrEq": string;
+            /**
+             * ユーザー名の情報量が〜以下
+             */
+            "usernameEntropyLessThanOrEq": string;
+            /**
+             * ユーザー名の文字あたりの情報量が〜以上
+             */
+            "usernameEntropyMeanMoreThanOrEq": string;
+            /**
+             * ユーザー名の文字あたりの情報量が〜以下
+             */
+            "usernameEntropyMeanLessThanOrEq": string;
+            /**
              * ユーザーの表示名が〜にマッチ
              */
             "nameMatchOf": string;

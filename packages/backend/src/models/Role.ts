@@ -202,6 +202,26 @@ type CondFormulaValueUsernameMatchOf = {
 	pattern: string;
 };
 
+type CondFormulaValueUsernameEntropyMoreThanOrEq = {
+	type: 'usernameEntropyMoreThanOrEq';
+	value: number;
+};
+
+type CondFormulaValueUsernameEntropyLessThanOrEq = {
+	type: 'usernameEntropyLessThanOrEq';
+	value: number;
+};
+
+type CondFormulaValueUsernameEntropyMeanMoreThanOrEq = {
+	type: 'usernameEntropyMeanMoreThanOrEq';
+	value: number;
+};
+
+type CondFormulaValueUsernameEntropyMeanLessThanOrEq = {
+	type: 'usernameEntropyMeanLessThanOrEq';
+	value: number;
+};
+
 type CondFormulaValueHostMatchOf = {
 	type: 'hostMatchOf';
 	pattern: string;
@@ -301,6 +321,10 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueNotesLessThanOrEq |
 	CondFormulaValueNotesMoreThanOrEq |
 	CondFormulaValueUsernameMatchOf |
+	CondFormulaValueUsernameEntropyMoreThanOrEq |
+	CondFormulaValueUsernameEntropyLessThanOrEq |
+	CondFormulaValueUsernameEntropyMeanMoreThanOrEq |
+	CondFormulaValueUsernameEntropyMeanLessThanOrEq |
 	CondFormulaValueHostMatchOf |
 	CondFormulaValueNameMatchOf |
 	CondFormulaValueNameIsDefault |

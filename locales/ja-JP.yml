@@ -1818,6 +1818,10 @@ _role:
   _condition:
     roleAssignedTo: "マニュアルロールにアサイン済み"
     usernameMatchOf: "ユーザー名が〜にマッチ"
+    usernameEntropyMoreThanOrEq: "ユーザー名の情報量が〜以上"
+    usernameEntropyLessThanOrEq: "ユーザー名の情報量が〜以下"
+    usernameEntropyMeanMoreThanOrEq: "ユーザー名の文字あたりの情報量が〜以上"
+    usernameEntropyMeanLessThanOrEq: "ユーザー名の文字あたりの情報量が〜以下"
     nameMatchOf: "ユーザーの表示名が〜にマッチ"
     hostMatchOf: "ユーザーのホスト名が〜にマッチ"
     nameIsDefault: "ユーザーの表示名が初期状態"
