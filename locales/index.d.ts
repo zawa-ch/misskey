@@ -4547,6 +4547,14 @@ export interface Locale extends ILocale {
      */
     "preservedUsernamesDescription": string;
     /**
+     * ユーザー名の情報量計算用テーブル
+     */
+    "usernameEntropyTable": string;
+    /**
+     * ユーザー名の情報量を計算するためのテーブルを指定します。内容はjsonで、すべてのアルファベット小文字、"0"、"_"を二重に要素に持つオブジェクトとして定義されます(e.g. { "_": { "_": 4.7, ... }, ... })。外側のオブジェクトが事前条件、内側のオブジェクトが事後条件を表し、それぞれの要素がその情報量(シャノン単位)を持ちます。このテーブルは一部のロールコンディションで使用されます。内容を空にすることで、設定したテーブルをクリアします。
+     */
+    "usernameEntropyTableDescription": string;
+    /**
      * このファイルからノートを作成
      */
     "createNoteFromTheFile": string;

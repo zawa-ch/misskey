@@ -5192,6 +5192,7 @@ export type operations = {
             prohibitedNotePattern: components['schemas']['ProhibitedNoteFormulaValue'] | null;
             bannedEmailDomains?: string[];
             preservedUsernames: string[];
+            usernameEntropyTable: Record<string, never> | null;
             hcaptchaSecretKey: string | null;
             mcaptchaSecretKey: string | null;
             recaptchaSecretKey: string | null;
@@ -9291,6 +9292,7 @@ export type operations = {
             lastActiveDate: string | null;
             moderationNote: string;
             signins: components['schemas']['Signin'][];
+            usernameEntropy: number | null;
             policies: components['schemas']['RolePolicies'];
             roles: components['schemas']['Role'][];
             roleAssigns: ({
@@ -9620,6 +9622,7 @@ export type operations = {
           serverRules?: string[];
           bannedEmailDomains?: string[];
           preservedUsernames?: string[];
+          usernameEntropyTable?: Record<string, never> | null;
           manifestJsonOverride?: string;
           enableFanoutTimeline?: boolean;
           enableFanoutTimelineDbFallback?: boolean;

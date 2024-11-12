@@ -4,6 +4,7 @@
  */
 
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { EntropyTable } from '@/misc/string-entropy.js';
 import { id } from './util/id.js';
 import { MiUser } from './User.js';
 import type { ProhibitedNoteFormulaValue } from './ProhibitedNoteFormula.js';
@@ -101,6 +102,11 @@ export class MiMeta {
 		length: 1024, array: true, default: '{}',
 	})
 	public mediaSilencedHosts: string[];
+
+	@Column('jsonb', {
+		nullable: true,
+	})
+	public usernameEntropyTable: EntropyTable | null;
 
 	@Column('varchar', {
 		length: 1024,

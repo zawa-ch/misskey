@@ -34,6 +34,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkFolder>
 
 					<MkFolder>
+						<template #label>{{ i18n.ts.usernameEntropyTable }}</template>
+
+						<div class="_gaps">
+							<MkTextarea v-model="usernameEntropyTable">
+								<template #caption>{{ i18n.ts.usernameEntropyTableDescription }}</template>
+							</MkTextarea>
+							<MkButton primary @click="save_usernameEntropyTable">{{ i18n.ts.save }}</MkButton>
+						</div>
+					</MkFolder>
+
+					<MkFolder>
 						<template #icon><i class="ti ti-message-exclamation"></i></template>
 						<template #label>{{ i18n.ts.sensitiveWords }}</template>
 
@@ -158,6 +169,7 @@ const prohibitedWords = ref<string>('');
 const prohibitedWordsForNameOfUser = ref<string>('');
 const hiddenTags = ref<string>('');
 const preservedUsernames = ref<string>('');
+const usernameEntropyTable = ref<string>('');
 const prohibitedNotePattern = ref<any>(null);
 const blockedHosts = ref<string>('');
 const silencedHosts = ref<string>('');
@@ -172,6 +184,7 @@ async function init() {
 	prohibitedWordsForNameOfUser.value = meta.prohibitedWordsForNameOfUser.join('\n');
 	hiddenTags.value = meta.hiddenTags.join('\n');
 	preservedUsernames.value = meta.preservedUsernames.join('\n');
+	usernameEntropyTable.value = meta.usernameEntropyTable ? JSON.stringify(meta.usernameEntropyTable) : '';
 	prohibitedNotePattern.value = meta.prohibitedNotePattern;
 	blockedHosts.value = meta.blockedHosts.join('\n');
 	silencedHosts.value = meta.silencedHosts?.join('\n') ?? '';
@@ -197,6 +210,27 @@ function onChange_emailRequiredForSignup(value: boolean) {
 function save_preservedUsernames() {
 	os.apiWithDialog('admin/update-meta', {
 		preservedUsernames: preservedUsernames.value.split('\n'),
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
+function parse_usernameEntropyTable(): { result: 'ok', value } | { result: 'err', error } {
+	try {
+		return { result: 'ok', value: usernameEntropyTable.value !== '' ? JSON.parse(usernameEntropyTable.value) : null };
+	} catch (err) {
+		os.alert({ type: 'error', title: 'Json parse error', text: 'Could not parse as JSON' });
+		return { result: 'err', error: err };
+	}
+}
+
+function save_usernameEntropyTable() {
+	const table = parse_usernameEntropyTable();
+	if (table.result !== 'ok') {
+		return;
+	}
+	os.apiWithDialog('admin/update-meta', {
+		usernameEntropyTable: table.value,
 	}).then(() => {
 		fetchInstance(true);
 	});

@@ -8,6 +8,8 @@ import type { MiMeta } from '@/models/Meta.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { MetaService } from '@/core/MetaService.js';
+import { tryToEntropyTable } from '@/misc/string-entropy.js';
+import { ApiError } from '../../error.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -143,6 +145,7 @@ export const paramDef = {
 		serverRules: { type: 'array', items: { type: 'string' } },
 		bannedEmailDomains: { type: 'array', items: { type: 'string' } },
 		preservedUsernames: { type: 'array', items: { type: 'string' } },
+		usernameEntropyTable: { type: 'object', nullable: true },
 		manifestJsonOverride: { type: 'string' },
 		enableFanoutTimeline: { type: 'boolean' },
 		enableFanoutTimelineDbFallback: { type: 'boolean' },
@@ -242,6 +245,22 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 			if (ps.prohibitedNotePattern !== undefined) {
 				set.prohibitedNotePattern = ps.prohibitedNotePattern ?? {};
+			}
+			if (ps.usernameEntropyTable != null) {
+				const table = tryToEntropyTable(ps.usernameEntropyTable);
+				if (table == null) {
+					throw new ApiError({
+						message: 'Invalid param.',
+						code: 'INVALID_PARAM',
+						id: '0b5f1631-7c1a-41a6-b399-cce335f34d85',
+					}, {
+						param: 'usernameEntropyTable',
+						reason: 'cannot cast to EntropyTable',
+					});
+				}
+				set.usernameEntropyTable = table;
+			} else if (ps.usernameEntropyTable !== undefined) {
+				set.usernameEntropyTable = ps.usernameEntropyTable;
 			}
 			if (ps.themeColor !== undefined) {
 				set.themeColor = ps.themeColor;

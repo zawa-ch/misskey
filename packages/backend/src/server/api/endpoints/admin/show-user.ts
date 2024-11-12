@@ -4,13 +4,14 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import type { UsersRepository, SigninsRepository, UserProfilesRepository } from '@/models/_.js';
+import type { UsersRepository, SigninsRepository, UserProfilesRepository, MiMeta } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@/core/RoleService.js';
 import { RoleEntityService } from '@/core/entities/RoleEntityService.js';
 import { IdService } from '@/core/IdService.js';
 import { notificationRecieveConfig } from '@/models/json-schema/user.js';
+import { calcEntropy } from '@/misc/string-entropy.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -142,6 +143,10 @@ export const meta = {
 					ref: 'Signin',
 				},
 			},
+			usernameEntropy: {
+				type: 'number',
+				optional: false, nullable: true,
+			},
 			policies: {
 				type: 'object',
 				optional: false, nullable: false,
@@ -191,6 +196,9 @@ export const paramDef = {
 @Injectable()
 export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
 	constructor(
+		@Inject(DI.meta)
+		private instanceMeta: MiMeta,
+
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
@@ -249,6 +257,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				lastActiveDate: user.lastActiveDate ? user.lastActiveDate.toISOString() : null,
 				moderationNote: profile.moderationNote ?? '',
 				signins,
+				usernameEntropy: this.instanceMeta.usernameEntropyTable ? calcEntropy(user.username, this.instanceMeta.usernameEntropyTable) : null,
 				policies: await this.roleService.getUserPolicies(user.id),
 				roles: await this.roleEntityService.packMany(roles, me),
 				roleAssigns: roleAssigns.map(a => ({

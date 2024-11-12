@@ -204,6 +204,10 @@ export const meta = {
 					type: 'string',
 				},
 			},
+			usernameEntropyTable: {
+				type: 'object',
+				optional: false, nullable: true,
+			},
 			hcaptchaSecretKey: {
 				type: 'string',
 				optional: false, nullable: true,
@@ -605,6 +609,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				prohibitedWordsForNameOfUser: instance.prohibitedWordsForNameOfUser,
 				prohibitedNotePattern: instance.prohibitedNotePattern.type ? instance.prohibitedNotePattern : null,
 				preservedUsernames: instance.preservedUsernames,
+				usernameEntropyTable: instance.usernameEntropyTable,
 				hcaptchaSecretKey: instance.hcaptchaSecretKey,
 				mcaptchaSecretKey: instance.mcaptchaSecretKey,
 				recaptchaSecretKey: instance.recaptchaSecretKey,
