@@ -66,9 +66,13 @@ export function tryToEntropyTable(value: unknown): EntropyTable | null {
 }
 
 function isEntropyTable(value: unknown): boolean {
-	return typeof(value) === 'object' && value != null && (['_', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] as CharSet[]).every((i) => { return Object.entries(value).some((p) => { return p[0] === i && typeof(p[1]) === 'object' && p[1] != null && isEntropyRow(p[1]);}); });
+	return typeof(value) === 'object' && value != null && (['_', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] as CharSet[]).every((i) => { return Object.entries(value).some((p) => { return p[0] === i && isEntropyRow(p[1]);}); });
 }
 
-function isEntropyRow(value: object): boolean {
-	return (['_', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] as CharSet[]).every((i) => { return Object.entries(value).some((p) => p[0] === i && typeof(p[1]) === 'number'); });
+function isEntropyRow(value: unknown): boolean {
+	return typeof(value) === 'object' && value != null && (['_', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] as CharSet[]).every((i) => { return Object.entries(value).some((p) => p[0] === i && isEntropyValue(p[1])); });
+}
+
+function isEntropyValue(value: unknown): boolean {
+	return typeof(value) === 'number' && value >= 0;
 }
