@@ -53,6 +53,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<option value="tagCountMoreThanOrEq">{{ i18n.ts._role._condition.tagCountMoreThanOrEq }}</option>
 			<option value="tagCountLessThan">{{ i18n.ts._role._condition.tagCountLessThan }}</option>
 			<option value="hasTagMatchOf">{{ i18n.ts._role._condition.hasTagMatchOf }}</option>
+			<option value="hasFields">{{ i18n.ts._role._condition.hasFields }}</option>
+			<option value="fieldCountIs">{{ i18n.ts._role._condition.fieldCountIs }}</option>
+			<option value="fieldCountMoreThanOrEq">{{ i18n.ts._role._condition.fieldCountMoreThanOrEq }}</option>
+			<option value="fieldCountLessThanOrEq">{{ i18n.ts._role._condition.fieldCountLessThanOrEq }}</option>
+			<option value="hasFieldNameMatchOf">{{ i18n.ts._role._condition.hasFieldNameMatchOf }}</option>
+			<option value="hasFieldValueMatchOf">{{ i18n.ts._role._condition.hasFieldValueMatchOf }}</option>
 			<option value="and">{{ i18n.ts._role._condition.and }}</option>
 			<option value="or">{{ i18n.ts._role._condition.or }}</option>
 			<option value="not">{{ i18n.ts._role._condition.not }}</option>
@@ -93,10 +99,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #suffix>bit</template>
 	</MkInput>
 
-	<MkInput v-else-if="['followersLessThanOrEq', 'followersMoreThanOrEq', 'followingLessThanOrEq', 'followingMoreThanOrEq', 'notesLessThanOrEq', 'notesMoreThanOrEq', 'tagCountIs', 'tagCountMoreThanOrEq', 'tagCountLessThan'].includes(type)" v-model="v.value" type="number">
+	<MkInput v-else-if="['followersLessThanOrEq', 'followersMoreThanOrEq', 'followingLessThanOrEq', 'followingMoreThanOrEq', 'notesLessThanOrEq', 'notesMoreThanOrEq', 'tagCountIs', 'tagCountMoreThanOrEq', 'tagCountLessThan', 'fieldCountIs', 'fieldCountMoreThanOrEq', 'fieldCountLessThan'].includes(type)" v-model="v.value" type="number">
 	</MkInput>
 
-	<MkInput v-else-if="['usernameMatchOf', 'nameMatchOf', 'hostMatchOf', 'hasTagMatchOf', 'emailMatchOf'].includes(type)" v-model="v.pattern" type="text">
+	<MkInput v-else-if="['usernameMatchOf', 'nameMatchOf', 'hostMatchOf', 'hasTagMatchOf', 'emailMatchOf', 'hasFieldNameMatchOf', 'hasFieldValueMatchOf'].includes(type)" v-model="v.pattern" type="text">
 		<template #caption>{{ i18n.ts._role.patternEditDescription }}</template>
 	</MkInput>
 
@@ -183,6 +189,11 @@ const type = computed({
 		if (t === 'tagCountMoreThanOrEq') v.value.value = 10;
 		if (t === 'tagCountLessThan') v.value.value = 10;
 		if (t === 'hasTagMatchOf') v.value.pattern = '';
+		if (t === 'fieldCountIs') v.value.value = 4;
+		if (t === 'fieldCountMoreThanOrEq') v.value.value = 4;
+		if (t === 'fieldCountLessThan') v.value.value = 4;
+		if (t === 'hasFieldNameMatchOf') v.value.pattern = '';
+		if (t === 'hasFieldValueMatchOf') v.value.pattern = '';
 		v.value.type = t;
 	},
 });

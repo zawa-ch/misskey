@@ -430,6 +430,24 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				case 'hasTagMatchOf': {
 					return (user.tags).some(h => this.utilityService.isKeyWordIncluded(h, [value.pattern]));
 				}
+				case 'hasFields': {
+					return profile ? profile.fields.length > 0 : false;
+				}
+				case 'fieldCountIs': {
+					return profile ? (profile.fields.length) === value.value : false;
+				}
+				case 'fieldCountMoreThanOrEq': {
+					return profile ? (profile.fields.length) >= value.value : false;
+				}
+				case 'fieldCountLessThanOrEq': {
+					return profile ? (profile.fields.length) <= value.value : false;
+				}
+				case 'hasFieldNameMatchOf': {
+					return profile ? (profile.fields).some(h => this.utilityService.isKeyWordIncluded(h.name, [value.pattern])) : false;
+				}
+				case 'hasFieldValueMatchOf': {
+					return profile ? (profile.fields).some(h => this.utilityService.isKeyWordIncluded(h.value, [value.pattern])) : false;
+				}
 				default:
 					return false;
 			}

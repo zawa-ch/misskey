@@ -289,6 +289,35 @@ type CondFormulaValueHasHashtagMatchOf = {
 	pattern: string;
 };
 
+type CondFormulaValueHasFields = {
+	type: 'hasFields';
+};
+
+type CondFormulaValueHashFieldCountIs = {
+	type: 'fieldCountIs';
+	value: number;
+};
+
+type CondFormulaValueHashFieldCountMoreThanOrEq = {
+	type: 'fieldCountMoreThanOrEq';
+	value: number;
+};
+
+type CondFormulaValueHashFieldCountLessThanOrEq = {
+	type: 'fieldCountLessThanOrEq';
+	value: number;
+};
+
+type CondFormulaValueHasHashFieldNameMatchOf = {
+	type: 'hasFieldNameMatchOf';
+	pattern: string;
+};
+
+type CondFormulaValueHasHashFieldValueMatchOf = {
+	type: 'hasFieldValueMatchOf';
+	pattern: string;
+};
+
 export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueAnd |
 	CondFormulaValueOr |
@@ -338,7 +367,13 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueHashtagCountIs |
 	CondFormulaValueHashtagCountMoreThanOrEq |
 	CondFormulaValueHashtagCountLessThan |
-	CondFormulaValueHasHashtagMatchOf
+	CondFormulaValueHasHashtagMatchOf |
+	CondFormulaValueHasFields |
+	CondFormulaValueHashFieldCountIs |
+	CondFormulaValueHashFieldCountMoreThanOrEq |
+	CondFormulaValueHashFieldCountLessThanOrEq |
+	CondFormulaValueHasHashFieldNameMatchOf |
+	CondFormulaValueHasHashFieldValueMatchOf
 );
 
 @Entity('role')

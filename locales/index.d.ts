@@ -7216,6 +7216,30 @@ export interface Locale extends ILocale {
              */
             "hasTagMatchOf": string;
             /**
+             * フィールドを持つ
+             */
+            "hasFields": string;
+            /**
+             * フィールドの数が～に一致
+             */
+            "fieldCountIs": string;
+            /**
+             * フィールドの数が～以上
+             */
+            "fieldCountMoreThanOrEq": string;
+            /**
+             * フィールドの数が～以下
+             */
+            "fieldCountLessThanOrEq": string;
+            /**
+             * ラベルが〜にマッチするフィールドを含む
+             */
+            "hasFieldNameMatchOf": string;
+            /**
+             * 内容が〜にマッチするフィールドを含む
+             */
+            "hasFieldValueMatchOf": string;
+            /**
              * ～かつ～
              */
             "and": string;
