@@ -424,8 +424,8 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				case 'tagCountMoreThanOrEq': {
 					return (user.tags.length) >= value.value;
 				}
-				case 'tagCountLessThan': {
-					return (user.tags.length) < value.value;
+				case 'tagCountLessThanOrEq': {
+					return (user.tags.length) <= value.value;
 				}
 				case 'hasTagMatchOf': {
 					return (user.tags).some(h => this.utilityService.isKeyWordIncluded(h, [value.pattern]));

@@ -279,8 +279,8 @@ type CondFormulaValueHashtagCountMoreThanOrEq = {
 	value: number;
 };
 
-type CondFormulaValueHashtagCountLessThan = {
-	type: 'tagCountLessThan';
+type CondFormulaValueHashtagCountLessThanOrEq = {
+	type: 'tagCountLessThanOrEq';
 	value: number;
 };
 
@@ -366,7 +366,7 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueHasTags |
 	CondFormulaValueHashtagCountIs |
 	CondFormulaValueHashtagCountMoreThanOrEq |
-	CondFormulaValueHashtagCountLessThan |
+	CondFormulaValueHashtagCountLessThanOrEq |
 	CondFormulaValueHasHashtagMatchOf |
 	CondFormulaValueHasFields |
 	CondFormulaValueHashFieldCountIs |

@@ -51,7 +51,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<option value="hasTags">{{ i18n.ts._role._condition.hasTags }}</option>
 			<option value="tagCountIs">{{ i18n.ts._role._condition.tagCountIs }}</option>
 			<option value="tagCountMoreThanOrEq">{{ i18n.ts._role._condition.tagCountMoreThanOrEq }}</option>
-			<option value="tagCountLessThan">{{ i18n.ts._role._condition.tagCountLessThan }}</option>
+			<option value="tagCountLessThanOrEq">{{ i18n.ts._role._condition.tagCountLessThanOrEq }}</option>
 			<option value="hasTagMatchOf">{{ i18n.ts._role._condition.hasTagMatchOf }}</option>
 			<option value="hasFields">{{ i18n.ts._role._condition.hasFields }}</option>
 			<option value="fieldCountIs">{{ i18n.ts._role._condition.fieldCountIs }}</option>
@@ -99,7 +99,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #suffix>bit</template>
 	</MkInput>
 
-	<MkInput v-else-if="['followersLessThanOrEq', 'followersMoreThanOrEq', 'followingLessThanOrEq', 'followingMoreThanOrEq', 'notesLessThanOrEq', 'notesMoreThanOrEq', 'tagCountIs', 'tagCountMoreThanOrEq', 'tagCountLessThan', 'fieldCountIs', 'fieldCountMoreThanOrEq', 'fieldCountLessThan'].includes(type)" v-model="v.value" type="number">
+	<MkInput v-else-if="['followersLessThanOrEq', 'followersMoreThanOrEq', 'followingLessThanOrEq', 'followingMoreThanOrEq', 'notesLessThanOrEq', 'notesMoreThanOrEq', 'tagCountIs', 'tagCountMoreThanOrEq', 'tagCountLessThanOrEq', 'fieldCountIs', 'fieldCountMoreThanOrEq', 'fieldCountLessThan'].includes(type)" v-model="v.value" type="number">
 	</MkInput>
 
 	<MkInput v-else-if="['usernameMatchOf', 'nameMatchOf', 'hostMatchOf', 'hasTagMatchOf', 'emailMatchOf', 'hasFieldNameMatchOf', 'hasFieldValueMatchOf'].includes(type)" v-model="v.pattern" type="text">
@@ -187,7 +187,7 @@ const type = computed({
 		if (t === 'bannerLikelyBlurhash') v.value.diff = 0;
 		if (t === 'tagCountIs') v.value.value = 10;
 		if (t === 'tagCountMoreThanOrEq') v.value.value = 10;
-		if (t === 'tagCountLessThan') v.value.value = 10;
+		if (t === 'tagCountLessThanOrEq') v.value.value = 10;
 		if (t === 'hasTagMatchOf') v.value.pattern = '';
 		if (t === 'fieldCountIs') v.value.value = 4;
 		if (t === 'fieldCountMoreThanOrEq') v.value.value = 4;

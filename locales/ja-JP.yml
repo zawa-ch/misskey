@@ -1860,7 +1860,7 @@ _role:
     hasTags: "タグを含む"
     tagCountIs: "タグの数が～に一致"
     tagCountMoreThanOrEq: "タグの数が～以上"
-    tagCountLessThan: "タグの数が～未満"
+    tagCountLessThanOrEq: "タグの数が～以下"
     hasTagMatchOf: "〜にマッチするタグを含む"
     hasFields: "フィールドを持つ"
     fieldCountIs: "フィールドの数が～に一致"

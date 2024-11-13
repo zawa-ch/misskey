@@ -7208,9 +7208,9 @@ export interface Locale extends ILocale {
              */
             "tagCountMoreThanOrEq": string;
             /**
-             * タグの数が～未満
+             * タグの数が～以下
              */
-            "tagCountLessThan": string;
+            "tagCountLessThanOrEq": string;
             /**
              * 〜にマッチするタグを含む
              */
