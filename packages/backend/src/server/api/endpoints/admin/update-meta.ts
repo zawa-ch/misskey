@@ -145,6 +145,7 @@ export const paramDef = {
 		serverRules: { type: 'array', items: { type: 'string' } },
 		bannedEmailDomains: { type: 'array', items: { type: 'string' } },
 		preservedUsernames: { type: 'array', items: { type: 'string' } },
+		preservedWordsForUsername: { type: 'array', items: { type: 'string' } },
 		usernameEntropyTable: { type: 'object', nullable: true },
 		manifestJsonOverride: { type: 'string' },
 		enableFanoutTimeline: { type: 'boolean' },
@@ -620,6 +621,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.preservedUsernames !== undefined) {
 				set.preservedUsernames = ps.preservedUsernames;
+			}
+			if (ps.preservedWordsForUsername !== undefined) {
+				set.preservedWordsForUsername = ps.preservedWordsForUsername;
 			}
 
 			if (ps.manifestJsonOverride !== undefined) {

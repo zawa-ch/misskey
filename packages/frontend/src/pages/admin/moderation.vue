@@ -34,6 +34,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkFolder>
 
 					<MkFolder>
+						<template #icon><i class="ti ti-lock-star"></i></template>
+						<template #label>{{ i18n.ts.preservedWordsForUsername }}</template>
+
+						<div class="_gaps">
+							<MkTextarea v-model="preservedWordsForUsername">
+								<template #caption>{{ i18n.ts.preservedWordsForUsernameDescription }}<br/><b>{{ i18n.ts.preservedWordsForUsernameWarning }}</b></template>
+							</MkTextarea>
+							<MkButton primary @click="save_preservedWordsForUsername">{{ i18n.ts.save }}</MkButton>
+						</div>
+					</MkFolder>
+
+					<MkFolder>
 						<template #label>{{ i18n.ts.usernameEntropyTable }}</template>
 
 						<div class="_gaps">
@@ -169,6 +181,7 @@ const prohibitedWords = ref<string>('');
 const prohibitedWordsForNameOfUser = ref<string>('');
 const hiddenTags = ref<string>('');
 const preservedUsernames = ref<string>('');
+const preservedWordsForUsername = ref<string>('');
 const usernameEntropyTable = ref<string>('');
 const prohibitedNotePattern = ref<any>(null);
 const blockedHosts = ref<string>('');
@@ -184,6 +197,7 @@ async function init() {
 	prohibitedWordsForNameOfUser.value = meta.prohibitedWordsForNameOfUser.join('\n');
 	hiddenTags.value = meta.hiddenTags.join('\n');
 	preservedUsernames.value = meta.preservedUsernames.join('\n');
+	preservedWordsForUsername.value = meta.preservedWordsForUsername.join('\n');
 	usernameEntropyTable.value = meta.usernameEntropyTable ? JSON.stringify(meta.usernameEntropyTable) : '';
 	prohibitedNotePattern.value = meta.prohibitedNotePattern;
 	blockedHosts.value = meta.blockedHosts.join('\n');
@@ -210,6 +224,14 @@ function onChange_emailRequiredForSignup(value: boolean) {
 function save_preservedUsernames() {
 	os.apiWithDialog('admin/update-meta', {
 		preservedUsernames: preservedUsernames.value.split('\n'),
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
+function save_preservedWordsForUsername() {
+	os.apiWithDialog('admin/update-meta', {
+		preservedWordsForUsername: preservedWordsForUsername.value.split('\n'),
 	}).then(() => {
 		fetchInstance(true);
 	});

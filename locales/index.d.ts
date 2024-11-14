@@ -4547,6 +4547,18 @@ export interface Locale extends ILocale {
      */
     "preservedUsernamesDescription": string;
     /**
+     * ユーザー名予約ワード
+     */
+    "preservedWordsForUsername": string;
+    /**
+     * 指定したワードを含むユーザー名を予約します。ここで指定された文字列を含むユーザー名はアカウント作成時に使えなくなりますが、管理者によるアカウント作成時はこの制限を受けません。また、既に存在するアカウントも影響を受けません。改行で区切って複数指定できます。スペースで区切るとAND指定になり、キーワードをスラッシュで囲むと正規表現になります。
+     */
+    "preservedWordsForUsernameDescription": string;
+    /**
+     * 警告: 入力した値に誤りがないことをダブルチェックしてください！この機能を誤って設定すると、ほとんど、もしくはすべてのユーザー名が予約され使用できなくなる可能性があります。
+     */
+    "preservedWordsForUsernameWarning": string;
+    /**
      * ユーザー名の情報量計算用テーブル
      */
     "usernameEntropyTable": string;
