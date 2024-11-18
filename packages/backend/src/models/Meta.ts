@@ -593,11 +593,6 @@ export class MiMeta {
 	})
 	public preservedUsernames: string[];
 
-	@Column('varchar', {
-		length: 1024, array: true, default: '{ }',
-	})
-	public preservedWordsForUsername: string[];
-
 	@Column('boolean', {
 		default: true,
 	})

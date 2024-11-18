@@ -9,7 +9,6 @@ import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@/models/
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { localUsernameSchema } from '@/models/User.js';
 import { DI } from '@/di-symbols.js';
-import { UtilityService } from '@/core/UtilityService.js';
 
 export const meta = {
 	tags: ['users'],
@@ -47,8 +46,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 		@Inject(DI.usedUsernamesRepository)
 		private usedUsernamesRepository: UsedUsernamesRepository,
-
-		private utilityService: UtilityService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const exist = await this.usersRepository.countBy({
@@ -58,7 +55,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			const exist2 = await this.usedUsernamesRepository.countBy({ username: ps.username.toLowerCase() });
 
-			const isPreserved = this.serverSettings.preservedUsernames.map(x => x.toLowerCase()).includes(ps.username.toLowerCase()) || this.utilityService.isKeyWordIncluded(ps.username.toLowerCase(), this.serverSettings.preservedWordsForUsername);
+			const isPreserved = this.serverSettings.preservedUsernames.map(x => x.toLowerCase()).includes(ps.username.toLowerCase());
 
 			return {
 				available: exist === 0 && exist2 === 0 && !isPreserved,

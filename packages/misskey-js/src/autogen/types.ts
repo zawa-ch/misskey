@@ -5193,7 +5193,6 @@ export type operations = {
             bannedEmailDomains?: string[];
             bannedEmails?: string[];
             preservedUsernames: string[];
-            preservedWordsForUsername: string[];
             usernameEntropyTable: Record<string, never> | null;
             hcaptchaSecretKey: string | null;
             mcaptchaSecretKey: string | null;
@@ -9625,7 +9624,6 @@ export type operations = {
           bannedEmailDomains?: string[];
           bannedEmails?: string[];
           preservedUsernames?: string[];
-          preservedWordsForUsername?: string[];
           usernameEntropyTable?: Record<string, never> | null;
           manifestJsonOverride?: string;
           enableFanoutTimeline?: boolean;

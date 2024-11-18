@@ -212,13 +212,6 @@ export const meta = {
 					type: 'string',
 				},
 			},
-			preservedWordsForUsername: {
-				type: 'array',
-				optional: false, nullable: false,
-				items: {
-					type: 'string',
-				},
-			},
 			usernameEntropyTable: {
 				type: 'object',
 				optional: false, nullable: true,
@@ -624,7 +617,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				prohibitedWordsForNameOfUser: instance.prohibitedWordsForNameOfUser,
 				prohibitedNotePattern: instance.prohibitedNotePattern.type ? instance.prohibitedNotePattern : null,
 				preservedUsernames: instance.preservedUsernames,
-				preservedWordsForUsername: instance.preservedWordsForUsername,
 				usernameEntropyTable: instance.usernameEntropyTable,
 				hcaptchaSecretKey: instance.hcaptchaSecretKey,
 				mcaptchaSecretKey: instance.mcaptchaSecretKey,

@@ -89,7 +89,7 @@ export class SignupService {
 		const isTheFirstUser = !await this.instanceActorService.realLocalUsersPresent();
 
 		if (!opts.ignorePreservedUsernames && !isTheFirstUser) {
-			const isPreserved = this.meta.preservedUsernames.map(x => x.toLowerCase()).includes(username.toLowerCase()) || this.utilityService.isKeyWordIncluded(username.toLowerCase(), this.meta.preservedWordsForUsername);
+			const isPreserved = this.meta.preservedUsernames.map(x => x.toLowerCase()).includes(username.toLowerCase());
 			if (isPreserved) {
 				throw new Error('USED_USERNAME');
 			}

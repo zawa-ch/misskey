@@ -18,7 +18,6 @@ import { MiLocalUser } from '@/models/User.js';
 import { FastifyReplyError } from '@/misc/fastify-reply-error.js';
 import { bindThis } from '@/decorators.js';
 import { L_CHARS, secureRndstr } from '@/misc/secure-rndstr.js';
-import { UtilityService } from '@/core/UtilityService.js';
 import { SigninService } from './SigninService.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 
@@ -46,7 +45,6 @@ export class SignupApiService {
 		@Inject(DI.registrationTicketsRepository)
 		private registrationTicketsRepository: RegistrationTicketsRepository,
 
-		private utilityService: UtilityService,
 		private userEntityService: UserEntityService,
 		private idService: IdService,
 		private captchaService: CaptchaService,
@@ -180,7 +178,7 @@ export class SignupApiService {
 				throw new FastifyReplyError(400, 'USED_USERNAME');
 			}
 
-			const isPreserved = this.meta.preservedUsernames.map(x => x.toLowerCase()).includes(username.toLowerCase()) || this.utilityService.isKeyWordIncluded(username.toLowerCase(), this.meta.preservedWordsForUsername);
+			const isPreserved = this.meta.preservedUsernames.map(x => x.toLowerCase()).includes(username.toLowerCase());
 			if (isPreserved) {
 				throw new FastifyReplyError(400, 'DENIED_USERNAME');
 			}
