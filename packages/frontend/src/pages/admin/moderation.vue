@@ -27,7 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 						<div class="_gaps">
 							<MkTextarea v-model="preservedUsernames">
-								<template #caption>{{ i18n.ts.preservedUsernamesDescription }}</template>
+								<template #caption>{{ i18n.ts.preservedUsernamesDescription }}<br/><b>{{ i18n.ts.preservedUsernamesWarning }}</b></template>
 							</MkTextarea>
 							<MkButton primary @click="save_preservedUsernames">{{ i18n.ts.save }}</MkButton>
 						</div>
