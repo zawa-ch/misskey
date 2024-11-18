@@ -102,6 +102,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkFolder>
 
 			<MkFolder>
+				<template #label>Banned Email Addresses</template>
+				<template v-if="bannedEmailsForm.modified.value" #footer>
+					<MkFormFooter :form="bannedEmailsForm"/>
+				</template>
+
+				<div class="_gaps_m">
+					<MkTextarea v-model="bannedEmailsForm.state.bannedEmails">
+						<template #label>Banned Email Addresses List</template>
+					</MkTextarea>
+				</div>
+			</MkFolder>
+
+			<MkFolder>
 				<template #label>Log IP address</template>
 				<template v-if="ipLoggingForm.savedState.enableIpLogging" #suffix>Enabled</template>
 				<template v-else #suffix>Disabled</template>
@@ -198,6 +211,15 @@ const bannedEmailDomainsForm = useForm({
 }, async (state) => {
 	await os.apiWithDialog('admin/update-meta', {
 		bannedEmailDomains: state.bannedEmailDomains.split('\n'),
+	});
+	fetchInstance(true);
+});
+
+const bannedEmailsForm = useForm({
+	bannedEmails: meta.bannedEmails?.join('\n') ?? '',
+}, async (state) => {
+	await os.apiWithDialog('admin/update-meta', {
+		bannedEmails: state.bannedEmails.split('\n'),
 	});
 	fetchInstance(true);
 });

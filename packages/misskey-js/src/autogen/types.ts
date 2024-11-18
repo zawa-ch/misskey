@@ -5191,6 +5191,7 @@ export type operations = {
             prohibitedWordsForNameOfUser: string[];
             prohibitedNotePattern: components['schemas']['ProhibitedNoteFormulaValue'] | null;
             bannedEmailDomains?: string[];
+            bannedEmails?: string[];
             preservedUsernames: string[];
             preservedWordsForUsername: string[];
             usernameEntropyTable: Record<string, never> | null;
@@ -9622,6 +9623,7 @@ export type operations = {
           enableIdenticonGeneration?: boolean;
           serverRules?: string[];
           bannedEmailDomains?: string[];
+          bannedEmails?: string[];
           preservedUsernames?: string[];
           preservedWordsForUsername?: string[];
           usernameEntropyTable?: Record<string, never> | null;

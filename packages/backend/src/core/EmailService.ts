@@ -215,7 +215,7 @@ export class EmailService {
 		}
 
 		const emailDomain: string = emailAddress.split('@')[1];
-		const isBanned = this.utilityService.isBlockedHost(this.meta.bannedEmailDomains, emailDomain);
+		const isBanned = this.utilityService.isBlockedHost(this.meta.bannedEmailDomains, emailDomain) || this.utilityService.isMatchKeywords(emailAddress, this.meta.bannedEmails, 'identical');
 
 		if (isBanned) {
 			return {

@@ -144,6 +144,7 @@ export const paramDef = {
 		enableIdenticonGeneration: { type: 'boolean' },
 		serverRules: { type: 'array', items: { type: 'string' } },
 		bannedEmailDomains: { type: 'array', items: { type: 'string' } },
+		bannedEmails: { type: 'array', items: { type: 'string' } },
 		preservedUsernames: { type: 'array', items: { type: 'string' } },
 		preservedWordsForUsername: { type: 'array', items: { type: 'string' } },
 		usernameEntropyTable: { type: 'object', nullable: true },
@@ -664,6 +665,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.bannedEmailDomains !== undefined) {
 				set.bannedEmailDomains = ps.bannedEmailDomains;
+			}
+
+			if (ps.bannedEmails !== undefined) {
+				set.bannedEmails = ps.bannedEmails;
 			}
 
 			if (ps.urlPreviewEnabled !== undefined) {
