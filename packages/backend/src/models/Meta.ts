@@ -4,6 +4,7 @@
  */
 
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { EntropyTable } from '@/misc/string-entropy.js';
 import { id } from './util/id.js';
 import { MiUser } from './User.js';
 import type { ProhibitedNoteFormulaValue } from './ProhibitedNoteFormula.js';
@@ -101,6 +102,11 @@ export class MiMeta {
 		length: 1024, array: true, default: '{}',
 	})
 	public mediaSilencedHosts: string[];
+
+	@Column('jsonb', {
+		nullable: true,
+	})
+	public usernameEntropyTable: EntropyTable | null;
 
 	@Column('varchar', {
 		length: 1024,
@@ -574,6 +580,13 @@ export class MiMeta {
 		default: '{}',
 	})
 	public bannedEmailDomains: string[];
+
+	@Column('varchar', {
+		length: 1024,
+		array: true,
+		default: '{}',
+	})
+	public bannedEmails: string[];
 
 	@Column('varchar', {
 		length: 1024, array: true, default: '{ "admin", "administrator", "root", "system", "maintainer", "host", "mod", "moderator", "owner", "superuser", "staff", "auth", "i", "me", "everyone", "all", "mention", "mentions", "example", "user", "users", "account", "accounts", "official", "help", "helps", "support", "supports", "info", "information", "informations", "announce", "announces", "announcement", "announcements", "notice", "notification", "notifications", "dev", "developer", "developers", "tech", "misskey" }',

@@ -301,7 +301,7 @@ function removeSelf() {
 	.caption {
 		font-size: 0.85em;
 		padding: 8px 0 0 0;
-		color: var(--fgTransparentWeak);
+		color: var(--MI_THEME-fgTransparentWeak);
 
 		&:empty {
 			display: none;
@@ -309,12 +309,12 @@ function removeSelf() {
 	}
 
 	.item {
-		border: solid 2px var(--divider);
-		border-radius: var(--radius);
+		border: solid 2px var(--MI_THEME-divider);
+		border-radius: var(--MI_THEME-radius);
 		padding: 12px;
 
 		&:hover {
-			border-color: var(--accent);
+			border-color: var(--MI_THEME-accent);
 		}
 	}
 	</style>

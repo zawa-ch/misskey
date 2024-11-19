@@ -197,12 +197,24 @@ export const meta = {
 					optional: false, nullable: false,
 				},
 			},
+			bannedEmails: {
+				type: 'array',
+				optional: true, nullable: false,
+				items: {
+					type: 'string',
+					optional: false, nullable: false,
+				},
+			},
 			preservedUsernames: {
 				type: 'array',
 				optional: false, nullable: false,
 				items: {
 					type: 'string',
 				},
+			},
+			usernameEntropyTable: {
+				type: 'object',
+				optional: false, nullable: true,
 			},
 			hcaptchaSecretKey: {
 				type: 'string',
@@ -605,6 +617,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				prohibitedWordsForNameOfUser: instance.prohibitedWordsForNameOfUser,
 				prohibitedNotePattern: instance.prohibitedNotePattern.type ? instance.prohibitedNotePattern : null,
 				preservedUsernames: instance.preservedUsernames,
+				usernameEntropyTable: instance.usernameEntropyTable,
 				hcaptchaSecretKey: instance.hcaptchaSecretKey,
 				mcaptchaSecretKey: instance.mcaptchaSecretKey,
 				recaptchaSecretKey: instance.recaptchaSecretKey,
@@ -649,6 +662,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				enableServerMachineStats: instance.enableServerMachineStats,
 				enableIdenticonGeneration: instance.enableIdenticonGeneration,
 				bannedEmailDomains: instance.bannedEmailDomains,
+				bannedEmails: instance.bannedEmails,
 				policies: { ...DEFAULT_POLICIES, ...instance.policies },
 				manifestJsonOverride: instance.manifestJsonOverride,
 				enableFanoutTimeline: instance.enableFanoutTimeline,

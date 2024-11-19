@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { decode } from 'blurhash';
 import { MiNote } from '@/models/Note.js';
 import { MiDriveFile } from '@/models/DriveFile.js';
@@ -12,8 +12,9 @@ import type { ProhibitedNoteFormulaValue } from '@/models/ProhibitedNoteFormula.
 import { MiUser } from '@/models/User.js';
 import { FILE_TYPE_BROWSERSAFE } from '@/const.js';
 import { MiRole } from '@/models/Role.js';
+import { DI } from '@/di-symbols.js';
+import { MiMeta } from '@/models/Meta.js';
 import { RoleService } from './RoleService.js';
-import { MetaService } from './MetaService.js';
 import { UtilityService } from './UtilityService.js';
 
 type InspectionSubject = {
@@ -29,7 +30,9 @@ type InspectionSubject = {
 @Injectable()
 export class NoteProhibitService {
 	constructor(
-		private metaService: MetaService,
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 		private roleService: RoleService,
 		private utilityService: UtilityService,
 	) {
@@ -37,7 +40,7 @@ export class NoteProhibitService {
 
 	@bindThis
 	public async isProhibitedNote(subject: InspectionSubject): Promise<boolean> {
-		const formula = (await this.metaService.fetch()).prohibitedNotePattern;
+		const formula = this.meta.prohibitedNotePattern;
 		if (formula.type) {
 			const roles = await this.roleService.getUserRoles(subject.userId);
 			const bhash = subject.files?.filter(v => v.blurhash != null).map(v => { try { return decode(v.blurhash ?? '', 5, 5); } catch (e) { return null; }}).filter(v => v != null).map(v => v as Uint8ClampedArray) ?? [];

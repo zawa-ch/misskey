@@ -4543,9 +4543,21 @@ export interface Locale extends ILocale {
      */
     "preservedUsernames": string;
     /**
-     * 予約するユーザー名を改行で列挙します。ここで指定されたユーザー名はアカウント作成時に使えなくなりますが、管理者によるアカウント作成時はこの制限を受けません。また、既に存在するアカウントも影響を受けません。
+     * 予約するユーザー名を改行で列挙します。ここで指定されたユーザー名はアカウント作成時に使えなくなりますが、管理者によるアカウント作成時はこの制限を受けません。また、既に存在するアカウントも影響を受けません。キーワードをスラッシュで囲むと正規表現になります。
      */
     "preservedUsernamesDescription": string;
+    /**
+     * 警告: 正規表現を使用する場合、入力した値に誤りがないことをダブルチェックしてください！この機能を誤って設定すると、ほとんど、もしくはすべてのユーザー名が予約され使用できなくなる可能性があります。
+     */
+    "preservedUsernamesWarning": string;
+    /**
+     * ユーザー名の情報量計算用テーブル
+     */
+    "usernameEntropyTable": string;
+    /**
+     * ユーザー名の情報量を計算するためのテーブルを指定します。内容はjsonで、すべてのアルファベット小文字、"0"、"_"を二重に要素に持つオブジェクトとして定義されます(e.g. { "_": { "_": 4.7, ... }, ... })。外側のオブジェクトが事前条件、内側のオブジェクトが事後条件を表し、それぞれの要素がその情報量(シャノン単位)を持ちます。このテーブルは一部のロールコンディションで使用されます。内容を空にすることで、設定したテーブルをクリアします。
+     */
+    "usernameEntropyTableDescription": string;
     /**
      * このファイルからノートを作成
      */
@@ -7032,6 +7044,22 @@ export interface Locale extends ILocale {
              */
             "usernameMatchOf": string;
             /**
+             * ユーザー名の情報量が〜以上
+             */
+            "usernameEntropyMoreThanOrEq": string;
+            /**
+             * ユーザー名の情報量が〜以下
+             */
+            "usernameEntropyLessThanOrEq": string;
+            /**
+             * ユーザー名の文字あたりの情報量が〜以上
+             */
+            "usernameEntropyMeanMoreThanOrEq": string;
+            /**
+             * ユーザー名の文字あたりの情報量が〜以下
+             */
+            "usernameEntropyMeanLessThanOrEq": string;
+            /**
              * ユーザーの表示名が〜にマッチ
              */
             "nameMatchOf": string;
@@ -7184,13 +7212,37 @@ export interface Locale extends ILocale {
              */
             "tagCountMoreThanOrEq": string;
             /**
-             * タグの数が～未満
+             * タグの数が～以下
              */
-            "tagCountLessThan": string;
+            "tagCountLessThanOrEq": string;
             /**
              * 〜にマッチするタグを含む
              */
             "hasTagMatchOf": string;
+            /**
+             * フィールドを持つ
+             */
+            "hasFields": string;
+            /**
+             * フィールドの数が～に一致
+             */
+            "fieldCountIs": string;
+            /**
+             * フィールドの数が～以上
+             */
+            "fieldCountMoreThanOrEq": string;
+            /**
+             * フィールドの数が～以下
+             */
+            "fieldCountLessThanOrEq": string;
+            /**
+             * ラベルが〜にマッチするフィールドを含む
+             */
+            "hasFieldNameMatchOf": string;
+            /**
+             * 内容が〜にマッチするフィールドを含む
+             */
+            "hasFieldValueMatchOf": string;
             /**
              * ～かつ～
              */

@@ -202,6 +202,26 @@ type CondFormulaValueUsernameMatchOf = {
 	pattern: string;
 };
 
+type CondFormulaValueUsernameEntropyMoreThanOrEq = {
+	type: 'usernameEntropyMoreThanOrEq';
+	value: number;
+};
+
+type CondFormulaValueUsernameEntropyLessThanOrEq = {
+	type: 'usernameEntropyLessThanOrEq';
+	value: number;
+};
+
+type CondFormulaValueUsernameEntropyMeanMoreThanOrEq = {
+	type: 'usernameEntropyMeanMoreThanOrEq';
+	value: number;
+};
+
+type CondFormulaValueUsernameEntropyMeanLessThanOrEq = {
+	type: 'usernameEntropyMeanLessThanOrEq';
+	value: number;
+};
+
 type CondFormulaValueHostMatchOf = {
 	type: 'hostMatchOf';
 	pattern: string;
@@ -259,13 +279,42 @@ type CondFormulaValueHashtagCountMoreThanOrEq = {
 	value: number;
 };
 
-type CondFormulaValueHashtagCountLessThan = {
-	type: 'tagCountLessThan';
+type CondFormulaValueHashtagCountLessThanOrEq = {
+	type: 'tagCountLessThanOrEq';
 	value: number;
 };
 
 type CondFormulaValueHasHashtagMatchOf = {
 	type: 'hasTagMatchOf';
+	pattern: string;
+};
+
+type CondFormulaValueHasFields = {
+	type: 'hasFields';
+};
+
+type CondFormulaValueHashFieldCountIs = {
+	type: 'fieldCountIs';
+	value: number;
+};
+
+type CondFormulaValueHashFieldCountMoreThanOrEq = {
+	type: 'fieldCountMoreThanOrEq';
+	value: number;
+};
+
+type CondFormulaValueHashFieldCountLessThanOrEq = {
+	type: 'fieldCountLessThanOrEq';
+	value: number;
+};
+
+type CondFormulaValueHasHashFieldNameMatchOf = {
+	type: 'hasFieldNameMatchOf';
+	pattern: string;
+};
+
+type CondFormulaValueHasHashFieldValueMatchOf = {
+	type: 'hasFieldValueMatchOf';
 	pattern: string;
 };
 
@@ -301,6 +350,10 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueNotesLessThanOrEq |
 	CondFormulaValueNotesMoreThanOrEq |
 	CondFormulaValueUsernameMatchOf |
+	CondFormulaValueUsernameEntropyMoreThanOrEq |
+	CondFormulaValueUsernameEntropyLessThanOrEq |
+	CondFormulaValueUsernameEntropyMeanMoreThanOrEq |
+	CondFormulaValueUsernameEntropyMeanLessThanOrEq |
 	CondFormulaValueHostMatchOf |
 	CondFormulaValueNameMatchOf |
 	CondFormulaValueNameIsDefault |
@@ -313,8 +366,14 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueHasTags |
 	CondFormulaValueHashtagCountIs |
 	CondFormulaValueHashtagCountMoreThanOrEq |
-	CondFormulaValueHashtagCountLessThan |
-	CondFormulaValueHasHashtagMatchOf
+	CondFormulaValueHashtagCountLessThanOrEq |
+	CondFormulaValueHasHashtagMatchOf |
+	CondFormulaValueHasFields |
+	CondFormulaValueHashFieldCountIs |
+	CondFormulaValueHashFieldCountMoreThanOrEq |
+	CondFormulaValueHashFieldCountLessThanOrEq |
+	CondFormulaValueHasHashFieldNameMatchOf |
+	CondFormulaValueHasHashFieldValueMatchOf
 );
 
 @Entity('role')

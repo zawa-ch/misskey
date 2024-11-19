@@ -5191,7 +5191,9 @@ export type operations = {
             prohibitedWordsForNameOfUser: string[];
             prohibitedNotePattern: components['schemas']['ProhibitedNoteFormulaValue'] | null;
             bannedEmailDomains?: string[];
+            bannedEmails?: string[];
             preservedUsernames: string[];
+            usernameEntropyTable: Record<string, never> | null;
             hcaptchaSecretKey: string | null;
             mcaptchaSecretKey: string | null;
             recaptchaSecretKey: string | null;
@@ -9291,6 +9293,7 @@ export type operations = {
             lastActiveDate: string | null;
             moderationNote: string;
             signins: components['schemas']['Signin'][];
+            usernameEntropy: number | null;
             policies: components['schemas']['RolePolicies'];
             roles: components['schemas']['Role'][];
             roleAssigns: ({
@@ -9619,7 +9622,9 @@ export type operations = {
           enableIdenticonGeneration?: boolean;
           serverRules?: string[];
           bannedEmailDomains?: string[];
+          bannedEmails?: string[];
           preservedUsernames?: string[];
+          usernameEntropyTable?: Record<string, never> | null;
           manifestJsonOverride?: string;
           enableFanoutTimeline?: boolean;
           enableFanoutTimelineDbFallback?: boolean;

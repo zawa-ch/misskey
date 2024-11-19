@@ -34,6 +34,7 @@ import type { Packed } from '@/misc/json-schema.js';
 import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import type { Config } from '@/config.js';
+import { calcEntropy } from '@/misc/string-entropy.js';
 import { FederatedInstanceService } from './FederatedInstanceService.js';
 import { UtilityService } from './UtilityService.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
@@ -361,6 +362,18 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				case 'usernameMatchOf': {
 					return this.utilityService.isKeyWordIncluded(user.username, [value.pattern]);
 				}
+				case 'usernameEntropyMoreThanOrEq': {
+					return this.meta.usernameEntropyTable ? calcEntropy(user.username, this.meta.usernameEntropyTable) >= value.value : false;
+				}
+				case 'usernameEntropyLessThanOrEq': {
+					return this.meta.usernameEntropyTable ? calcEntropy(user.username, this.meta.usernameEntropyTable) <= value.value : false;
+				}
+				case 'usernameEntropyMeanMoreThanOrEq': {
+					return this.meta.usernameEntropyTable ? calcEntropy(user.username, this.meta.usernameEntropyTable) / user.username.length >= value.value : false;
+				}
+				case 'usernameEntropyMeanLessThanOrEq': {
+					return this.meta.usernameEntropyTable ? calcEntropy(user.username, this.meta.usernameEntropyTable) / user.username.length <= value.value : false;
+				}
 				case 'hostMatchOf': {
 					return instance !== null && this.utilityService.isKeyWordIncluded(instance.host, [value.pattern]);
 				}
@@ -411,11 +424,29 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				case 'tagCountMoreThanOrEq': {
 					return (user.tags.length) >= value.value;
 				}
-				case 'tagCountLessThan': {
-					return (user.tags.length) < value.value;
+				case 'tagCountLessThanOrEq': {
+					return (user.tags.length) <= value.value;
 				}
 				case 'hasTagMatchOf': {
 					return (user.tags).some(h => this.utilityService.isKeyWordIncluded(h, [value.pattern]));
+				}
+				case 'hasFields': {
+					return profile ? profile.fields.length > 0 : false;
+				}
+				case 'fieldCountIs': {
+					return profile ? (profile.fields.length) === value.value : false;
+				}
+				case 'fieldCountMoreThanOrEq': {
+					return profile ? (profile.fields.length) >= value.value : false;
+				}
+				case 'fieldCountLessThanOrEq': {
+					return profile ? (profile.fields.length) <= value.value : false;
+				}
+				case 'hasFieldNameMatchOf': {
+					return profile ? (profile.fields).some(h => this.utilityService.isKeyWordIncluded(h.name, [value.pattern])) : false;
+				}
+				case 'hasFieldValueMatchOf': {
+					return profile ? (profile.fields).some(h => this.utilityService.isKeyWordIncluded(h.value, [value.pattern])) : false;
 				}
 				default:
 					return false;
